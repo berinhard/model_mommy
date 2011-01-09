@@ -1,5 +1,4 @@
 # Creating objects for testing shouldn't hurt
------------------------------------------------------------
 
 model_mommy is a tool for creating objects for testing in Django, inspired in ruby's ObjectDaddy and FactoryGirl.
 It generate the values according with the field type, but it supports custom values as well.
@@ -37,4 +36,4 @@ when you do:
 it will also create the Kid, automatically.
 
 ##Currently supports the fields:
-CharField, TextField, FloatField, ForeignKey, and all the integer-type Fields
+CharField, TextField, FloatField, ForeignKey, DateField, and all the integer-type Fields
