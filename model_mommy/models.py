@@ -1,4 +1,10 @@
 #coding: utf-8
+
+#######################################
+# TESTING PURPOSE ONLY MODELS!!       #
+# DO NOT ADD THE APP TO INSTALLED_APPS#
+#######################################
+
 from django.db import models
 
 class Kid(models.Model):
