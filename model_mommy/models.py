@@ -26,7 +26,6 @@ class DummyIntModel(models.Model):
 
 class DummyNumbersModel(models.Model):
     float_field = models.FloatField(null=True)
-    decimal_field = models.DecimalField(max_digits=4, decimal_places=2, null=True)
 
 
 

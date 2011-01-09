@@ -93,8 +93,3 @@ class FillingOthersNumericFields(TestCase):
         self.assertTrue(isinstance(float_field, FloatField))
         self.assertTrue(isinstance(self.dummy_numbers_model.float_field, float))
 
-    def _test_filling_DecimalField_with_a_random_decimal(self):
-        self.dummy_numbers_model = mommy.make_one(DummyNumbersModel)
-        decimal_field = DummyNumbersModel._meta.get_field('decimal_field')
-        self.assertTrue(isinstance(decimal_field, DecimalField))
-        self.assertTrue(isinstance(self.dummy_numbers_model.decimal_field, Decimal))
