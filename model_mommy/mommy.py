@@ -67,7 +67,7 @@ class Mommy(object):
     
     def generate_value(self, field):
         'Calls the generator associated with a field passing all required args.'
-        if self.attr_mapping is not None:
+        if self.attr_mapping is not None and field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
         else:
             generator = self.type_mapping[field.__class__]

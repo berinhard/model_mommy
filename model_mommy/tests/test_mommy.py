@@ -13,6 +13,31 @@ class FieldFillingTestCase(TestCase):
         
         self.kid = mommy.make_one(Kid)
 
+class SimpleExtendMommy(TestCase):
+    def test_simple_extended_mommy_example(self):
+        from model_mommy.mommy import Mommy
+        from model_mommy.models import Kid
+        
+        class Aunt(Mommy):
+            pass
+        
+        aunt = Aunt(Kid)
+        self.cousin = aunt.make_one()
+        
+    def test_mommy_with_custom_generator(self):
+        from model_mommy.mommy import Mommy
+        from model_mommy.models import Dog
+        from model_mommy.generators import gen_from_list
+        
+        dog_breed = ['collie', 'bulldog', 'poodle']
+        
+        class DogMommy(Mommy):
+            attr_mapping = {'breed':lambda: gen_from_list(dog_breed)}
+        
+        mom = DogMommy(Dog)
+        dog = mom.make_one()
+        self.assertTrue(dog.breed in dog_breed)
+        
 class MommyCreatesSimpleModel(TestCase):
 
     def test_make_one_should_create_one_object(self):

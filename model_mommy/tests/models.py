@@ -17,7 +17,8 @@ class Kid(models.Model):
     appointment = models.DateTimeField()
 
 class Dog(models.Model):
-    owner = models.ForeignKey('Kid')
+    owner = models.ForeignKey('Kid')    
+    breed = models.CharField(max_length=50)
 
 class DummyIntModel(models.Model):
     int_field = models.IntegerField()
