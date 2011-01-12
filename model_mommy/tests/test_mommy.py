@@ -13,6 +13,26 @@ class FieldFillingTestCase(TestCase):
         
         self.kid = mommy.make_one(Kid)
 
+class FieldFillingWithParameterTestCase(TestCase):
+    def test_simple_creating_kid_with_paramter(self):
+        from model_mommy import mommy
+        from model_mommy.models import Kid
+        
+        kid = mommy.make_one(Kid, {'happy':True, 'age':10, 'name':'Mike'})
+        self.assertEqual(kid.age, 10)
+        self.assertEqual(kid.happy, True)
+        self.assertEqual(kid.name, 'Mike')
+    
+    def test_creating_kid_from_factory_using_paramter(self):
+        from model_mommy.mommy import Mommy
+        from model_mommy.models import Kid
+        
+        kid_mom = Mommy(Kid)
+        kid = kid_mom.make_one({'happy':False, 'age':20, 'name':'John'})
+        self.assertEqual(kid.age, 20)
+        self.assertEqual(kid.happy, False)
+        self.assertEqual(kid.name, 'John')
+        
 class SimpleExtendMommy(TestCase):
     def test_simple_extended_mommy_example(self):
         from model_mommy.mommy import Mommy
