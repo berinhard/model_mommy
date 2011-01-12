@@ -17,9 +17,9 @@ import sys
 
 MAX_LENGTH = 300
 
-def make_one(model):
+def make_one(model, attrs=None):
     mommy = Mommy(model)
-    return mommy.make_one()
+    return mommy.make_one(attrs or {})
 
 make_one.required = [lambda field: (field.related.parent_model, 'model')]
 
@@ -56,13 +56,15 @@ class Mommy(object):
         if self.model is None:
             raise ValueError("Mommy wants to know her kids better. Inform the 'model' class, sweetie!")
     
-    def make_one(self):
-        attrs = {}
+    def make_one(self, attrs=None):
+        attrs = attrs or {}
+        
         for field in self.model._meta.fields:
             if isinstance(field, AutoField):
                 continue
             
-            attrs[field.name] = self.generate_value(field)
+            if field.name not in attrs:
+                attrs[field.name] = self.generate_value(field)
         return self.model.objects.create(**attrs)
     
     def generate_value(self, field):
