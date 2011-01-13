@@ -15,7 +15,6 @@ from decimal import Decimal
 import generators
 import sys
 
-MAX_LENGTH = 300
 
 def make_one(model):
     mommy = Mommy(model)
@@ -36,7 +35,7 @@ default_mapping = {
     DecimalField:generators.gen_decimal,
 
     CharField:generators.gen_string,
-    TextField:generators.gen_text(MAX_LENGTH),
+    TextField:generators.gen_text,
 
     ForeignKey:make_one,
 

@@ -6,30 +6,31 @@ import datetime
 from decimal import Decimal
 from random import randint, choice, random
 
-# retorna um dos valores da lista
-gen_from_list = lambda L: choice(L)
+MAX_LENGTH = 300
 
-# retorna um inteiro dentre o menor e o maior valor suportado pelo sistema
-gen_integer = lambda lower=-sys.maxint, upper=sys.maxint: randint(lower, upper)
+gen_from_list = choice
 
-# gera um número float
+def gen_integer(min_int=-sys.maxint, max_int=sys.maxint):
+    return randint(min_int, max_int)
+
 gen_float = lambda:random()*gen_integer()
 
-# gera um número decimal positivo 
-gen_decimal = lambda max_digits, decimal_places: "%s.%s" % (
-    ''.join([str(randint(0,9)) for i in range(max_digits-decimal_places)]), 
-    ''.join([str(randint(0,9)) for i in range(decimal_places)]))
-
+def gen_decimal(max_digits, decimal_places):
+    num_as_str = lambda x: ''.join([str(randint(0,9)) for i in range(x)])
+    return "%s.%s" % (
+        num_as_str(max_digits-decimal_places),
+        num_as_str(decimal_places)
+    )
 gen_decimal.required = ['max_digits', 'decimal_places']
 
-gen_date = lambda: datetime.date.today()
+gen_date = datetime.date.today
 
-gen_datetime = lambda: datetime.datetime.now()
+gen_datetime = datetime.datetime.now
 
-gen_string = lambda max_length:''.join(choice(string.printable) for i in range(max_length))
+def gen_string(max_length):
+    return ''.join(choice(string.printable) for i in range(max_length))
 gen_string.required = ['max_length']
 
-gen_text = lambda max_length: lambda:''.join(choice(string.printable) for i in range(max_length))
+gen_text = lambda: gen_string(MAX_LENGTH)
 
-# gera um valor booleano
 gen_boolean = lambda: choice((True, False))
