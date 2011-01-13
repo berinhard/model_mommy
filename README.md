@@ -36,4 +36,4 @@ when you do:
 it will also create the Kid, automatically.
 
 ##Currently supports the fields:
-CharField, TextField, FloatField, ForeignKey, DateField, and all the integer-type Fields
+CharField, TextField, FloatField, ForeignKey, Date and DateTimeField, BooleanField, and all the integer-type Fields
