@@ -7,7 +7,10 @@
 
 from django.db import models
 
-class Kid(models.Model):
+GENDER_CH = [('M', 'male'), ('F', 'female')]
+
+class Person(models.Model):
+    gender = models.CharField(max_length=1, choices=GENDER_CH)
     happy = models.BooleanField()
     name = models.CharField(max_length=30)
     age = models.IntegerField()
@@ -17,7 +20,7 @@ class Kid(models.Model):
     appointment = models.DateTimeField()
 
 class Dog(models.Model):
-    owner = models.ForeignKey('Kid')    
+    owner = models.ForeignKey('Person')    
     breed = models.CharField(max_length=50)
 
 class DummyIntModel(models.Model):

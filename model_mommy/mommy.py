@@ -20,7 +20,11 @@ def make_one(model, attrs=None):
     mommy = Mommy(model)
     return mommy.make_one(attrs or {})
 
-make_one.required = [lambda field: (field.related.parent_model, 'model')]
+make_one.required = [lambda field: ('model', field.related.parent_model)]
+
+def kind_of(model, attrs=None):
+    mommy = Mommy(model)
+    return mommy.kind_of(attrs or {})
 
 default_mapping = {
     BooleanField:generators.gen_boolean,
@@ -44,31 +48,57 @@ default_mapping = {
 }
 
 class Mommy(object):
-    model = None
-    attr_mapping = None
-    type_mapping = default_mapping
+    attr_mapping = {}
+    type_mapping = {}
     
     def __init__(self, model):
         self.model = model
         
     def make_one(self, attrs=None):
-        attrs = attrs or {}
+        '''Creates and persists an instance of the model 
+        associated with Mommy instance.'''
         
+        attrs = attrs or {}
+        return self._make_one(attrs, commit=True)
+    
+    def kind_of(self, attrs=None):
+        '''Creates, but do not persists, an instance of the model 
+        associated with Mommy instance.'''
+        
+        attrs = attrs or {}
+        return self._make_one(attrs, commit=False)
+    
+    def _make_one(self, attrs, commit=True):
         for field in self.model._meta.fields:
             if isinstance(field, AutoField):
                 continue
             
             if field.name not in attrs:
                 attrs[field.name] = self.generate_value(field)
-
-        return self.model.objects.create(**attrs)
-
+        
+        instance = self.model(**attrs)
+        if commit: instance.save()
+        return instance
+    
     def generate_value(self, field):
-        'Calls the generator associated with a field passing all required args.'
-        if self.attr_mapping is not None and field.name in self.attr_mapping:
+        '''Calls the generator associated with a field passing all required args.
+        
+        Generator Resolution Precedence Order:
+        -- attr_mapping - mapping per attribute name
+        -- choices -- mapping from avaiable field choices
+        -- type_mapping - mapping from user defined type associated generators
+        -- default_mapping - mapping from pre-defined type associated generators
+        
+        `attr_mapping` and `type_mapping` can be defined easely overwriting the model.
+        '''
+        if field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
-        else:
+        elif hasattr(field, 'choices') and field.choices: # without second check boolean fields break
+            generator = generators.gen_from_choices(field.choices)
+        elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
+        else:
+            generator = default_mapping[field.__class__]
 
         required_fields = get_required_values(generator, field)
         return generator(**required_fields)
@@ -77,7 +107,7 @@ def get_required_values(generator, field):
     '''
     Gets required values for a generator from the field.
     If required value is a function, call's it with field as argument.
-    If required value is a string, simple fetch the value from the field
+    If required value is a string, simply fetch the value from the field
     and returns.
     '''
     rt = {}
@@ -85,8 +115,8 @@ def get_required_values(generator, field):
         for item in generator.required:
 
             if callable(item): # mommy can deal with the nasty hacking too!
-                value, attr_name = item(field)
-                rt[attr_name] = value
+                key, value = item(field)
+                rt[key] = value
 
             elif isinstance(item, basestring):
                 rt[item] = getattr(field, item)
