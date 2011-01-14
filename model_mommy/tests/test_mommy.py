@@ -106,6 +106,8 @@ class MommyCreatesSimpleModel(TestCase):
         person = mommy.kind_of(Person)
         self.assertTrue(isinstance(person, Person))
         
+        self.assertEqual(person.id, None)
+        
         # makes sure database is clean
         self.assertEqual(Person.objects.all().count(), 0)
 
