@@ -16,11 +16,11 @@ class FieldFillingTestCase(TestCase):
 
 class FieldFillingWithParameterTestCase(TestCase):
 
-    def test_simple_creating_person_with_paramters(self):
+    def test_simple_creating_person_with_parameters(self):
         from model_mommy import mommy
         from model_mommy.models import Person
 
-        kid = mommy.make_one(Person, {'happy':True, 'age':10, 'name':'Mike'})
+        kid = mommy.make_one(Person, happy=True, age=10, name='Mike')
         self.assertEqual(kid.age, 10)
         self.assertEqual(kid.happy, True)
         self.assertEqual(kid.name, 'Mike')
@@ -30,7 +30,7 @@ class FieldFillingWithParameterTestCase(TestCase):
         from model_mommy.models import Person
 
         person_mom = Mommy(Person)
-        person = person_mom.make_one({'happy':False, 'age':20, 'gender':'M', 'name':'John'})
+        person = person_mom.make_one(happy=False, age=20, gender='M', name='John')
         self.assertEqual(person.age, 20)
         self.assertEqual(person.happy, False)
         self.assertEqual(person.name, 'John')

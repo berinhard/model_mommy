@@ -16,15 +16,15 @@ import generators
 import sys
 
 
-def make_one(model, attrs=None):
+def make_one(model, **attrs):
     mommy = Mommy(model)
-    return mommy.make_one(attrs or {})
+    return mommy.make_one(**attrs)
 
 make_one.required = [lambda field: ('model', field.related.parent_model)]
 
-def kind_of(model, attrs=None):
+def kind_of(model, **attrs):
     mommy = Mommy(model)
-    return mommy.kind_of(attrs or {})
+    return mommy.kind_of(**attrs)
 
 default_mapping = {
     BooleanField:generators.gen_boolean,
@@ -50,45 +50,43 @@ default_mapping = {
 class Mommy(object):
     attr_mapping = {}
     type_mapping = {}
-    
+
     def __init__(self, model):
         self.model = model
-        
-    def make_one(self, attrs=None):
-        '''Creates and persists an instance of the model 
+
+    def make_one(self, **attrs):
+        '''Creates and persists an instance of the model
         associated with Mommy instance.'''
-        
-        attrs = attrs or {}
-        return self._make_one(attrs, commit=True)
-    
-    def kind_of(self, attrs=None):
-        '''Creates, but do not persists, an instance of the model 
+
+        return self._make_one(commit=True, **attrs)
+
+    def kind_of(self, **attrs):
+        '''Creates, but do not persists, an instance of the model
         associated with Mommy instance.'''
-        
-        attrs = attrs or {}
-        return self._make_one(attrs, commit=False)
-    
-    def _make_one(self, attrs, commit=True):
+
+        return self._make_one(commit=False, **attrs)
+
+    def _make_one(self, commit=True, **attrs):
         for field in self.model._meta.fields:
             if isinstance(field, AutoField):
                 continue
-            
+
             if field.name not in attrs:
                 attrs[field.name] = self.generate_value(field)
-        
+
         instance = self.model(**attrs)
         if commit: instance.save()
         return instance
-    
+
     def generate_value(self, field):
         '''Calls the generator associated with a field passing all required args.
-        
+
         Generator Resolution Precedence Order:
         -- attr_mapping - mapping per attribute name
         -- choices -- mapping from avaiable field choices
         -- type_mapping - mapping from user defined type associated generators
         -- default_mapping - mapping from pre-defined type associated generators
-        
+
         `attr_mapping` and `type_mapping` can be defined easely overwriting the model.
         '''
         if field.name in self.attr_mapping:
