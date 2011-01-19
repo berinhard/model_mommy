@@ -75,7 +75,9 @@ class Mommy(object):
                 attrs[field.name] = self.generate_value(field)
 
         instance = self.model(**attrs)
-        if commit: instance.save()
+        if commit:
+            instance.save()
+
         return instance
 
     def generate_value(self, field):
