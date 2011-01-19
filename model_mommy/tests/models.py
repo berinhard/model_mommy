@@ -11,10 +11,10 @@ GENDER_CH = [('M', 'male'), ('F', 'female')]
 
 class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CH)
-    happy = models.BooleanField()
+    happy = models.BooleanField(default=True)
     name = models.CharField(max_length=30)
     age = models.IntegerField()
-    bio = models.TextField()
+    bio = models.TextField(blank=True, null=True)
     wanted_games_qtd = models.BigIntegerField()
     birthday = models.DateField()
     appointment = models.DateTimeField()

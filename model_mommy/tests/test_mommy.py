@@ -84,6 +84,68 @@ class SimpleExtendMommy(TestCase):
         self.assertEqual(person.happy, False)
         
 
+class LessSimpleExtendMommy(TestCase):
+    
+    def test_fail_no_field_attr_string_to_generator_required(self):
+        from model_mommy.mommy import Mommy
+        from model_mommy.models import Person
+        
+        gen_oposite = lambda x:not x
+        gen_oposite.required = ['house']
+        
+        class SadPeopleMommy(Mommy):
+            attr_mapping = {'happy':gen_oposite}
+        
+        mom = SadPeopleMommy(Person)
+        self.assertRaises(AttributeError, lambda:mom.make_one())
+    
+    def test_string_to_generator_required(self):
+        from model_mommy.mommy import Mommy
+        from model_mommy.models import Person
+        
+        gen_oposite = lambda default:not default
+        gen_oposite.required = ['default']
+        
+        class SadPeopleMommy(Mommy):
+            attr_mapping = {'happy':gen_oposite}
+        
+        happy_field = Person._meta.get_field('happy')
+        mom = SadPeopleMommy(Person)
+        person = mom.make_one()
+        self.assertEqual(person.happy, not happy_field.default)
+    
+    def test_fail_pass_non_string_to_generator_required(self):
+        from model_mommy.mommy import Mommy
+        from model_mommy.models import Person
+        
+        gen_age = lambda x:10
+        
+        class MyMommy(Mommy):
+            pass
+        
+        MyMommy.attr_mapping = {'age':gen_age}
+        mom = MyMommy(Person)
+        
+        # for int
+        gen_age.required = [10]
+        self.assertRaises(ValueError, lambda:mom.make_one())
+        
+        # for float
+        gen_age.required = [10.10]
+        self.assertRaises(ValueError, lambda:mom.make_one())
+        
+        # for iterable
+        gen_age.required = [[]]
+        self.assertRaises(ValueError, lambda:mom.make_one())
+        
+        # for iterable/dict
+        gen_age.required = [{}]
+        self.assertRaises(ValueError, lambda:mom.make_one())
+        
+        # for boolean
+        gen_age.required = [True]
+        self.assertRaises(ValueError, lambda:mom.make_one())
+        
 class MommyCreatesSimpleModel(TestCase):
 
     def test_make_one_should_create_one_object(self):
