@@ -93,7 +93,7 @@ class Mommy(object):
         '''
         if field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
-        elif hasattr(field, 'choices') and field.choices: # without second check boolean fields break
+        elif getattr(field, 'choices'):
             generator = generators.gen_from_choices(field.choices)
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
