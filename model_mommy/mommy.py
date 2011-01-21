@@ -22,9 +22,9 @@ def make_one(model, **attrs):
 
 make_one.required = [lambda field: ('model', field.related.parent_model)]
 
-def kind_of(model, **attrs):
+def prepare(model, **attrs):
     mommy = Mommy(model)
-    return mommy.kind_of(**attrs)
+    return mommy.prepare(**attrs)
 
 default_mapping = {
     BooleanField:generators.gen_boolean,
@@ -60,7 +60,7 @@ class Mommy(object):
 
         return self._make_one(commit=True, **attrs)
 
-    def kind_of(self, **attrs):
+    def prepare(self, **attrs):
         '''Creates, but do not persists, an instance of the model
         associated with Mommy instance.'''
 

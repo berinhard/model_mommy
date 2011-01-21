@@ -99,11 +99,11 @@ class MommyCreatesSimpleModel(TestCase):
         # makes sure it is the person we created
         self.assertEqual(Person.objects.all()[0].id, person.id)
 
-    def test_kind_of_should_not_create_one_object(self):
+    def test_prepare_should_not_create_one_object(self):
         from model_mommy import mommy
         from model_mommy.models import Person
 
-        person = mommy.kind_of(Person)
+        person = mommy.prepare(Person)
         self.assertTrue(isinstance(person, Person))
 
         # makes sure database is clean
