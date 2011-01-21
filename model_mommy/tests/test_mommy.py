@@ -73,9 +73,11 @@ class SimpleExtendMommy(TestCase):
         from model_mommy.models import Person
 
         class SadPeopleMommy(Mommy):
-            type_mapping = {
-                BooleanField:lambda:False
-            }
+            def __init__(self, model):
+                super(SadPeopleMommy, self).__init__(model)
+                self.type_mapping.update({
+                    BooleanField:lambda:False
+                })
 
         sad_people_mommy = SadPeopleMommy(Person)
         person = sad_people_mommy.make_one()

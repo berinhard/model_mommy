@@ -101,8 +101,6 @@ class Mommy(object):
             generator = generators.gen_from_choices(field.choices)
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
-        else:
-            generator = default_mapping[field.__class__]
 
         required_fields = get_required_values(generator, field)
         return generator(**required_fields)
