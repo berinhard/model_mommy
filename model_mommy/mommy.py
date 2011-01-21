@@ -110,6 +110,7 @@ def get_required_values(generator, field):
     If required value is a string, simply fetch the value from the field
     and returns.
     '''
+    #FIXME: avoid abreviations
     rt = {}
     if hasattr(generator, 'required'):
         for item in generator.required:
