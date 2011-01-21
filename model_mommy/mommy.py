@@ -16,15 +16,19 @@ import generators
 import sys
 
 
+#TODO: improve related models handling
+foreign_key_required = [lambda field: ('model', field.related.parent_model)]
+
 def make_one(model, **attrs):
     mommy = Mommy(model)
     return mommy.make_one(**attrs)
 
-make_one.required = [lambda field: ('model', field.related.parent_model)]
-
 def prepare(model, **attrs):
     mommy = Mommy(model)
     return mommy.prepare(**attrs)
+
+make_one.required = foreign_key_required
+prepare.required = foreign_key_required
 
 default_mapping = {
     BooleanField:generators.gen_boolean,
@@ -49,9 +53,9 @@ default_mapping = {
 
 class Mommy(object):
     attr_mapping = {}
-    type_mapping = {}
 
     def __init__(self, model):
+        self.type_mapping = default_mapping.copy()
         self.model = model
 
     def make_one(self, **attrs):
@@ -63,7 +67,7 @@ class Mommy(object):
     def prepare(self, **attrs):
         '''Creates, but do not persists, an instance of the model
         associated with Mommy instance.'''
-
+        self.type_mapping[ForeignKey] = prepare
         return self._make_one(commit=False, **attrs)
 
     def _make_one(self, commit=True, **attrs):
