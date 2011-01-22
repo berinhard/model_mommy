@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name="model_mommy",
-    version="0.2",
+    version="0.4",
     packages=["model_mommy",],
     install_requires=["django",],
     author="vandersonmota",
