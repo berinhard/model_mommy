@@ -23,12 +23,12 @@ def make_one(model, **attrs):
     mommy = Mommy(model)
     return mommy.make_one(**attrs)
 
-def prepare(model, **attrs):
+def prepare_one(model, **attrs):
     mommy = Mommy(model)
     return mommy.prepare(**attrs)
 
 make_one.required = foreign_key_required
-prepare.required = foreign_key_required
+prepare_one.required = foreign_key_required
 
 default_mapping = {
     BooleanField:generators.gen_boolean,
@@ -67,7 +67,7 @@ class Mommy(object):
     def prepare(self, **attrs):
         '''Creates, but do not persists, an instance of the model
         associated with Mommy instance.'''
-        self.type_mapping[ForeignKey] = prepare
+        self.type_mapping[ForeignKey] = prepare_one
         return self._make_one(commit=False, **attrs)
 
     def _make_one(self, commit=True, **attrs):

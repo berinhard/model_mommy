@@ -101,11 +101,11 @@ class MommyCreatesSimpleModel(TestCase):
         # makes sure it is the person we created
         self.assertEqual(Person.objects.all()[0].id, person.id)
 
-    def test_prepare_should_not_persist_one_object(self):
+    def test_prepare_one_should_not_persist_one_object(self):
         from model_mommy import mommy
         from model_mommy.models import Person
 
-        person = mommy.prepare(Person)
+        person = mommy.prepare_one(Person)
         self.assertTrue(isinstance(person, Person))
 
         # makes sure database is clean
@@ -121,11 +121,11 @@ class MommyCreatesAssociatedModels(TestCase):
         dog = mommy.make_one(Dog)
         self.assertTrue(isinstance(dog.owner, Person))
 
-    def test_prepare_should_not_create_one_object(self):
+    def test_prepare_one_should_not_create_one_object(self):
         from model_mommy import mommy
         from model_mommy.models import Person, Dog
 
-        dog = mommy.prepare(Dog)
+        dog = mommy.prepare_one(Dog)
         self.assertTrue(isinstance(dog, Dog))
         self.assertTrue(isinstance(dog.owner, Person))
 
