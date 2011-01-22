@@ -20,10 +20,20 @@ import sys
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
 def make_one(model, **attrs):
+    """
+    Creates a persisted instance from a given model its associated models.
+    It fill the fields with random values or you can specify
+    which fields you want to define its values by yourself.
+    """
     mommy = Mommy(model)
     return mommy.make_one(**attrs)
 
 def prepare_one(model, **attrs):
+    """
+    Creates a BUT DOESN'T persist an instance from a given model its associated models.
+    It fill the fields with random values or you can specify
+    which fields you want to define its values by yourself.
+    """
     mommy = Mommy(model)
     return mommy.prepare(**attrs)
 
