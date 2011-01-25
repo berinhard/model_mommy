@@ -133,5 +133,7 @@ def get_required_values(generator, field):
 
             elif isinstance(item, basestring):
                 rt[item] = getattr(field, item)
+            
+            else: raise ValueError("Required value '%s' is of wrong type. Don't make mommy sad." % str(item))
 
     return rt
