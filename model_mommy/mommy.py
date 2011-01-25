@@ -16,15 +16,29 @@ import generators
 import sys
 
 
-def make_one(model, attrs=None):
-    mommy = Mommy(model)
-    return mommy.make_one(attrs or {})
+#TODO: improve related models handling
+foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
-make_one.required = [lambda field: ('model', field.related.parent_model)]
-
-def kind_of(model, attrs=None):
+def make_one(model, **attrs):
+    """
+    Creates a persisted instance from a given model its associated models.
+    It fill the fields with random values or you can specify
+    which fields you want to define its values by yourself.
+    """
     mommy = Mommy(model)
-    return mommy.kind_of(attrs or {})
+    return mommy.make_one(**attrs)
+
+def prepare_one(model, **attrs):
+    """
+    Creates a BUT DOESN'T persist an instance from a given model its associated models.
+    It fill the fields with random values or you can specify
+    which fields you want to define its values by yourself.
+    """
+    mommy = Mommy(model)
+    return mommy.prepare(**attrs)
+
+make_one.required = foreign_key_required
+prepare_one.required = foreign_key_required
 
 default_mapping = {
     BooleanField:generators.gen_boolean,
@@ -49,56 +63,54 @@ default_mapping = {
 
 class Mommy(object):
     attr_mapping = {}
-    type_mapping = {}
-    
+
     def __init__(self, model):
+        self.type_mapping = default_mapping.copy()
         self.model = model
-        
-    def make_one(self, attrs=None):
-        '''Creates and persists an instance of the model 
+
+    def make_one(self, **attrs):
+        '''Creates and persists an instance of the model
         associated with Mommy instance.'''
-        
-        attrs = attrs or {}
-        return self._make_one(attrs, commit=True)
-    
-    def kind_of(self, attrs=None):
-        '''Creates, but do not persists, an instance of the model 
+
+        return self._make_one(commit=True, **attrs)
+
+    def prepare(self, **attrs):
+        '''Creates, but do not persists, an instance of the model
         associated with Mommy instance.'''
-        
-        attrs = attrs or {}
-        return self._make_one(attrs, commit=False)
-    
-    def _make_one(self, attrs, commit=True):
+        self.type_mapping[ForeignKey] = prepare_one
+        return self._make_one(commit=False, **attrs)
+
+    def _make_one(self, commit=True, **attrs):
         for field in self.model._meta.fields:
             if isinstance(field, AutoField):
                 continue
-            
+
             if field.name not in attrs:
                 attrs[field.name] = self.generate_value(field)
-        
+
         instance = self.model(**attrs)
-        if commit: instance.save()
+        if commit:
+            instance.save()
+
         return instance
-    
+
     def generate_value(self, field):
         '''Calls the generator associated with a field passing all required args.
-        
+
         Generator Resolution Precedence Order:
         -- attr_mapping - mapping per attribute name
         -- choices -- mapping from avaiable field choices
         -- type_mapping - mapping from user defined type associated generators
         -- default_mapping - mapping from pre-defined type associated generators
-        
+
         `attr_mapping` and `type_mapping` can be defined easely overwriting the model.
         '''
         if field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
-        elif hasattr(field, 'choices') and field.choices: # without second check boolean fields break
+        elif getattr(field, 'choices'):
             generator = generators.gen_from_choices(field.choices)
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
-        else:
-            generator = default_mapping[field.__class__]
 
         required_fields = get_required_values(generator, field)
         return generator(**required_fields)
@@ -110,6 +122,7 @@ def get_required_values(generator, field):
     If required value is a string, simply fetch the value from the field
     and returns.
     '''
+    #FIXME: avoid abreviations
     rt = {}
     if hasattr(generator, 'required'):
         for item in generator.required:
@@ -121,5 +134,4 @@ def get_required_values(generator, field):
             elif isinstance(item, basestring):
                 rt[item] = getattr(field, item)
 
-            else: raise ValueError("Required value '%s' is of wrong type. Don't make mommy sad." % str(item))
     return rt

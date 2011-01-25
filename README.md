@@ -24,9 +24,12 @@ just call the mommy =):
 
     from model_mommy import mommy
     from model_mommy.models import Kid
+
     kid = mommy.make_one(Kid)
 
+
 and your object is created! No boring attributes passing like 'foobar' every damn time.
+
 
 mommy also handles relationships. Suppose the kid has a dog:
 
@@ -39,26 +42,35 @@ when you do:
 
 it will also create the Kid, automatically.
 
-You can also pass arguments to make one. 
+You can also pass arguments to make one.
 
     another_kid = mommy.make_one(Kid, {'age':3})
     assert(another_kid.age == 3)
 
+But, if don't need a persisted object, mommy can handle this for you as well:
+
+    from model_mommy import mommy
+    from model_mommy.models import Kid
+
+    kid = mommy.prepare_one(Kid)
+
+It works like make_one, but like was said, it doesn't persist the instance.
+
 ## Not so Basic Usage:
 
-Model instances can also be generated from Mommy factories. Make your 
+Model instances can also be generated from Mommy factories. Make your
 mass producer mom like this:
 
     from model_mommy.mommy import Mommy
     from model_mommy.models import Kid
-    
+
     mom = Mommy(Kid)
     first_kid = mom.make_one()
     second_kid = mom.make_one()
     third_kid = mom.make_one()
 
-Note that this kind of construction is much more efficient than 
-mommy.make_one(Model), so, if you need to create a lot of instances, 
+Note that this kind of construction is much more efficient than
+mommy.make_one(Model), so, if you need to create a lot of instances,
 this much be a nicier approach.
 
 ## Even Less Basic Usage
@@ -71,34 +83,34 @@ generator, you must extend the Mommy class to get this behavior. Let's see a exa
     from model_mommy.generators import gen_from_list
     from model_mommy.models import Kid
     from model_mommy.mommy import Mommy
-    
+
     a_lot_of_games = range(30, 100)
 
     class HardGamerMommy(Mommy):
         attr_mapping = {
             'wanted_games_qtd':gen_from_list(a_lot_of_games)
         }
-    
+
     mom = HardGamerMommy(Kid)
     kid = mom.make_one()
     assert(kid.wanted_games_qtd in a_lot_of_games)
-   
+
 You can also change the default generator for a field. Let's take a look:
 
     from random import randint
     from model_mommy.models import Kid
     from model_mommy.mommy import Mommy
-    
+
     class KidMommy(Mommy):
         attr_mapping = {
             'wanted_games_qtd':gen_from_list(a_lot_of_games)
         }
-    
+
     mom = HardGamerMommy(Kid)
     kid = mom.make_one()
     assert(kid.wanted_games_qtd in a_lot_of_games)
 
-Note that you can also create your own generator. 
+Note that you can also create your own generator.
 
 ## Your Own Generator
 
