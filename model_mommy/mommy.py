@@ -63,6 +63,7 @@ default_mapping = {
 
 class Mommy(object):
     attr_mapping = {}
+    type_mapping = None
 
     def __init__(self, model):
         self.type_mapping = default_mapping.copy()
