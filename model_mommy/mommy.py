@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
 from django.db.models.fields import AutoField, CharField, TextField
 from django.db.models.fields import DateField, DateTimeField
-from django.db.models.fields import IntegerField, BigIntegerField, SmallIntegerField
+from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
+
+try:
+    from django.db.models.fields import BigIntegerField
+except ImportError:
+    BigIntegerField = IntegerField
 
 from django.db.models import ForeignKey
 

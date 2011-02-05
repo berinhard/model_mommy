@@ -14,19 +14,29 @@ class Person(models.Model):
     happy = models.BooleanField(default=True)
     name = models.CharField(max_length=30)
     age = models.IntegerField()
-    bio = models.TextField(blank=True, null=True)
-    wanted_games_qtd = models.BigIntegerField()
+    bio = models.TextField()
     birthday = models.DateField()
     appointment = models.DateTimeField()
 
+    #backward compatibilty with Django 1.1
+    try:
+        wanted_games_qtd = models.BigIntegerField()
+    except AttributeError:
+        wanted_games_qtd = models.IntegerField()
+
 class Dog(models.Model):
-    owner = models.ForeignKey('Person')    
+    owner = models.ForeignKey('Person')
     breed = models.CharField(max_length=50)
 
 class DummyIntModel(models.Model):
     int_field = models.IntegerField()
-    big_int_field = models.BigIntegerField()
     small_int_field = models.SmallIntegerField()
+
+    #backward compatibilty with Django 1.1
+    try:
+        big_int_field = models.BigIntegerField()
+    except AttributeError:
+        big_int_field = models.IntegerField()
 
 class DummyPositiveIntModel(models.Model):
     positive_small_int_field = models.PositiveSmallIntegerField()
