@@ -15,9 +15,13 @@ class Person(models.Model):
     name = models.CharField(max_length=30)
     age = models.IntegerField()
     bio = models.TextField()
-    wanted_games_qtd = models.BigIntegerField()
     birthday = models.DateField()
     appointment = models.DateTimeField()
+    
+    try:
+        wanted_games_qtd = models.BigIntegerField()
+    except AttributeError:
+        wanted_games_qtd = models.IntegerField()
 
 class Dog(models.Model):
     owner = models.ForeignKey('Person')    
@@ -25,8 +29,12 @@ class Dog(models.Model):
 
 class DummyIntModel(models.Model):
     int_field = models.IntegerField()
-    big_int_field = models.BigIntegerField()
     small_int_field = models.SmallIntegerField()
+    
+    try:
+        big_int_field = models.BigIntegerField()
+    except AttributeError:
+        big_int_field = models.IntegerField()
 
 class DummyPositiveIntModel(models.Model):
     positive_small_int_field = models.PositiveSmallIntegerField()

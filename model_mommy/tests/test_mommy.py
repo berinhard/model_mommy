@@ -2,7 +2,18 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from django.db.models.fields import *
+from django.db.models.fields import AutoField, CharField, TextField
+from django.db.models.fields import DateField, DateTimeField
+from django.db.models.fields import IntegerField, SmallIntegerField
+from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
+from django.db.models.fields import FloatField, DecimalField
+from django.db.models.fields import BooleanField
+
+try:
+    from django.db.models.fields import BigIntegerField
+except ImportError:
+    BigIntegerField = IntegerField
+
 from django.test import TestCase
 
 class FieldFillingTestCase(TestCase):
@@ -209,6 +220,7 @@ class FillingIntFields(TestCase):
 
         self.assertTrue(isinstance(self.dummy_int_model.int_field, int))
 
+    
     def test_fill_BigIntegerField_with_a_random_number(self):
         from model_mommy.models import DummyIntModel
 
