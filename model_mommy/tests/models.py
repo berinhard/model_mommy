@@ -18,7 +18,7 @@ class Person(models.Model):
     happy = models.BooleanField(default=True)
     name = models.CharField(max_length=30)
     age = models.IntegerField()
-    bio = models.TextField()
+    bio = models.TextField(null=True)
     birthday = models.DateField()
     appointment = models.DateTimeField()
     wanted_games_qtd = models.BigIntegerField()
@@ -41,7 +41,7 @@ class DummyPositiveIntModel(models.Model):
     positive_int_field = models.PositiveIntegerField()
 
 class DummyNumbersModel(models.Model):
-    float_field = models.FloatField(null=True)
+    float_field = models.FloatField()
 
 class DummyDecimalModel(models.Model):
     decimal_field = models.DecimalField(max_digits=5, decimal_places=2)
