@@ -11,7 +11,7 @@ try:
 except ImportError:
     BigIntegerField = IntegerField
 
-from django.db.models import ForeignKey
+from django.db.models import ForeignKey, OneToOneField, ManyToManyField
 
 from string import letters
 from random import choice, randint
@@ -42,8 +42,13 @@ def prepare_one(model, **attrs):
     mommy = Mommy(model)
     return mommy.prepare(**attrs)
 
+def make_many(model, qty=5, **attrs):
+    mommy = Mommy(model)
+    return [mommy.make_one() for i in range(qty)]
+
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required
+make_many.required = foreign_key_required
 
 default_mapping = {
     BooleanField:generators.gen_boolean,
@@ -61,6 +66,8 @@ default_mapping = {
     TextField:generators.gen_text,
 
     ForeignKey:make_one,
+    #OneToOneField:make_one,
+    ManyToManyField:make_many,
 
     DateField:generators.gen_date,
     DateTimeField:generators.gen_date,
@@ -86,17 +93,36 @@ class Mommy(object):
         self.type_mapping[ForeignKey] = prepare_one
         return self._make_one(commit=False, **attrs)
 
+    def get_fields(self):
+        return self.model._meta.fields+self.model._meta.many_to_many
+
     def _make_one(self, commit=True, **attrs):
-        for field in self.model._meta.fields:
+        m2m_dict = {}
+        
+        for field in self.get_fields():
             if isinstance(field, AutoField):
                 continue
-
-            if field.name not in attrs:
+            
+            if isinstance(field, ManyToManyField):
+                if field.name not in attrs:
+                    m2m_dict[field.name] = self.generate_value(field)
+                else:
+                    m2m_dict[field.name] = attrs.pop(field.name)
+            
+            elif field.name not in attrs:
                 attrs[field.name] = self.generate_value(field)
-
+        
         instance = self.model(**attrs)
+        
+        # m2m only works for persisted instances
         if commit:
             instance.save()
+            
+            # m2m relation is treated differently
+            for key, value in m2m_dict.items():
+                m2m_relation = getattr(instance, key)
+                for model_instance in value:
+                    m2m_relation.add(model_instance)
 
         return instance
 

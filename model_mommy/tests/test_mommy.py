@@ -205,6 +205,14 @@ class MommyCreatesAssociatedModels(TestCase):
         # makes sure database is clean
         self.assertEqual(Person.objects.all().count(), 0)
         self.assertEqual(Dog.objects.all().count(), 0)
+    
+    def test_create_many_to_many(self):
+        from model_mommy import mommy
+        from model_mommy.models import Store
+        
+        store = mommy.make_one(Store)
+        self.assertEqual(store.employees.count(), 5)
+        self.assertEqual(store.customers.count(), 5)
 
 
 class FillingFromChoice(FieldFillingTestCase):
