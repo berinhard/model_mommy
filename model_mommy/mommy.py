@@ -77,9 +77,10 @@ class Mommy(object):
     attr_mapping = {}
     type_mapping = None
 
-    def __init__(self, model):
+    def __init__(self, model, fill_nullables=True):
         self.type_mapping = default_mapping.copy()
         self.model = model
+        self.fill_nullables = fill_nullables
 
     def make_one(self, **attrs):
         '''Creates and persists an instance of the model
@@ -104,13 +105,20 @@ class Mommy(object):
                 continue
             
             if isinstance(field, ManyToManyField):
-                if field.name not in attrs:
-                    m2m_dict[field.name] = self.generate_value(field)
-                else:
+                # default value was not informed
+                if field.name not in attrs: 
+                    if field.null and not self.fill_nullables:
+                        continue # do not populate
+                    else: 
+                        m2m_dict[field.name] = self.generate_value(field)
+                else: 
                     m2m_dict[field.name] = attrs.pop(field.name)
             
             elif field.name not in attrs:
-                attrs[field.name] = self.generate_value(field)
+                if field.null and not self.fill_nullables:
+                    continue
+                else:
+                    attrs[field.name] = self.generate_value(field)
         
         instance = self.model(**attrs)
         

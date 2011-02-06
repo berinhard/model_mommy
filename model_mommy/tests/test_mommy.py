@@ -214,6 +214,32 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(store.employees.count(), 5)
         self.assertEqual(store.customers.count(), 5)
 
+        
+class FillNullablesTestCase(TestCase):
+    def test_always_fill_nullables_if_value_provided_via_attrs(self):
+        from model_mommy.mommy import Mommy
+        from model_mommy.models import Person
+        
+        bio_data = 'some bio'
+        mom = Mommy(Person, False)
+        p = mom.make_one(bio=bio_data)
+        self.assertEqual(p.bio, bio_data)
+    
+    def test_fill_nullables_if_fill_nullables_is_true(self):
+        from model_mommy.mommy import Mommy
+        from model_mommy.models import Person
+        
+        mom = Mommy(Person, True)
+        p = mom.make_one()
+        self.assertTrue( isinstance(p.bio, basestring) )
+    
+    def test_do_not_fill_nullables_if_fill_nullables_is_false(self):
+        from model_mommy.mommy import Mommy
+        from model_mommy.models import Person
+        
+        mom = Mommy(Person, False)
+        p = mom.make_one()
+        self.assertTrue( p.bio == None )
 
 class FillingFromChoice(FieldFillingTestCase):
 
