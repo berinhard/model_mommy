@@ -9,6 +9,12 @@ from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerFi
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
 
+from model_mommy import mommy
+from model_mommy.models import Person, Dog, Store
+from model_mommy.models import DummyIntModel, DummyPositiveIntModel, DummyNumbersModel
+from model_mommy.models import DummyDecimalModel
+from model_mommy.generators import gen_from_list
+
 try:
     from django.db.models.fields import BigIntegerField
 except ImportError:
@@ -19,28 +25,22 @@ from django.test import TestCase
 class FieldFillingTestCase(TestCase):
 
     def setUp(self):
-        from model_mommy import mommy
-        from model_mommy.models import Person
-
         self.person = mommy.make_one(Person)
 
 
 class FieldFillingWithParameterTestCase(TestCase):
 
     def test_simple_creating_person_with_parameters(self):
-        from model_mommy import mommy
-        from model_mommy.models import Person
-
         kid = mommy.make_one(Person, happy=True, age=10, name='Mike')
         self.assertEqual(kid.age, 10)
         self.assertEqual(kid.happy, True)
         self.assertEqual(kid.name, 'Mike')
 
     def test_creating_person_from_factory_using_paramters(self):
-        from model_mommy.mommy import Mommy
-        from model_mommy.models import Person
 
-        person_mom = Mommy(Person)
+
+
+        person_mom = mommy.Mommy(Person)
         person = person_mom.make_one(happy=False, age=20, gender='M', name='John')
         self.assertEqual(person.age, 20)
         self.assertEqual(person.happy, False)
@@ -51,10 +51,7 @@ class FieldFillingWithParameterTestCase(TestCase):
 class SimpleExtendMommy(TestCase):
 
     def test_simple_extended_mommy_example(self):
-        from model_mommy.mommy import Mommy
-        from model_mommy.models import Person
-
-        class Aunt(Mommy):
+        class Aunt(mommy.Mommy):
             pass
 
         aunt = Aunt(Person)
@@ -62,13 +59,9 @@ class SimpleExtendMommy(TestCase):
 
 
     def test_attr_mapping_with_from_list_generator(self):
-        from model_mommy.mommy import Mommy
-        from model_mommy.models import Person
-        from model_mommy.generators import gen_from_list
-
         age_list = range(4, 12)
 
-        class KidMommy(Mommy):
+        class KidMommy(mommy.Mommy):
             attr_mapping = {
                 'age':gen_from_list(age_list)
             }
@@ -80,10 +73,7 @@ class SimpleExtendMommy(TestCase):
         self.assertTrue(kid.age in age_list)
 
     def test_type_mapping_overwriting_boolean_model_behavior(self):
-        from model_mommy.mommy import Mommy
-        from model_mommy.models import Person
-
-        class SadPeopleMommy(Mommy):
+        class SadPeopleMommy(mommy.Mommy):
             def __init__(self, model):
                 super(SadPeopleMommy, self).__init__(model)
                 self.type_mapping.update({
@@ -98,106 +88,84 @@ class SimpleExtendMommy(TestCase):
 
 
 class LessSimpleExtendMommy(TestCase):
-    
+
     def test_fail_no_field_attr_string_to_generator_required(self):
-        from model_mommy.mommy import Mommy
-        from model_mommy.models import Person
-        
         gen_oposite = lambda x:not x
         gen_oposite.required = ['house']
-        
-        class SadPeopleMommy(Mommy):
+
+        class SadPeopleMommy(mommy.Mommy):
             attr_mapping = {'happy':gen_oposite}
-        
+
         mom = SadPeopleMommy(Person)
         self.assertRaises(AttributeError, lambda:mom.make_one())
-    
+
     def test_string_to_generator_required(self):
-        from model_mommy.mommy import Mommy
-        from model_mommy.models import Person
-        
         gen_oposite = lambda default:not default
         gen_oposite.required = ['default']
-        
-        class SadPeopleMommy(Mommy):
+
+        class SadPeopleMommy(mommy.Mommy):
             attr_mapping = {'happy':gen_oposite}
-        
+
         happy_field = Person._meta.get_field('happy')
         mom = SadPeopleMommy(Person)
         person = mom.make_one()
         self.assertEqual(person.happy, not happy_field.default)
-    
+
     def test_fail_pass_non_string_to_generator_required(self):
-        from model_mommy.mommy import Mommy
-        from model_mommy.models import Person
-        
         gen_age = lambda x:10
-        
-        class MyMommy(Mommy):
+
+        class MyMommy(mommy.Mommy):
             pass
-        
+
         MyMommy.attr_mapping = {'age':gen_age}
         mom = MyMommy(Person)
-        
+
         # for int
         gen_age.required = [10]
         self.assertRaises(ValueError, lambda:mom.make_one())
-        
+
         # for float
         gen_age.required = [10.10]
         self.assertRaises(ValueError, lambda:mom.make_one())
-        
+
         # for iterable
         gen_age.required = [[]]
         self.assertRaises(ValueError, lambda:mom.make_one())
-        
+
         # for iterable/dict
         gen_age.required = [{}]
         self.assertRaises(ValueError, lambda:mom.make_one())
-        
+
         # for boolean
         gen_age.required = [True]
         self.assertRaises(ValueError, lambda:mom.make_one())
-        
+
 class MommyCreatesSimpleModel(TestCase):
 
     def test_make_one_should_create_one_object(self):
-        from model_mommy import mommy
-        from model_mommy.models import Person
-
         person = mommy.make_one(Person)
         self.assertTrue(isinstance(person, Person))
 
-        # makes sure there's someong in the database
-        self.assertEqual(Person.objects.all().count(), 1)
-
         # makes sure it is the person we created
-        self.assertEqual(Person.objects.all()[0].id, person.id)
+        self.assertTrue(Person.objects.filter(id=person.id))
 
     def test_prepare_one_should_not_persist_one_object(self):
-        from model_mommy import mommy
-        from model_mommy.models import Person
-
         person = mommy.prepare_one(Person)
         self.assertTrue(isinstance(person, Person))
-        
+
         # makes sure database is clean
         self.assertEqual(Person.objects.all().count(), 0)
+
+        self.assertEqual(person.id, None)
 
 
 class MommyCreatesAssociatedModels(TestCase):
 
     def test_dependent_models_with_ForeignKey(self):
-        from model_mommy import mommy
-        from model_mommy.models import Dog, Person
-
         dog = mommy.make_one(Dog)
         self.assertTrue(isinstance(dog.owner, Person))
 
     def test_prepare_one_should_not_create_one_object(self):
-        from model_mommy import mommy
-        from model_mommy.models import Person, Dog
-
         dog = mommy.prepare_one(Dog)
         self.assertTrue(isinstance(dog, Dog))
         self.assertTrue(isinstance(dog.owner, Person))
@@ -205,39 +173,28 @@ class MommyCreatesAssociatedModels(TestCase):
         # makes sure database is clean
         self.assertEqual(Person.objects.all().count(), 0)
         self.assertEqual(Dog.objects.all().count(), 0)
-    
+
     def test_create_many_to_many(self):
-        from model_mommy import mommy
-        from model_mommy.models import Store
-        
+
         store = mommy.make_one(Store)
         self.assertEqual(store.employees.count(), 5)
         self.assertEqual(store.customers.count(), 5)
 
-        
+
 class FillNullablesTestCase(TestCase):
     def test_always_fill_nullables_if_value_provided_via_attrs(self):
-        from model_mommy.mommy import Mommy
-        from model_mommy.models import Person
-        
         bio_data = 'some bio'
-        mom = Mommy(Person, False)
+        mom = mommy.Mommy(Person, False)
         p = mom.make_one(bio=bio_data)
         self.assertEqual(p.bio, bio_data)
-    
+
     def test_fill_nullables_if_fill_nullables_is_true(self):
-        from model_mommy.mommy import Mommy
-        from model_mommy.models import Person
-        
-        mom = Mommy(Person, True)
+        mom = mommy.Mommy(Person, True)
         p = mom.make_one()
         self.assertTrue( isinstance(p.bio, basestring) )
-    
+
     def test_do_not_fill_nullables_if_fill_nullables_is_false(self):
-        from model_mommy.mommy import Mommy
-        from model_mommy.models import Person
-        
-        mom = Mommy(Person, False)
+        mom = mommy.Mommy(Person, False)
         p = mom.make_one()
         self.assertTrue( p.bio == None )
 
@@ -251,8 +208,6 @@ class FillingFromChoice(FieldFillingTestCase):
 class StringFieldsFilling(FieldFillingTestCase):
 
     def test_fill_CharField_with_a_random_str(self):
-        from model_mommy.models import Person
-
         person_name_field = Person._meta.get_field('name')
         self.assertTrue(isinstance(person_name_field, CharField))
 
@@ -260,8 +215,6 @@ class StringFieldsFilling(FieldFillingTestCase):
         self.assertEqual(len(self.person.name), person_name_field.max_length)
 
     def test_fill_TextField_with_a_random_str(self):
-        from model_mommy.models import Person
-
         person_bio_field = Person._meta.get_field('bio')
         self.assertTrue(isinstance(person_bio_field, TextField))
 
@@ -270,8 +223,6 @@ class StringFieldsFilling(FieldFillingTestCase):
 
 class BooleanFieldsFilling(FieldFillingTestCase):
     def test_fill_BooleanField_with_boolean(self):
-        from model_mommy.models import Person
-
         happy_field = Person._meta.get_field('happy')
         self.assertTrue(isinstance(happy_field, BooleanField))
 
@@ -281,8 +232,6 @@ class BooleanFieldsFilling(FieldFillingTestCase):
 class DateFieldsFilling(FieldFillingTestCase):
 
     def test_fill_DateField_with_a_date(self):
-        from model_mommy.models import Person
-
         birthday_field = Person._meta.get_field('birthday')
         self.assertTrue(isinstance(birthday_field, DateField))
 
@@ -292,8 +241,6 @@ class DateFieldsFilling(FieldFillingTestCase):
 class DateTimeFieldsFilling(FieldFillingTestCase):
 
     def test_fill_DateField_with_a_date(self):
-        from model_mommy.models import Person
-
         appointment_field = Person._meta.get_field('appointment')
         self.assertTrue(isinstance(appointment_field, DateTimeField))
 
@@ -303,30 +250,22 @@ class DateTimeFieldsFilling(FieldFillingTestCase):
 class FillingIntFields(TestCase):
 
     def setUp(self):
-        from model_mommy import mommy
-        from model_mommy.models import DummyIntModel
-
         self.dummy_int_model = mommy.make_one(DummyIntModel)
 
     def test_fill_IntegerField_with_a_random_number(self):
-        from model_mommy.models import DummyIntModel
-
         int_field = DummyIntModel._meta.get_field('int_field')
         self.assertTrue(isinstance(int_field, IntegerField))
 
         self.assertTrue(isinstance(self.dummy_int_model.int_field, int))
 
-    
-    def test_fill_BigIntegerField_with_a_random_number(self):
-        from model_mommy.models import DummyIntModel
 
+    def test_fill_BigIntegerField_with_a_random_number(self):
         big_int_field = DummyIntModel._meta.get_field('big_int_field')
         self.assertTrue(isinstance(big_int_field, BigIntegerField))
 
         self.assertTrue(isinstance(self.dummy_int_model.big_int_field, int))
 
     def test_fill_SmallIntegerField_with_a_random_number(self):
-        from model_mommy.models import DummyIntModel
 
         small_int_field = DummyIntModel._meta.get_field('small_int_field')
         self.assertTrue(isinstance(small_int_field, SmallIntegerField))
@@ -337,14 +276,9 @@ class FillingIntFields(TestCase):
 class FillingPositiveIntFields(TestCase):
 
     def setUp(self):
-        from model_mommy import mommy
-        from model_mommy.models import DummyPositiveIntModel
-
         self.dummy_positive_int_model = mommy.make_one(DummyPositiveIntModel)
 
     def test_fill_PositiveSmallIntegerField_with_a_random_number(self):
-        from model_mommy.models import DummyPositiveIntModel
-
         positive_small_int_field = DummyPositiveIntModel._meta.get_field('positive_small_int_field')
         self.assertTrue(isinstance(positive_small_int_field, PositiveSmallIntegerField))
 
@@ -352,8 +286,6 @@ class FillingPositiveIntFields(TestCase):
         self.assertTrue(self.dummy_positive_int_model.positive_small_int_field > 0)
 
     def test_fill_PositiveIntegerField_with_a_random_number(self):
-        from model_mommy.models import DummyPositiveIntModel
-
         positive_int_field = DummyPositiveIntModel._meta.get_field('positive_int_field')
         self.assertTrue(isinstance(positive_int_field, PositiveIntegerField))
 
@@ -363,18 +295,12 @@ class FillingPositiveIntFields(TestCase):
 
 class FillingOthersNumericFields(TestCase):
     def test_filling_FloatField_with_a_random_float(self):
-        from model_mommy import mommy
-        from model_mommy.models import DummyNumbersModel
-
         self.dummy_numbers_model = mommy.make_one(DummyNumbersModel)
         float_field = DummyNumbersModel._meta.get_field('float_field')
         self.assertTrue(isinstance(float_field, FloatField))
         self.assertTrue(isinstance(self.dummy_numbers_model.float_field, float))
 
     def test_filling_DecimalField_with_random_decimal(self):
-        from model_mommy import mommy
-        from model_mommy.models import DummyDecimalModel
-
         self.dummy_decimal_model = mommy.make_one(DummyDecimalModel)
         decimal_field = DummyDecimalModel._meta.get_field('decimal_field')
 
