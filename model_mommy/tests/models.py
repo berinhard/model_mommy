@@ -7,10 +7,6 @@
 
 from django.db import models
 
-# fix for django <= 1.1
-if not hasattr(models, 'BigIntegerField'):
-    setattr(models, 'BigIntegerField', models.IntegerField)
-
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
 class Person(models.Model):
@@ -21,7 +17,10 @@ class Person(models.Model):
     bio = models.TextField(null=True)
     birthday = models.DateField()
     appointment = models.DateTimeField()
-    wanted_games_qtd = models.BigIntegerField()
+    try:
+        wanted_games_qtd = models.BigIntegerField()
+    except AttributeError:
+        wanted_games_qtd = models.IntegerField()
 
 class Dog(models.Model):
     owner = models.ForeignKey('Person')
@@ -34,7 +33,11 @@ class Store(models.Model):
 class DummyIntModel(models.Model):
     int_field = models.IntegerField()
     small_int_field = models.SmallIntegerField()
-    big_int_field = models.BigIntegerField()
+    try:
+        big_int_field = models.BigIntegerField()
+    except AttributeError:
+        big_int_field = models.IntegerField()
+
 
 class DummyPositiveIntModel(models.Model):
     positive_small_int_field = models.PositiveSmallIntegerField()
