@@ -98,67 +98,67 @@ class SimpleExtendMommy(TestCase):
 
 
 class LessSimpleExtendMommy(TestCase):
-    
+
     def test_fail_no_field_attr_string_to_generator_required(self):
         from model_mommy.mommy import Mommy
         from model_mommy.models import Person
-        
+
         gen_oposite = lambda x:not x
         gen_oposite.required = ['house']
-        
+
         class SadPeopleMommy(Mommy):
             attr_mapping = {'happy':gen_oposite}
-        
+
         mom = SadPeopleMommy(Person)
         self.assertRaises(AttributeError, lambda:mom.make_one())
-    
+
     def test_string_to_generator_required(self):
         from model_mommy.mommy import Mommy
         from model_mommy.models import Person
-        
+
         gen_oposite = lambda default:not default
         gen_oposite.required = ['default']
-        
+
         class SadPeopleMommy(Mommy):
             attr_mapping = {'happy':gen_oposite}
-        
+
         happy_field = Person._meta.get_field('happy')
         mom = SadPeopleMommy(Person)
         person = mom.make_one()
         self.assertEqual(person.happy, not happy_field.default)
-    
+
     def test_fail_pass_non_string_to_generator_required(self):
         from model_mommy.mommy import Mommy
         from model_mommy.models import Person
-        
+
         gen_age = lambda x:10
-        
+
         class MyMommy(Mommy):
             pass
-        
+
         MyMommy.attr_mapping = {'age':gen_age}
         mom = MyMommy(Person)
-        
+
         # for int
         gen_age.required = [10]
         self.assertRaises(ValueError, lambda:mom.make_one())
-        
+
         # for float
         gen_age.required = [10.10]
         self.assertRaises(ValueError, lambda:mom.make_one())
-        
+
         # for iterable
         gen_age.required = [[]]
         self.assertRaises(ValueError, lambda:mom.make_one())
-        
+
         # for iterable/dict
         gen_age.required = [{}]
         self.assertRaises(ValueError, lambda:mom.make_one())
-        
+
         # for boolean
         gen_age.required = [True]
         self.assertRaises(ValueError, lambda:mom.make_one())
-        
+
 class MommyCreatesSimpleModel(TestCase):
 
     def test_make_one_should_create_one_object(self):
@@ -180,7 +180,7 @@ class MommyCreatesSimpleModel(TestCase):
 
         person = mommy.prepare_one(Person)
         self.assertTrue(isinstance(person, Person))
-        
+
         # makes sure database is clean
         self.assertEqual(Person.objects.all().count(), 0)
 
@@ -282,7 +282,7 @@ class FillingIntFields(TestCase):
 
         self.assertTrue(isinstance(self.dummy_int_model.int_field, int))
 
-    
+
     def test_fill_BigIntegerField_with_a_random_number(self):
         from model_mommy.models import DummyIntModel
 
@@ -346,3 +346,16 @@ class FillingOthersNumericFields(TestCase):
 
         self.assertTrue(isinstance(decimal_field, DecimalField))
         self.assertTrue(isinstance(self.dummy_decimal_model.decimal_field, basestring))
+
+
+class HandlingUnsupportedModels(TestCase):
+    def test_unsupported_model_raises_an_explanatory_exception(self):
+        from model_mommy import mommy
+        from model_mommy.models import UnsupportedModel
+
+        try:
+            mommy.make_one(UnsupportedModel)
+            self.fail("Should have raised a TypeError")
+        except TypeError, e:
+            self.assertTrue('not supported' in repr(e))
+
