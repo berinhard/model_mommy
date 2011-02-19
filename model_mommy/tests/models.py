@@ -17,6 +17,7 @@ class Person(models.Model):
     bio = models.TextField()
     birthday = models.DateField()
     appointment = models.DateTimeField()
+    blog = models.URLField()
 
     #backward compatibilty with Django 1.1
     try:
@@ -47,3 +48,4 @@ class DummyNumbersModel(models.Model):
 
 class DummyDecimalModel(models.Model):
     decimal_field = models.DecimalField(max_digits=5, decimal_places=2)
+

@@ -5,6 +5,7 @@ from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
+from django.db.models.fields import URLField
 
 try:
     from django.db.models.fields import BigIntegerField
@@ -64,6 +65,8 @@ default_mapping = {
 
     DateField:generators.gen_date,
     DateTimeField:generators.gen_date,
+
+    URLField:generators.gen_url,
 }
 
 class Mommy(object):
@@ -138,7 +141,8 @@ def get_required_values(generator, field):
 
             elif isinstance(item, basestring):
                 rt[item] = getattr(field, item)
-            
+
             else: raise ValueError("Required value '%s' is of wrong type. Don't make mommy sad." % str(item))
 
     return rt
+

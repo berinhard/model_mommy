@@ -1,12 +1,12 @@
 # -*- coding:utf-8 -*-
 
 __doc__ = """
-Generators are callables that return a value used to populate a field. 
+Generators are callables that return a value used to populate a field.
 
-If this callable has a `required` attribute (a list, mostly), for each item in the list, 
-if the item is a string, the field attribute with the same name will be fetched from the field 
-and used as argument for the generator. If it is a callable (which will receive `field` 
-as first argument), it should return a list in the format (key, value) where key is 
+If this callable has a `required` attribute (a list, mostly), for each item in the list,
+if the item is a string, the field attribute with the same name will be fetched from the field
+and used as argument for the generator. If it is a callable (which will receive `field`
+as first argument), it should return a list in the format (key, value) where key is
 the argument name for generator and value is the value for that argument.
 """
 
@@ -20,7 +20,7 @@ MAX_LENGTH = 300
 
 def gen_from_list(L):
     '''Makes sure all values of the field are generated from the list L
-    Usage: 
+    Usage:
     from mommy import Mommy
     class KidMommy(Mommy):
       attr_mapping = {'some_field':gen_from_list([A, B, C])}
@@ -57,3 +57,8 @@ gen_string.required = ['max_length']
 gen_text = lambda: gen_string(MAX_LENGTH)
 
 gen_boolean = lambda: choice((True, False))
+
+def gen_url():
+    letters = ''.join(choice(string.letters) for i in range(30))
+    return 'http://www.%s.com' % letters
+
