@@ -27,7 +27,6 @@ class FieldFillingTestCase(TestCase):
     def setUp(self):
         self.person = mommy.make_one(Person)
 
-
 class FieldFillingWithParameterTestCase(TestCase):
 
     def test_simple_creating_person_with_parameters(self):
@@ -37,9 +36,6 @@ class FieldFillingWithParameterTestCase(TestCase):
         self.assertEqual(kid.name, 'Mike')
 
     def test_creating_person_from_factory_using_paramters(self):
-
-
-
         person_mom = mommy.Mommy(Person)
         person = person_mom.make_one(happy=False, age=20, gender='M', name='John')
         self.assertEqual(person.age, 20)
@@ -47,18 +43,9 @@ class FieldFillingWithParameterTestCase(TestCase):
         self.assertEqual(person.name, 'John')
         self.assertEqual(person.gender, 'M')
 
-
 class SimpleExtendMommy(TestCase):
 
-    def test_simple_extended_mommy_example(self):
-        class Aunt(mommy.Mommy):
-            pass
-
-        aunt = Aunt(Person)
-        self.cousin = aunt.make_one()
-
-
-    def test_attr_mapping_with_from_list_generator(self):
+    def test_list_generator_respects_values_from_list(self):
         age_list = range(4, 12)
 
         class KidMommy(mommy.Mommy):
@@ -69,7 +56,6 @@ class SimpleExtendMommy(TestCase):
         mom = KidMommy(Person)
         kid = mom.make_one()
 
-        # person's age belongs to informed list?
         self.assertTrue(kid.age in age_list)
 
     def test_type_mapping_overwriting_boolean_model_behavior(self):
@@ -80,10 +66,10 @@ class SimpleExtendMommy(TestCase):
                     BooleanField:lambda:False
                 })
 
+        assert Person._meta.get_field('happy').default is True
         sad_people_mommy = SadPeopleMommy(Person)
         person = sad_people_mommy.make_one()
 
-        # making sure this person is sad >:D
         self.assertEqual(person.happy, False)
 
 

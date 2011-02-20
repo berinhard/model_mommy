@@ -97,35 +97,36 @@ class Mommy(object):
     def get_fields(self):
         return self.model._meta.fields+self.model._meta.many_to_many
 
+    #Method too big
     def _make_one(self, commit=True, **attrs):
         m2m_dict = {}
-        
+
         for field in self.get_fields():
             if isinstance(field, AutoField):
                 continue
-            
+
             if isinstance(field, ManyToManyField):
                 # default value was not informed
-                if field.name not in attrs: 
+                if field.name not in attrs:
                     if field.null and not self.fill_nullables:
                         continue # do not populate
-                    else: 
+                    else:
                         m2m_dict[field.name] = self.generate_value(field)
-                else: 
+                else:
                     m2m_dict[field.name] = attrs.pop(field.name)
-            
+
             elif field.name not in attrs:
                 if field.null and not self.fill_nullables:
                     continue
                 else:
                     attrs[field.name] = self.generate_value(field)
-        
+
         instance = self.model(**attrs)
-        
+
         # m2m only works for persisted instances
         if commit:
             instance.save()
-            
+
             # m2m relation is treated differently
             for key, value in m2m_dict.items():
                 m2m_relation = getattr(instance, key)
@@ -173,7 +174,7 @@ def get_required_values(generator, field):
 
             elif isinstance(item, basestring):
                 rt[item] = getattr(field, item)
-            
+
             else: raise ValueError("Required value '%s' is of wrong type. Don't make mommy sad." % str(item))
 
     return rt
