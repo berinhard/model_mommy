@@ -27,6 +27,46 @@ class FieldFillingTestCase(TestCase):
     def setUp(self):
         self.person = mommy.make_one(Person)
 
+class MommyCreatesSimpleModel(TestCase):
+
+    def test_make_one_should_create_one_object(self):
+        person = mommy.make_one(Person)
+        self.assertTrue(isinstance(person, Person))
+
+        # makes sure it is the person we created
+        self.assertTrue(Person.objects.filter(id=person.id))
+
+    def test_prepare_one_should_not_persist_one_object(self):
+        person = mommy.prepare_one(Person)
+        self.assertTrue(isinstance(person, Person))
+
+        # makes sure database is clean
+        self.assertEqual(Person.objects.all().count(), 0)
+
+        self.assertEqual(person.id, None)
+
+
+class MommyCreatesAssociatedModels(TestCase):
+
+    def test_dependent_models_with_ForeignKey(self):
+        dog = mommy.make_one(Dog)
+        self.assertTrue(isinstance(dog.owner, Person))
+
+    def test_prepare_one_should_not_create_one_object(self):
+        dog = mommy.prepare_one(Dog)
+        self.assertTrue(isinstance(dog, Dog))
+        self.assertTrue(isinstance(dog.owner, Person))
+
+        # makes sure database is clean
+        self.assertEqual(Person.objects.all().count(), 0)
+        self.assertEqual(Dog.objects.all().count(), 0)
+
+    def test_create_many_to_many(self):
+
+        store = mommy.make_one(Store)
+        self.assertEqual(store.employees.count(), 5)
+        self.assertEqual(store.customers.count(), 5)
+
 class FieldFillingWithParameterTestCase(TestCase):
 
     def test_simple_creating_person_with_parameters(self):
@@ -126,45 +166,6 @@ class LessSimpleExtendMommy(TestCase):
         gen_age.required = [True]
         self.assertRaises(ValueError, mom.make_one)
 
-class MommyCreatesSimpleModel(TestCase):
-
-    def test_make_one_should_create_one_object(self):
-        person = mommy.make_one(Person)
-        self.assertTrue(isinstance(person, Person))
-
-        # makes sure it is the person we created
-        self.assertTrue(Person.objects.filter(id=person.id))
-
-    def test_prepare_one_should_not_persist_one_object(self):
-        person = mommy.prepare_one(Person)
-        self.assertTrue(isinstance(person, Person))
-
-        # makes sure database is clean
-        self.assertEqual(Person.objects.all().count(), 0)
-
-        self.assertEqual(person.id, None)
-
-
-class MommyCreatesAssociatedModels(TestCase):
-
-    def test_dependent_models_with_ForeignKey(self):
-        dog = mommy.make_one(Dog)
-        self.assertTrue(isinstance(dog.owner, Person))
-
-    def test_prepare_one_should_not_create_one_object(self):
-        dog = mommy.prepare_one(Dog)
-        self.assertTrue(isinstance(dog, Dog))
-        self.assertTrue(isinstance(dog.owner, Person))
-
-        # makes sure database is clean
-        self.assertEqual(Person.objects.all().count(), 0)
-        self.assertEqual(Dog.objects.all().count(), 0)
-
-    def test_create_many_to_many(self):
-
-        store = mommy.make_one(Store)
-        self.assertEqual(store.employees.count(), 5)
-        self.assertEqual(store.customers.count(), 5)
 
 
 class FillNullablesTestCase(TestCase):
