@@ -75,7 +75,7 @@ class SimpleExtendMommy(TestCase):
 
 class LessSimpleExtendMommy(TestCase):
 
-    def test_fail_no_field_attr_string_to_generator_required(self):
+    def test_unexistent_required_field(self):
         gen_oposite = lambda x:not x
         gen_oposite.required = ['house']
 
@@ -85,6 +85,7 @@ class LessSimpleExtendMommy(TestCase):
         mom = SadPeopleMommy(Person)
         self.assertRaises(AttributeError, mom.make_one)
 
+    #TODO: put a better name
     def test_string_to_generator_required(self):
         gen_oposite = lambda default:not default
         gen_oposite.required = ['default']
@@ -101,9 +102,8 @@ class LessSimpleExtendMommy(TestCase):
         gen_age = lambda x:10
 
         class MyMommy(mommy.Mommy):
-            pass
+            attr_mapping = {'age':gen_age}
 
-        MyMommy.attr_mapping = {'age':gen_age}
         mom = MyMommy(Person)
 
         # for int
