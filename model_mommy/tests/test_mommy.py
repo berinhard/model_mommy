@@ -83,7 +83,7 @@ class LessSimpleExtendMommy(TestCase):
             attr_mapping = {'happy':gen_oposite}
 
         mom = SadPeopleMommy(Person)
-        self.assertRaises(AttributeError, lambda:mom.make_one())
+        self.assertRaises(AttributeError, mom.make_one)
 
     def test_string_to_generator_required(self):
         gen_oposite = lambda default:not default
@@ -108,23 +108,23 @@ class LessSimpleExtendMommy(TestCase):
 
         # for int
         gen_age.required = [10]
-        self.assertRaises(ValueError, lambda:mom.make_one())
+        self.assertRaises(ValueError, mom.make_one)
 
         # for float
         gen_age.required = [10.10]
-        self.assertRaises(ValueError, lambda:mom.make_one())
+        self.assertRaises(ValueError, mom.make_one)
 
         # for iterable
         gen_age.required = [[]]
-        self.assertRaises(ValueError, lambda:mom.make_one())
+        self.assertRaises(ValueError, mom.make_one)
 
         # for iterable/dict
         gen_age.required = [{}]
-        self.assertRaises(ValueError, lambda:mom.make_one())
+        self.assertRaises(ValueError, mom.make_one)
 
         # for boolean
         gen_age.required = [True]
-        self.assertRaises(ValueError, lambda:mom.make_one())
+        self.assertRaises(ValueError, mom.make_one)
 
 class MommyCreatesSimpleModel(TestCase):
 
