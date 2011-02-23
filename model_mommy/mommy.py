@@ -102,21 +102,23 @@ class Mommy(object):
         m2m_dict = {}
 
         for field in self.get_fields():
+            ignore_null_field = field.null and not self.fill_nullables
+            field_value_not_defined = field.name not in attrs
+
             if isinstance(field, AutoField):
                 continue
 
             if isinstance(field, ManyToManyField):
-                # default value was not informed
-                if field.name not in attrs:
-                    if field.null and not self.fill_nullables:
-                        continue # do not populate
+                if field_value_not_defined:
+                    if ignore_null_field:
+                        continue
                     else:
                         m2m_dict[field.name] = self.generate_value(field)
                 else:
                     m2m_dict[field.name] = attrs.pop(field.name)
 
-            elif field.name not in attrs:
-                if field.null and not self.fill_nullables:
+            elif field_value_not_defined:
+                if ignore_null_field:
                     continue
                 else:
                     attrs[field.name] = self.generate_value(field)
