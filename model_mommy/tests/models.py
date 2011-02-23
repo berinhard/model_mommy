@@ -48,3 +48,6 @@ class DummyNumbersModel(models.Model):
 
 class DummyDecimalModel(models.Model):
     decimal_field = models.DecimalField(max_digits=5, decimal_places=2)
+
+class DummyEmailModel(models.Model):
+    email_field = models.EmailField()

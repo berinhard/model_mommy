@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db.models.fields import AutoField, CharField, TextField
-from django.db.models.fields import DateField, DateTimeField
+from django.db.models.fields import DateField, DateTimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
@@ -71,6 +71,8 @@ default_mapping = {
 
     DateField:generators.gen_date,
     DateTimeField:generators.gen_date,
+
+    EmailField:generators.gen_email,
 }
 
 class Mommy(object):

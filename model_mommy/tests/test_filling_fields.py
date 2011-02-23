@@ -5,7 +5,7 @@ from django.test import TestCase
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling','FillingIntFields', 'FillingPositiveIntFields',
-    'FillingOthersNumericFields', 'FillingFromChoice'
+    'FillingOthersNumericFields', 'FillingFromChoice', 'FillingEmailField',
 ]
 
 class FieldFillingTestCase(TestCase):
@@ -114,3 +114,10 @@ class FillingOthersNumericFields(TestCase):
 
         self.assertTrue(isinstance(decimal_field, DecimalField))
         self.assertTrue(isinstance(self.dummy_decimal_model.decimal_field, basestring))
+
+class FillingEmailField(TestCase):
+    def test_filling_EmailField(self):
+        obj = mommy.make_one(DummyEmailModel)
+        field = DummyEmailModel._meta.get_field('email_field')
+        self.assertTrue(isinstance(field, EmailField))
+        self.assertTrue(isinstance(obj.email_field, basestring))
