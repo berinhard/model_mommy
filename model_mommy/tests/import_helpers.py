@@ -7,7 +7,7 @@ from django.db.models.fields import DateField, DateTimeField
 from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
-from django.db.models.fields import BooleanField
+from django.db.models.fields import BooleanField, URLField
 
 from model_mommy import mommy
 from model_mommy.models import Person, Dog, Store

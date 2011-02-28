@@ -5,7 +5,7 @@ from django.test import TestCase
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling','FillingIntFields', 'FillingPositiveIntFields',
-    'FillingOthersNumericFields', 'FillingFromChoice'
+    'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling'
 ]
 
 class FieldFillingTestCase(TestCase):
@@ -114,3 +114,12 @@ class FillingOthersNumericFields(TestCase):
 
         self.assertTrue(isinstance(decimal_field, DecimalField))
         self.assertTrue(isinstance(self.dummy_decimal_model.decimal_field, basestring))
+
+class URLFieldsFilling(FieldFillingTestCase):
+    def test_fill_URLField_with_valid_url(self):
+        from model_mommy.models import Person
+
+        blog_field = Person._meta.get_field('blog')
+        self.assertTrue(isinstance(blog_field, URLField))
+
+        self.assertTrue(isinstance(self.person.blog, str))

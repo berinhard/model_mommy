@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 from import_helpers import *
-from django.test import TestCase
 
+from django.test import TestCase
 
 class MommyCreatesSimpleModel(TestCase):
 

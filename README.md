@@ -134,4 +134,5 @@ If the generator requires a attribute of field as argument, you could do somethi
 For more examples, see tests.
 
 ##Currently supports the fields:
-CharField, TextField, FloatField, ForeignKey, Date and DateTimeField, BooleanField, and all the integer-type Fields
+CharField, TextField, FloatField, ForeignKey, Date and DateTimeField, BooleanField, URLField, and all the integer-type Fields
+
