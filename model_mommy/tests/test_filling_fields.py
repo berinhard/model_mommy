@@ -117,8 +117,6 @@ class FillingOthersNumericFields(TestCase):
 
 class URLFieldsFilling(FieldFillingTestCase):
     def test_fill_URLField_with_valid_url(self):
-        from model_mommy.models import Person
-
         blog_field = Person._meta.get_field('blog')
         self.assertTrue(isinstance(blog_field, URLField))
 
