@@ -43,8 +43,6 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(store.employees.count(), 5)
         self.assertEqual(store.customers.count(), 5)
 
-class FieldFillingWithParameterTestCase(TestCase):
-
     def test_simple_creating_person_with_parameters(self):
         kid = mommy.make_one(Person, happy=True, age=10, name='Mike')
         self.assertEqual(kid.age, 10)
@@ -76,3 +74,10 @@ class FillNullablesTestCase(TestCase):
         p = mom.make_one()
         self.assertTrue( p.bio == None )
 
+class HandlingUnsupportedModels(TestCase):
+    def test_unsupported_model_raises_an_explanatory_exception(self):
+        try:
+            mommy.make_one(UnsupportedModel)
+            self.fail("Should have raised a TypeError")
+        except TypeError, e:
+            self.assertTrue('not supported' in repr(e))
