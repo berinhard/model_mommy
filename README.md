@@ -42,10 +42,10 @@ when you do:
 
 it will also create the Kid, automatically.
 
-You can also pass arguments to make one.
+You can also specify values for one or more attribute.
 
-    another_kid = mommy.make_one(Kid, {'age':3})
-    assert(another_kid.age == 3)
+    another_kid = mommy.make_one(Kid, age = 3)
+    assert another_kid.age == 3
 
 But, if don't need a persisted object, mommy can handle this for you as well:
 
@@ -56,66 +56,12 @@ But, if don't need a persisted object, mommy can handle this for you as well:
 
 It works like make_one, but like was said, it doesn't persist the instance.
 
-## Not so Basic Usage:
-
-Model instances can also be generated from Mommy factories. Make your
-mass producer mom like this:
-
-    from model_mommy.mommy import Mommy
-    from model_mommy.models import Kid
-
-    mom = Mommy(Kid)
-    first_kid = mom.make_one()
-    second_kid = mom.make_one()
-    third_kid = mom.make_one()
-
-Note that this kind of construction is much more efficient than
-mommy.make_one(Model), so, if you need to create a lot of instances,
-this much be a nicier approach.
-
-## Even Less Basic Usage
+## Extending Mommy
 
 All attributes used to automatically populate mommy generated instances
-are created with generators from **model_mommy/generators.py**. If you want
+are created with generators from **model_mommy/generators.py**. if you want
 a specific field to be populated with a different generator from the default
-generator, you must extend the Mommy class to get this behavior. Let's see a example:
-
-    from model_mommy.generators import gen_from_list
-    from model_mommy.models import Kid
-    from model_mommy.mommy import Mommy
-
-    a_lot_of_games = range(30, 100)
-
-    class HardGamerMommy(Mommy):
-        attr_mapping = {
-            'wanted_games_qtd':gen_from_list(a_lot_of_games)
-        }
-
-    mom = HardGamerMommy(Kid)
-    kid = mom.make_one()
-    assert(kid.wanted_games_qtd in a_lot_of_games)
-
-You can also change the default generator for a field. Let's take a look:
-
-    from random import randint
-    from model_mommy.models import Kid
-    from model_mommy.mommy import Mommy
-
-    class KidMommy(Mommy):
-        attr_mapping = {
-            'wanted_games_qtd':gen_from_list(a_lot_of_games)
-        }
-
-    mom = HardGamerMommy(Kid)
-    kid = mom.make_one()
-    assert(kid.wanted_games_qtd in a_lot_of_games)
-
-Note that you can also create your own generator.
-
-## Your Own Generator
-
-A generator is just a simple callable (like a function) that may require a few arguments.
-Let's see a dead simple example:
+generator, you must extend the mommy class to get this behavior. let's see a example:
 
     gen_newborn_age = lambda:0
 
@@ -126,12 +72,24 @@ Let's see a dead simple example:
     baby = mom.make_one()
     assert(baby.age==0)
 
-If the generator requires a attribute of field as argument, you could do something like this:
+If the generator requires a attribute from the field as argument, you could do something like this:
 
     gen_name_from_default = lambda default_value:default_value
     gen_name_from_default.required = ['default']
 
-For more examples, see tests.
+You can also override the type_mapping, if you want to all values from a given Field to be populate with a value you prefer,
+you  could do:
+
+    class TimeCopMommy(Mommy):
+        def __init__(self, model, fill_nullables=True):
+            super(Mommy, self).__init__(model, fill_nullables)
+            self.type_mapping[DateField] = datetime.date(2011, 02, 02)
+
+## Doubts? Loved it? Hated it? Suggestions?
+
+mail us!:
+vanderson.mota at gmail "dot" com
+italo.maia at gmail "dot" com
 
 ##Currently supports the fields:
 CharField, TextField, FloatField, ForeignKey, Date and DateTimeField, BooleanField, URLField, and all the integer-type Fields
