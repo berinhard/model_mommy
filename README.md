@@ -88,8 +88,8 @@ you  could do:
 ## Doubts? Loved it? Hated it? Suggestions?
 
 mail us!:
-vanderson.mota at gmail "dot" com
-italo.maia at gmail "dot" com
+*  vanderson.mota **at** gmail **dot** com
+*  italo.maia **at** gmail **dot** com
 
 ##Currently supports the fields:
 CharField, TextField, FloatField, ForeignKey, Date and DateTimeField, BooleanField, URLField, and all the integer-type Fields
