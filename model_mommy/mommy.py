@@ -25,6 +25,8 @@ import sys
 #TODO: improve related models handling
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
+MAX_SELF_REFERENCE_LOOPS = 2
+
 def make_one(model, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
@@ -125,7 +127,16 @@ class Mommy(object):
                 if ignore_field(field):
                     continue
                 else:
+                    #XXX: hack to avoid infinite recursion
+                    if isinstance(field, ForeignKey) and (field.related.parent_model == self.model):
+                        self.model.self_reference_loop_count = getattr(self.model, 'self_reference_loop_count', 1)
+                        if self.model.self_reference_loop_count <= MAX_SELF_REFERENCE_LOOPS:
+                            self.model.self_reference_loop_count += 1
+                        else:
+                            del self.model.self_reference_loop_count
+                            return
                     attrs[field.name] = self.generate_value(field)
+
 
         instance = self.model(**attrs)
 

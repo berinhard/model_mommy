@@ -6,8 +6,14 @@ __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling','FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
-    'FillingEmailField',
+    'FillingEmailField', 'FillingSelfReferenceField'
 ]
+
+def assert_not_raise(method, parameters, exception):
+    try:
+        method(*parameters)
+    except exception:
+        raise AssertionError, "Exception %s not expected to be raised" %exception.__name__
 
 class FieldFillingTestCase(TestCase):
 
@@ -129,3 +135,11 @@ class FillingEmailField(TestCase):
         field = DummyEmailModel._meta.get_field('email_field')
         self.assertTrue(isinstance(field, EmailField))
         self.assertTrue(isinstance(obj.email_field, basestring))
+
+class FillingSelfReferenceField(TestCase):
+    def test_filling_selfreference_not_enters_in_infinite_recursion(self):
+        assert_not_raise(mommy.make_one, (ModelWithSelfReference,), RuntimeError)
+
+    def test_fills_selfreference_properly(self):
+        self_referenced_model = mommy.make_one(ModelWithSelfReference)
+        self.assertTrue(isinstance(self_referenced_model.self_reference, ModelWithSelfReference))
