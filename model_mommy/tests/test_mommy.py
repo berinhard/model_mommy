@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 from model_mommy.models import Person, Dog, Store
-from model_mommy.models import UnsupportedModel
+from model_mommy.models import UnsupportedModel, DummyGenericRelationModel
 
 class MommyCreatesSimpleModel(TestCase):
 
@@ -83,3 +83,8 @@ class HandlingUnsupportedModels(TestCase):
             self.fail("Should have raised a TypeError")
         except TypeError, e:
             self.assertTrue('not supported' in repr(e))
+
+class HandlingModelsWithGenericRelationFields(TestCase):
+        def test_create_model_with_generic_relation(self):
+            dummy = mommy.make_one(DummyGenericRelationModel)
+            self.assertTrue(isinstance(dummy, DummyGenericRelationModel))
