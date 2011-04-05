@@ -7,6 +7,8 @@ from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
 from django.db.models.fields import URLField
 
+from django.contrib.contenttypes import generic
+
 try:
     from django.db.models.fields import BigIntegerField
 except ImportError:
@@ -114,6 +116,9 @@ class Mommy(object):
             if isinstance(field, AutoField):
                 continue
 
+            if isinstance(field, generic.GenericRelation):
+                continue
+            
             if isinstance(field, ManyToManyField):
                 if field_value_not_defined:
                     if ignore_field(field):
