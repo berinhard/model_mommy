@@ -7,6 +7,9 @@
 
 from django.db import models
 
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
+
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
 class Person(models.Model):
@@ -65,3 +68,11 @@ class DummyEmailModel(models.Model):
 
 class ModelWithSelfReference(models.Model):
     self_reference = models.ForeignKey('self', null=True)
+
+class DummyGenericForeignKeyModel(models.Model):
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+
+class DummyGenericRelationModel(models.Model):
+    relation = generic.GenericRelation(DummyGenericForeignKeyModel)

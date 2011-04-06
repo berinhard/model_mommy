@@ -81,3 +81,8 @@ class HandlingUnsupportedModels(TestCase):
             self.fail("Should have raised a TypeError")
         except TypeError, e:
             self.assertTrue('not supported' in repr(e))
+
+class HandlingModelsWithGenericRelationFields(TestCase):
+        def test_create_model_with_generic_relation(self):
+            p = mommy.make_one(DummyGenericRelationModel)
+            self.assertTrue(isinstance(p, DummyGenericRelationModel))
