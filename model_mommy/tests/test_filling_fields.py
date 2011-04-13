@@ -35,6 +35,13 @@ class StringFieldsFilling(FieldFillingTestCase):
         self.assertTrue(isinstance(self.person.name, str))
         self.assertEqual(len(self.person.name), person_name_field.max_length)
 
+    def test_fill_SlugField_with_a_random_str(self):
+        person_nickname_field = Person._meta.get_field('nickname')
+        self.assertTrue(isinstance(person_nickname_field, SlugField))
+
+        self.assertTrue(isinstance(self.person.nickname, str))
+        self.assertEqual(len(self.person.nickname), person_nickname_field.max_length)
+
     def test_fill_TextField_with_a_random_str(self):
         person_bio_field = Person._meta.get_field('bio')
         self.assertTrue(isinstance(person_bio_field, TextField))
