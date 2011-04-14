@@ -16,6 +16,7 @@ class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CH)
     happy = models.BooleanField(default=True)
     name = models.CharField(max_length=30)
+    nickname = models.SlugField(null=True)
     age = models.IntegerField()
     bio = models.TextField(null=True)
     birthday = models.DateField()

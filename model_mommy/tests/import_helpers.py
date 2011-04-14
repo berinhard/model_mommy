@@ -2,7 +2,7 @@
 from datetime import date, datetime
 from decimal import Decimal
 
-from django.db.models.fields import AutoField, CharField, TextField
+from django.db.models.fields import AutoField, CharField, TextField, SlugField
 from django.db.models.fields import DateField, DateTimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField

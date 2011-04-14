@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.db.models.fields import AutoField, CharField, TextField
+from django.db.models.fields import AutoField, CharField, TextField, SlugField
 from django.db.models.fields import DateField, DateTimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
@@ -69,6 +69,7 @@ default_mapping = {
 
     CharField:generators.gen_string,
     TextField:generators.gen_text,
+    SlugField:generators.gen_slug,
 
     ForeignKey:make_one,
     #OneToOneField:make_one,
@@ -203,4 +204,3 @@ def get_required_values(generator, field):
                 raise ValueError("Required value '%s' is of wrong type. Don't make mommy sad." % str(item))
 
     return rt
-
