@@ -6,6 +6,7 @@ from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerFi
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
 from django.db.models.fields import URLField
+from django.db.models.fields import NOT_PROVIDED
 
 from django.contrib.contenttypes import generic
 
@@ -119,6 +120,12 @@ class Mommy(object):
 
             if isinstance(field, generic.GenericRelation):
                 continue
+
+            # If not specified, django automatically sets blank=True and default
+            # on BooleanFields so we don't need to check these            
+            if field.get_internal_type() != 'BooleanField':            
+                if field.default != NOT_PROVIDED or field.blank:
+                    continue
             
             if isinstance(field, ManyToManyField):
                 if field_value_not_defined:

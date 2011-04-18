@@ -86,3 +86,18 @@ class HandlingModelsWithGenericRelationFields(TestCase):
         def test_create_model_with_generic_relation(self):
             p = mommy.make_one(DummyGenericRelationModel)
             self.assertTrue(isinstance(p, DummyGenericRelationModel))
+            
+class SkipBlanksTestCase(TestCase):
+        def test_skip_blank(self):
+            dummy = mommy.make_one(DummyBlankFieldsModel)
+            self.assertEqual(dummy.blank_char_field, '')
+            self.assertEqual(dummy.blank_text_field, '')
+
+class SkipDefaultsTestCase(TestCase):
+    def test_skip_blank(self):
+        dummy = mommy.make_one(DummyDefaultFieldsModel)
+        self.assertEqual(dummy.default_char_field, 'default')
+        self.assertEqual(dummy.default_text_field, 'default')
+        self.assertEqual(dummy.default_int_field, 123)
+        self.assertEqual(dummy.default_float_field, 123.0)
+        self.assertEqual(dummy.default_date_field, '2011-01-01')
