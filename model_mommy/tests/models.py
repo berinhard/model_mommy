@@ -4,6 +4,7 @@
 # TESTING PURPOSE ONLY MODELS!!       #
 # DO NOT ADD THE APP TO INSTALLED_APPS#
 #######################################
+from decimal import Decimal
 
 from django.db import models
 
@@ -88,3 +89,7 @@ class DummyDefaultFieldsModel(models.Model):
     default_int_field = models.IntegerField(default=123)
     default_float_field = models.FloatField(default=123.0)
     default_date_field = models.DateField(default='2011-01-01')
+    default_date_time_field = models.DateTimeField(default='2011-01-01')
+    default_decimal_field = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0'))
+    default_email_field = models.EmailField(default='')
+    default_slug_field = models.SlugField(default='')
