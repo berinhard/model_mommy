@@ -19,7 +19,7 @@ from random import randint, choice, random
 MAX_LENGTH = 300
 # Using sys.maxint here breaks a bunch of tests when running against a
 # Postgres database.
-maxint = 10000
+MAX_INT = 10000
 
 def gen_from_list(L):
     '''Makes sure all values of the field are generated from the list L
@@ -36,7 +36,7 @@ def gen_from_choices(C):
     choice_list = map(lambda x:x[0], C)
     return gen_from_list(choice_list)
 
-def gen_integer(min_int=-maxint, max_int=maxint):
+def gen_integer(min_int=-MAX_INT, max_int=MAX_INT):
     return randint(min_int, max_int)
 
 gen_float = lambda:random()*gen_integer()
