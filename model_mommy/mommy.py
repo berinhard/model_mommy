@@ -9,6 +9,7 @@ from django.db.models.fields import URLField
 from django.db.models.fields import NOT_PROVIDED
 
 from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 
 try:
     from django.db.models.fields import BigIntegerField
@@ -81,6 +82,8 @@ default_mapping = {
 
     URLField:generators.gen_url,
     EmailField:generators.gen_email,
+    
+    ContentType:generators.gen_content_type,
 }
 
 class Mommy(object):
@@ -114,7 +117,7 @@ class Mommy(object):
         for field in self.get_fields():
             ignore_field = lambda field: field.null and not self.fill_nullables
             field_value_not_defined = field.name not in attrs
-
+            
             if isinstance(field, AutoField):
                 continue
 
@@ -176,10 +179,13 @@ class Mommy(object):
 
         `attr_mapping` and `type_mapping` can be defined easely overwriting the model.
         '''
+        
         if field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
-            generator = generators.gen_from_choices(field.choices)
+            generator = generators.gen_from_choices(field.choices)        
+        elif isinstance(field, ForeignKey) and field.rel.to is ContentType:
+            generator = self.type_mapping[ContentType]
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
         else:

@@ -3,6 +3,7 @@ from decimal import Decimal
 
 from import_helpers import *
 
+from django.db import IntegrityError
 from django.test import TestCase
 
 class MommyCreatesSimpleModel(TestCase):
@@ -85,18 +86,25 @@ class HandlingUnsupportedModels(TestCase):
             self.assertTrue('not supported' in repr(e))
 
 class HandlingModelsWithGenericRelationFields(TestCase):
-        def test_create_model_with_generic_relation(self):
-            p = mommy.make_one(DummyGenericRelationModel)
-            self.assertTrue(isinstance(p, DummyGenericRelationModel))
-            
+    def test_create_model_with_generic_relation(self):
+        p = mommy.make_one(DummyGenericRelationModel)
+        self.assertTrue(isinstance(p, DummyGenericRelationModel))
+
+
+class HandlingContentTypeField(TestCase):
+    def test_create_model_with_contenttype_field(self):
+        dummy = mommy.make_one(DummyGenericForeignKeyModel)
+        self.assertTrue(isinstance(dummy, DummyGenericForeignKeyModel))
+
+
 class SkipBlanksTestCase(TestCase):
-        def test_skip_blank(self):
-            dummy = mommy.make_one(DummyBlankFieldsModel)
-            self.assertEqual(dummy.blank_char_field, '')
-            self.assertEqual(dummy.blank_text_field, '')
+    def test_skip_blank(self):
+        dummy = mommy.make_one(DummyBlankFieldsModel)
+        self.assertEqual(dummy.blank_char_field, '')
+        self.assertEqual(dummy.blank_text_field, '')
 
 class SkipDefaultsTestCase(TestCase):
-    def test_skip_blank(self):
+    def test_skip_fields_with_default(self):
         dummy = mommy.make_one(DummyDefaultFieldsModel)
         self.assertEqual(dummy.default_char_field, 'default')
         self.assertEqual(dummy.default_text_field, 'default')

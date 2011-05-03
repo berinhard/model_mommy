@@ -6,7 +6,8 @@ __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling','FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
-    'FillingEmailField', 'FillingSelfReferenceField'
+    'FillingEmailField', 'FillingSelfReferenceField',
+    'FillingGenericForeignKeyField',
 ]
 
 def assert_not_raise(method, parameters, exception):
@@ -150,3 +151,9 @@ class FillingSelfReferenceField(TestCase):
     def test_fills_selfreference_properly(self):
         self_referenced_model = mommy.make_one(ModelWithSelfReference)
         self.assertTrue(isinstance(self_referenced_model.self_reference, ModelWithSelfReference))
+
+
+class FillingGenericForeignKeyField(TestCase):
+    def test_filling_content_type_field(self):
+        dummy = mommy.make_one(DummyGenericForeignKeyModel)
+        self.assertTrue(isinstance(dummy.content_type, ContentType))
