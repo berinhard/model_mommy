@@ -39,7 +39,8 @@ def gen_from_choices(C):
 def gen_integer(min_int=-MAX_INT, max_int=MAX_INT):
     return randint(min_int, max_int)
 
-gen_float = lambda:random()*gen_integer()
+def gen_float():
+    return random()*gen_integer()
 
 def gen_decimal(max_digits, decimal_places):
     num_as_str = lambda x: ''.join([str(randint(0,9)) for i in range(x)])
