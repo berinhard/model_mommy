@@ -68,4 +68,5 @@ gen_boolean = lambda: choice((True, False))
 def gen_url():
     return 'http://www.%s.com' % gen_string(30)
 
-gen_email = lambda: "%s@example.com" % gen_string(10)
+def gen_email():
+    return "%s@example.com" % gen_string(10)
