@@ -173,8 +173,9 @@ class Mommy(object):
         else:
             raise TypeError('%s is not supported by mommy.' % field.__class__)
 
-        required_fields = get_required_values(generator, field)
-        return generator(**required_fields)
+        # attributes like max_length, decimal_places are take in account when generating the value.
+        required_field_attrs = get_required_values(generator, field)
+        return generator(**required_field_attrs)
 
 def get_required_values(generator, field):
     '''
