@@ -61,7 +61,8 @@ def gen_slug(max_length=50):
     valid_chars = string.letters + string.digits + '_-'
     return ''.join(choice(valid_chars) for i in range(max_length))
 
-gen_text = lambda: gen_string(MAX_LENGTH)
+def gen_text():
+    return gen_string(MAX_LENGTH)
 
 gen_boolean = lambda: choice((True, False))
 
