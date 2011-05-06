@@ -66,7 +66,6 @@ gen_text = lambda: gen_string(MAX_LENGTH)
 gen_boolean = lambda: choice((True, False))
 
 def gen_url():
-    letters = ''.join(choice(string.letters) for i in range(30))
-    return 'http://www.%s.com' % letters
+    return 'http://www.%s.com' % gen_string(30)
 
 gen_email = lambda: "%s@example.com" % gen_string(10)
