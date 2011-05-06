@@ -64,7 +64,8 @@ def gen_slug(max_length=50):
 def gen_text():
     return gen_string(MAX_LENGTH)
 
-gen_boolean = lambda: choice((True, False))
+def gen_boolean():
+    return choice((True, False))
 
 def gen_url():
     return 'http://www.%s.com' % gen_string(30)
