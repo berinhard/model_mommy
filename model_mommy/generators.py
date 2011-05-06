@@ -10,7 +10,6 @@ as first argument), it should return a list in the format (key, value) where key
 the argument name for generator and value is the value for that argument.
 """
 
-import sys
 import string
 import datetime
 from decimal import Decimal
