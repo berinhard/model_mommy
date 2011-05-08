@@ -1,10 +1,9 @@
 # -*- coding:utf-8 -*-
+from django.test import TestCase
+
 from model_mommy import mommy
 from model_mommy.models import Person, Dog, Store
 from model_mommy.models import UnsupportedModel
-
-
-from django.test import TestCase
 
 class MommyCreatesSimpleModel(TestCase):
 

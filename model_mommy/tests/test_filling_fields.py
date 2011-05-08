@@ -8,16 +8,16 @@ from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField, URLField
+try:
+    from django.db.models.fields import BigIntegerField
+except ImportError:
+    BigIntegerField = IntegerField
 
 from model_mommy import mommy
 from model_mommy.models import Person, ModelWithSelfReference
 from model_mommy.models import DummyIntModel, DummyPositiveIntModel, DummyNumbersModel
 from model_mommy.models import DummyDecimalModel, DummyEmailModel
 
-try:
-    from django.db.models.fields import BigIntegerField
-except ImportError:
-    BigIntegerField = IntegerField
 
 
 __all__ = [
