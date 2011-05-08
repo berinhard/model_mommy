@@ -1,5 +1,8 @@
-from import_helpers import mommy
-from import_helpers import Person, BooleanField, gen_from_list
+from django.db.models.fields import BooleanField
+
+from model_mommy import mommy
+from model_mommy.models import Person
+from model_mommy.generators import gen_from_list
 
 from django.test import TestCase
 

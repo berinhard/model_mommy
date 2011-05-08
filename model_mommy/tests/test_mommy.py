@@ -1,5 +1,8 @@
 # -*- coding:utf-8 -*-
-from import_helpers import *
+from model_mommy import mommy
+from model_mommy.models import Person, Dog, Store
+from model_mommy.models import UnsupportedModel
+
 
 from django.test import TestCase
 

@@ -1,7 +1,24 @@
-from import_helpers import *
+from decimal import Decimal
+from datetime import date
 
 from django.test import TestCase
-from decimal import Decimal
+from django.db.models.fields import CharField, TextField, SlugField
+from django.db.models.fields import DateField, DateTimeField, EmailField
+from django.db.models.fields import IntegerField, SmallIntegerField
+from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
+from django.db.models.fields import FloatField, DecimalField
+from django.db.models.fields import BooleanField, URLField
+
+from model_mommy import mommy
+from model_mommy.models import Person, ModelWithSelfReference
+from model_mommy.models import DummyIntModel, DummyPositiveIntModel, DummyNumbersModel
+from model_mommy.models import DummyDecimalModel, DummyEmailModel
+
+try:
+    from django.db.models.fields import BigIntegerField
+except ImportError:
+    BigIntegerField = IntegerField
+
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
