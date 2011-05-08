@@ -1,6 +1,7 @@
 from import_helpers import *
 
 from django.test import TestCase
+from decimal import Decimal
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
@@ -127,7 +128,7 @@ class FillingOthersNumericFields(TestCase):
         decimal_field = DummyDecimalModel._meta.get_field('decimal_field')
 
         self.assertTrue(isinstance(decimal_field, DecimalField))
-        self.assertTrue(isinstance(self.dummy_decimal_model.decimal_field, basestring))
+        self.assertTrue(isinstance(self.dummy_decimal_model.decimal_field, Decimal))
 
 class URLFieldsFilling(FieldFillingTestCase):
     def test_fill_URLField_with_valid_url(self):

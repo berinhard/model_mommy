@@ -43,10 +43,10 @@ def gen_float():
 
 def gen_decimal(max_digits, decimal_places):
     num_as_str = lambda x: ''.join([str(randint(0,9)) for i in range(x)])
-    return "%s.%s" % (
+    return Decimal("%s.%s" % (
         num_as_str(max_digits-decimal_places),
         num_as_str(decimal_places)
-    )
+    ))
 gen_decimal.required = ['max_digits', 'decimal_places']
 
 gen_date = datetime.date.today
