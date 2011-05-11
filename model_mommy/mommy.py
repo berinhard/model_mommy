@@ -114,12 +114,9 @@ class Mommy(object):
             ignore_field = lambda field: field.null and not self.fill_nullables
             field_value_not_defined = field.name not in attrs
 
-            if isinstance(field, AutoField):
+            if isinstance(field, (AutoField, generic.GenericRelation)):
                 continue
 
-            if isinstance(field, generic.GenericRelation):
-                continue
-            
             if isinstance(field, ManyToManyField):
                 if field_value_not_defined:
                     if ignore_field(field):
