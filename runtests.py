@@ -4,7 +4,9 @@ import os
 import sys
 
 parent = os.path.abspath(os.path.dirname(__file__))
+tests_dir = os.path.join(parent, 'model_mommy', 'tests')
 sys.path.insert(0, parent)
+sys.path.insert(0, tests_dir)
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'test_settings'
 
