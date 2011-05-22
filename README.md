@@ -85,6 +85,11 @@ you  could do:
             super(Mommy, self).__init__(model, fill_nullables)
             self.type_mapping[DateField] = datetime.date(2011, 02, 02)
 
+## When you shouldn't let mommy do the things for you:
+
+If you have a field that has any special validation, you should set the value by yourself.
+model_mommy should be used to handle the fields that doesn't have relation with the test that you're doing at the moment and don't require special validation(like unique, etc), but still required in order to create the object.
+
 ## Doubts? Loved it? Hated it? Suggestions?
 
 Mail us!:
