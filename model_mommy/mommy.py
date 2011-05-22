@@ -6,6 +6,10 @@ from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerFi
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
 from django.db.models.fields import URLField
+from django.db.models.fields import NOT_PROVIDED
+
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 
 from django.contrib.contenttypes import generic
 
@@ -80,6 +84,8 @@ default_mapping = {
 
     URLField:generators.gen_url,
     EmailField:generators.gen_email,
+
+    ContentType:generators.gen_content_type,
 }
 
 class Mommy(object):
@@ -116,6 +122,15 @@ class Mommy(object):
 
             if isinstance(field, (AutoField, generic.GenericRelation)):
                 continue
+
+            if isinstance(field, generic.GenericRelation):
+                continue
+
+            # If not specified, django automatically sets blank=True and default
+            # on BooleanFields so we don't need to check these
+            if field.get_internal_type() != 'BooleanField':
+                if field.default != NOT_PROVIDED or field.blank:
+                    continue
 
             if isinstance(field, ManyToManyField):
                 if field_value_not_defined:
@@ -166,10 +181,13 @@ class Mommy(object):
 
         `attr_mapping` and `type_mapping` can be defined easely overwriting the model.
         '''
+
         if field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
             generator = generators.gen_from_choices(field.choices)
+        elif isinstance(field, ForeignKey) and field.rel.to is ContentType:
+            generator = self.type_mapping[ContentType]
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
         else:
