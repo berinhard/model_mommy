@@ -123,9 +123,6 @@ class Mommy(object):
             if isinstance(field, (AutoField, generic.GenericRelation)):
                 continue
 
-            if isinstance(field, generic.GenericRelation):
-                continue
-
             # If not specified, django automatically sets blank=True and default
             # on BooleanFields so we don't need to check these
             if field.get_internal_type() != 'BooleanField':
