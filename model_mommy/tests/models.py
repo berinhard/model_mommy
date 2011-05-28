@@ -91,5 +91,5 @@ class DummyDefaultFieldsModel(models.Model):
     default_date_field = models.DateField(default='2011-01-01')
     default_date_time_field = models.DateTimeField(default='2011-01-01')
     default_decimal_field = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0'))
-    default_email_field = models.EmailField(default='')
-    default_slug_field = models.SlugField(default='')
+    default_email_field = models.EmailField(default='foo@bar.org')
+    default_slug_field = models.SlugField(default='a-slug')
