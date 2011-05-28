@@ -125,7 +125,7 @@ class Mommy(object):
 
             # If not specified, django automatically sets blank=True and default
             # on BooleanFields so we don't need to check these
-            if field.get_internal_type() != 'BooleanField':
+            if not isinstance(field, BooleanField):
                 if field.default != NOT_PROVIDED or field.blank:
                     continue
 
