@@ -2,6 +2,7 @@ from decimal import Decimal
 from datetime import date
 
 from django.test import TestCase
+from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import CharField, TextField, SlugField
 from django.db.models.fields import DateField, DateTimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
@@ -16,7 +17,7 @@ except ImportError:
 from model_mommy import mommy
 from model_mommy.models import Person, ModelWithSelfReference
 from model_mommy.models import DummyIntModel, DummyPositiveIntModel, DummyNumbersModel
-from model_mommy.models import DummyDecimalModel, DummyEmailModel
+from model_mommy.models import DummyDecimalModel, DummyEmailModel, DummyGenericForeignKeyModel
 
 
 
@@ -24,7 +25,8 @@ __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling','FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
-    'FillingEmailField', 'FillingSelfReferenceField'
+    'FillingEmailField', 'FillingSelfReferenceField',
+    'FillingGenericForeignKeyField',
 ]
 
 def assert_not_raise(method, parameters, exception):
@@ -168,3 +170,9 @@ class FillingSelfReferenceField(TestCase):
     def test_fills_selfreference_properly(self):
         self_referenced_model = mommy.make_one(ModelWithSelfReference)
         self.assertTrue(isinstance(self_referenced_model.self_reference, ModelWithSelfReference))
+
+
+class FillingGenericForeignKeyField(TestCase):
+    def test_filling_content_type_field(self):
+        dummy = mommy.make_one(DummyGenericForeignKeyModel)
+        self.assertTrue(isinstance(dummy.content_type, ContentType))

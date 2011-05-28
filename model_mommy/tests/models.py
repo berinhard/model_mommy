@@ -4,6 +4,7 @@
 # TESTING PURPOSE ONLY MODELS!!       #
 # DO NOT ADD THE APP TO INSTALLED_APPS#
 #######################################
+from decimal import Decimal
 
 from django.db import models
 
@@ -34,7 +35,7 @@ class Dog(models.Model):
     breed = models.CharField(max_length=50)
 
 class Store(models.Model):
-    customers = models.ManyToManyField(Person, related_name='favorite_stores', blank=True, null=True)
+    customers = models.ManyToManyField(Person, related_name='favorite_stores')
     employees = models.ManyToManyField(Person, related_name='employers')
 
 class DummyIntModel(models.Model):
@@ -77,3 +78,18 @@ class DummyGenericForeignKeyModel(models.Model):
 
 class DummyGenericRelationModel(models.Model):
     relation = generic.GenericRelation(DummyGenericForeignKeyModel)
+
+class DummyBlankFieldsModel(models.Model):
+    blank_char_field = models.CharField(max_length=50, blank=True)
+    blank_text_field = models.TextField(blank=True)
+
+class DummyDefaultFieldsModel(models.Model):
+    default_char_field = models.CharField(max_length=50, default='default')
+    default_text_field = models.TextField(default='default')
+    default_int_field = models.IntegerField(default=123)
+    default_float_field = models.FloatField(default=123.0)
+    default_date_field = models.DateField(default='2011-01-01')
+    default_date_time_field = models.DateTimeField(default='2011-01-01')
+    default_decimal_field = models.DecimalField(max_digits=5, decimal_places=2, default=Decimal('0'))
+    default_email_field = models.EmailField(default='foo@bar.org')
+    default_slug_field = models.SlugField(default='a-slug')

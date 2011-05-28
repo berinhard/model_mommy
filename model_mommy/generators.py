@@ -15,6 +15,9 @@ import datetime
 from decimal import Decimal
 from random import randint, choice, random
 
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import get_models
+
 MAX_LENGTH = 300
 # Using sys.maxint here breaks a bunch of tests when running against a
 # Postgres database.
@@ -72,3 +75,6 @@ def gen_url():
 
 def gen_email():
     return "%s@example.com" % gen_string(10)
+
+def gen_content_type():
+    return ContentType.objects.get_for_model(choice(get_models()))
