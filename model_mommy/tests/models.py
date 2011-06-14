@@ -68,9 +68,6 @@ class UnsupportedModel(models.Model):
 class DummyEmailModel(models.Model):
     email_field = models.EmailField()
 
-class ModelWithSelfReference(models.Model):
-    self_reference = models.ForeignKey('self', null=True)
-
 class DummyGenericForeignKeyModel(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()

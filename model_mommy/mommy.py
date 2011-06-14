@@ -139,14 +139,6 @@ class Mommy(object):
                 if field.null:
                     continue
                 else:
-                    #XXX: hack to avoid infinite recursion
-                    if isinstance(field, ForeignKey) and (field.related.parent_model == self.model):
-                        self.model.self_reference_loop_count = getattr(self.model, 'self_reference_loop_count', 1)
-                        if self.model.self_reference_loop_count <= MAX_SELF_REFERENCE_LOOPS:
-                            self.model.self_reference_loop_count += 1
-                        else:
-                            del self.model.self_reference_loop_count
-                            return
                     attrs[field.name] = self.generate_value(field)
 
 
