@@ -91,10 +91,9 @@ class Mommy(object):
     attr_mapping = {}
     type_mapping = None
 
-    def __init__(self, model, fill_nullables=True):
+    def __init__(self, model):
         self.type_mapping = default_mapping.copy()
         self.model = model
-        self.fill_nullables = fill_nullables
 
     def make_one(self, **attrs):
         '''Creates and persists an instance of the model
@@ -116,7 +115,6 @@ class Mommy(object):
         m2m_dict = {}
 
         for field in self.get_fields():
-            ignore_field = lambda field: field.null and not self.fill_nullables
             field_value_not_defined = field.name not in attrs
 
             if isinstance(field, (AutoField, generic.GenericRelation)):
@@ -130,7 +128,7 @@ class Mommy(object):
 
             if isinstance(field, ManyToManyField):
                 if field_value_not_defined:
-                    if ignore_field(field):
+                    if field.null:
                         continue
                     else:
                         m2m_dict[field.name] = self.generate_value(field)
@@ -138,7 +136,7 @@ class Mommy(object):
                     m2m_dict[field.name] = attrs.pop(field.name)
 
             elif field_value_not_defined:
-                if ignore_field(field):
+                if field.null:
                     continue
                 else:
                     #XXX: hack to avoid infinite recursion

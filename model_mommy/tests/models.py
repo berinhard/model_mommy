@@ -17,9 +17,9 @@ class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CH)
     happy = models.BooleanField(default=True)
     name = models.CharField(max_length=30)
-    nickname = models.SlugField(null=True)
+    nickname = models.SlugField()
     age = models.IntegerField()
-    bio = models.TextField(null=True)
+    bio = models.TextField()
     birthday = models.DateField()
     appointment = models.DateTimeField()
     blog = models.URLField()
@@ -78,6 +78,10 @@ class DummyGenericForeignKeyModel(models.Model):
 
 class DummyGenericRelationModel(models.Model):
     relation = generic.GenericRelation(DummyGenericForeignKeyModel)
+
+class DummyNullFieldsModel(models.Model):
+    null_foreign_key = models.ForeignKey('DummyBlankFieldsModel', null=True)
+    null_integer_field = models.IntegerField(null=True)
 
 class DummyBlankFieldsModel(models.Model):
     blank_char_field = models.CharField(max_length=50, blank=True)

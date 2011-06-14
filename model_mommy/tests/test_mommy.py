@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 from model_mommy.models import Person, Dog, Store
-from model_mommy.models import UnsupportedModel, DummyGenericRelationModel
+from model_mommy.models import UnsupportedModel, DummyGenericRelationModel, DummyNullFieldsModel
 from model_mommy.models import DummyBlankFieldsModel, DummyDefaultFieldsModel, DummyGenericForeignKeyModel
 
 class MommyCreatesSimpleModel(TestCase):
@@ -62,23 +62,6 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(person.name, 'John')
         self.assertEqual(person.gender, 'M')
 
-class FillNullablesTestCase(TestCase):
-    def test_always_fill_nullables_if_value_provided_via_attrs(self):
-        bio_data = 'some bio'
-        mom = mommy.Mommy(Person, False)
-        p = mom.make_one(bio=bio_data)
-        self.assertEqual(p.bio, bio_data)
-
-    def test_fill_nullables_if_fill_nullables_is_true(self):
-        mom = mommy.Mommy(Person, True)
-        p = mom.make_one()
-        self.assertTrue( isinstance(p.bio, basestring) )
-
-    def test_do_not_fill_nullables_if_fill_nullables_is_false(self):
-        mom = mommy.Mommy(Person, False)
-        p = mom.make_one()
-        self.assertTrue( p.bio == None )
-
 class HandlingUnsupportedModels(TestCase):
     def test_unsupported_model_raises_an_explanatory_exception(self):
         try:
@@ -97,6 +80,11 @@ class HandlingContentTypeField(TestCase):
         dummy = mommy.make_one(DummyGenericForeignKeyModel)
         self.assertTrue(isinstance(dummy, DummyGenericForeignKeyModel))
 
+class SkipNullsTestCase(TestCase):
+    def test_skip_null(self):
+        dummy = mommy.make_one(DummyNullFieldsModel)
+        self.assertEqual(dummy.null_foreign_key, None)
+        self.assertEqual(dummy.null_integer_field, None)
 
 class SkipBlanksTestCase(TestCase):
     def test_skip_blank(self):
