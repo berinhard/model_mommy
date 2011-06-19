@@ -6,44 +6,53 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import CharField, TextField, SlugField
 from django.db.models.fields import DateField, DateTimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
-from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
+from django.db.models.fields import PositiveSmallIntegerField
+from django.db.models.fields import PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField, URLField
+
 try:
     from django.db.models.fields import BigIntegerField
 except ImportError:
-    BigIntegerField = IntegerField
+    pass
+    #BigIntegerField = IntegerField
 
 from model_mommy import mommy
 from model_mommy.models import Person
-from model_mommy.models import DummyIntModel, DummyPositiveIntModel, DummyNumbersModel
-from model_mommy.models import DummyDecimalModel, DummyEmailModel, DummyGenericForeignKeyModel
-
-
+from model_mommy.models import DummyIntModel, DummyPositiveIntModel
+from model_mommy.models import DummyNumbersModel
+from model_mommy.models import DummyDecimalModel, DummyEmailModel
+from model_mommy.models import DummyGenericForeignKeyModel
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
-    'DateFieldsFilling','FillingIntFields', 'FillingPositiveIntFields',
+    'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
     'FillingEmailField', 'FillingGenericForeignKeyField',
 ]
+
 
 def assert_not_raise(method, parameters, exception):
     try:
         method(*parameters)
     except exception:
-        raise AssertionError, "Exception %s not expected to be raised" %exception.__name__
+        # TODO: Fix the way this exception is raised, this way is deprecated
+        msg = "Exception %s not expected to be raised" % exception.__name__
+        raise AssertionError, msg
+
 
 class FieldFillingTestCase(TestCase):
 
     def setUp(self):
         self.person = mommy.make_one(Person)
 
+
 class FillingFromChoice(FieldFillingTestCase):
 
     def test_if_gender_is_populated_from_choices(self):
         from model_mommy.models import GENDER_CH
-        self.assertTrue(self.person.gender in map(lambda x:x[0], GENDER_CH))
+        self.assertTrue(self.person.gender in map(lambda x: x[0], GENDER_CH))
+
 
 class StringFieldsFilling(FieldFillingTestCase):
 
@@ -59,7 +68,8 @@ class StringFieldsFilling(FieldFillingTestCase):
         self.assertTrue(isinstance(person_nickname_field, SlugField))
 
         self.assertTrue(isinstance(self.person.nickname, str))
-        self.assertEqual(len(self.person.nickname), person_nickname_field.max_length)
+        self.assertEqual(len(self.person.nickname),
+                         person_nickname_field.max_length)
 
     def test_fill_TextField_with_a_random_str(self):
         person_bio_field = Person._meta.get_field('bio')
@@ -67,12 +77,14 @@ class StringFieldsFilling(FieldFillingTestCase):
 
         self.assertTrue(isinstance(self.person.bio, str))
 
+
 class BooleanFieldsFilling(FieldFillingTestCase):
     def test_fill_BooleanField_with_boolean(self):
         happy_field = Person._meta.get_field('happy')
         self.assertTrue(isinstance(happy_field, BooleanField))
 
         self.assertTrue(isinstance(self.person.happy, bool))
+
 
 class DateFieldsFilling(FieldFillingTestCase):
 
@@ -82,6 +94,7 @@ class DateFieldsFilling(FieldFillingTestCase):
 
         self.assertTrue(isinstance(self.person.birthday, date))
 
+
 class DateTimeFieldsFilling(FieldFillingTestCase):
 
     def test_fill_DateField_with_a_date(self):
@@ -89,6 +102,7 @@ class DateTimeFieldsFilling(FieldFillingTestCase):
         self.assertTrue(isinstance(appointment_field, DateTimeField))
 
         self.assertTrue(isinstance(self.person.appointment, date))
+
 
 class FillingIntFields(TestCase):
 
@@ -100,7 +114,6 @@ class FillingIntFields(TestCase):
         self.assertTrue(isinstance(int_field, IntegerField))
 
         self.assertTrue(isinstance(self.dummy_int_model.int_field, int))
-
 
     def test_fill_BigIntegerField_with_a_random_number(self):
         big_int_field = DummyIntModel._meta.get_field('big_int_field')
@@ -115,14 +128,17 @@ class FillingIntFields(TestCase):
 
         self.assertTrue(isinstance(self.dummy_int_model.small_int_field, int))
 
+
 class FillingPositiveIntFields(TestCase):
 
     def setUp(self):
         self.dummy_positive_int_model = mommy.make_one(DummyPositiveIntModel)
 
     def test_fill_PositiveSmallIntegerField_with_a_random_number(self):
-        positive_small_int_field = DummyPositiveIntModel._meta.get_field('positive_small_int_field')
-        self.assertTrue(isinstance(positive_small_int_field, PositiveSmallIntegerField))
+        field = DummyPositiveIntModel._meta.get_field('positive_small_int_field')
+        positive_small_int_field = field
+        self.assertTrue(isinstance(positive_small_int_field,
+                        PositiveSmallIntegerField))
 
         self.assertTrue(isinstance(self.dummy_positive_int_model.positive_small_int_field, int))
         self.assertTrue(self.dummy_positive_int_model.positive_small_int_field > 0)
@@ -134,19 +150,23 @@ class FillingPositiveIntFields(TestCase):
         self.assertTrue(isinstance(self.dummy_positive_int_model.positive_int_field, int))
         self.assertTrue(self.dummy_positive_int_model.positive_int_field > 0)
 
+
 class FillingOthersNumericFields(TestCase):
     def test_filling_FloatField_with_a_random_float(self):
         self.dummy_numbers_model = mommy.make_one(DummyNumbersModel)
         float_field = DummyNumbersModel._meta.get_field('float_field')
         self.assertTrue(isinstance(float_field, FloatField))
-        self.assertTrue(isinstance(self.dummy_numbers_model.float_field, float))
+        self.assertTrue(isinstance(self.dummy_numbers_model.float_field,
+                                   float))
 
     def test_filling_DecimalField_with_random_decimal(self):
         self.dummy_decimal_model = mommy.make_one(DummyDecimalModel)
         decimal_field = DummyDecimalModel._meta.get_field('decimal_field')
 
         self.assertTrue(isinstance(decimal_field, DecimalField))
-        self.assertTrue(isinstance(self.dummy_decimal_model.decimal_field, Decimal))
+        self.assertTrue(isinstance(self.dummy_decimal_model.decimal_field,
+                                   Decimal))
+
 
 class URLFieldsFilling(FieldFillingTestCase):
     def test_fill_URLField_with_valid_url(self):
@@ -155,12 +175,14 @@ class URLFieldsFilling(FieldFillingTestCase):
 
         self.assertTrue(isinstance(self.person.blog, str))
 
+
 class FillingEmailField(TestCase):
     def test_filling_EmailField(self):
         obj = mommy.make_one(DummyEmailModel)
         field = DummyEmailModel._meta.get_field('email_field')
         self.assertTrue(isinstance(field, EmailField))
         self.assertTrue(isinstance(obj.email_field, basestring))
+
 
 class FillingGenericForeignKeyField(TestCase):
     def test_filling_content_type_field(self):
