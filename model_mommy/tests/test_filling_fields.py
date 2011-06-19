@@ -36,9 +36,8 @@ def assert_not_raise(method, parameters, exception):
     try:
         method(*parameters)
     except exception:
-        # TODO: Fix the way this exception is raised, this way is deprecated
         msg = "Exception %s not expected to be raised" % exception.__name__
-        raise AssertionError, msg
+        raise AssertionError(msg)
 
 
 class FieldFillingTestCase(TestCase):
