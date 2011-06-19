@@ -60,35 +60,6 @@ It works like make_one, but like was said, it doesn't persist the instance.
 
 model_mommy skips fields with null=True or blank=True. Also if the field has a default value, mommy will use it.
 
-## Extending Mommy
-
-All attributes used to automatically populate mommy generated instances
-are created with generators from **model_mommy/generators.py**. if you want
-a specific field to be populated with a different generator from the default
-generator, you must extend the mommy class to get this behavior. let's see a example:
-
-    gen_newborn_age = lambda:0
-
-    class BabeMommy(Mommy):
-        attr_mapping = {'age':gen_newborn_age}
-
-    mom = BabeMommy(Kid)
-    baby = mom.make_one()
-    assert(baby.age==0)
-
-If the generator requires a attribute from the field as argument, you could do something like this:
-
-    gen_name_from_default = lambda default_value:default_value
-    gen_name_from_default.required = ['default']
-
-You can also override the type_mapping, if you want to all values from a given Field to be populate with a value you prefer,
-you  could do:
-
-    class TimeCopMommy(Mommy):
-        def __init__(self, model, fill_nullables=True):
-            super(Mommy, self).__init__(model, fill_nullables)
-            self.type_mapping[DateField] = datetime.date(2011, 02, 02)
-
 ## When you shouldn't let mommy do the things for you:
 
 If you have a field that has any special validation, you should set the value by yourself.
