@@ -2,7 +2,8 @@
 from django.db.models.fields import AutoField, CharField, TextField, SlugField
 from django.db.models.fields import DateField, DateTimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
-from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
+from django.db.models.fields import PositiveSmallIntegerField
+from django.db.models.fields import PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
 from django.db.models.fields import URLField
@@ -10,22 +11,14 @@ from django.db.models.fields import URLField
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
-from django.contrib.contenttypes import generic
+from django.db.models import ForeignKey, ManyToManyField
 
 try:
     from django.db.models.fields import BigIntegerField
 except ImportError:
     BigIntegerField = IntegerField
 
-from django.db.models import ForeignKey, OneToOneField, ManyToManyField
-
-from string import letters
-from random import choice, randint
-from datetime import date
-from decimal import Decimal
 import generators
-import sys
-
 
 #TODO: improve related models handling
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
