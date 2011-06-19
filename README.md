@@ -3,6 +3,7 @@
 model_mommy is a tool for creating objects for testing in Django, inspired in ruby's ObjectDaddy and FactoryGirl.
 It generate the values according with the field type, but i will add support to custom values as well.
 
+
 #Installing
 
     pip install model_mommy
@@ -30,7 +31,6 @@ just call the mommy =):
 
 and your object is created! No boring attributes passing like 'foobar' every damn time.
 
-
 mommy also handles relationships. Suppose the kid has a dog:
 
     class Dog(models.Model):
@@ -55,6 +55,10 @@ But, if don't need a persisted object, mommy can handle this for you as well:
     kid = mommy.prepare_one(Kid)
 
 It works like make_one, but like was said, it doesn't persist the instance.
+
+## How mommy behaves?
+
+model_mommy skips fields with null=True or blank=True. Also if the field has a default value, mommy will use it.
 
 ## Extending Mommy
 
