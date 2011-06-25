@@ -5,8 +5,11 @@ from django.test import TestCase
 
 from model_mommy import mommy
 from model_mommy.models import Person, Dog, Store
-from model_mommy.models import UnsupportedModel, DummyGenericRelationModel, DummyNullFieldsModel
-from model_mommy.models import DummyBlankFieldsModel, DummyDefaultFieldsModel, DummyGenericForeignKeyModel
+from model_mommy.models import UnsupportedModel, DummyGenericRelationModel
+from model_mommy.models import DummyNullFieldsModel, DummyBlankFieldsModel
+from model_mommy.models import DummyDefaultFieldsModel
+from model_mommy.models import DummyGenericForeignKeyModel
+
 
 class MommyCreatesSimpleModel(TestCase):
 
@@ -56,11 +59,13 @@ class MommyCreatesAssociatedModels(TestCase):
 
     def test_creating_person_from_factory_using_paramters(self):
         person_mom = mommy.Mommy(Person)
-        person = person_mom.make_one(happy=False, age=20, gender='M', name='John')
+        person = person_mom.make_one(happy=False, age=20, gender='M',
+                                     name='John')
         self.assertEqual(person.age, 20)
         self.assertEqual(person.happy, False)
         self.assertEqual(person.name, 'John')
         self.assertEqual(person.gender, 'M')
+
 
 class HandlingUnsupportedModels(TestCase):
     def test_unsupported_model_raises_an_explanatory_exception(self):
@@ -70,15 +75,18 @@ class HandlingUnsupportedModels(TestCase):
         except TypeError, e:
             self.assertTrue('not supported' in repr(e))
 
+
 class HandlingModelsWithGenericRelationFields(TestCase):
     def test_create_model_with_generic_relation(self):
         dummy = mommy.make_one(DummyGenericRelationModel)
         self.assertTrue(isinstance(dummy, DummyGenericRelationModel))
 
+
 class HandlingContentTypeField(TestCase):
     def test_create_model_with_contenttype_field(self):
         dummy = mommy.make_one(DummyGenericForeignKeyModel)
         self.assertTrue(isinstance(dummy, DummyGenericForeignKeyModel))
+
 
 class SkipNullsTestCase(TestCase):
     def test_skip_null(self):
@@ -86,11 +94,13 @@ class SkipNullsTestCase(TestCase):
         self.assertEqual(dummy.null_foreign_key, None)
         self.assertEqual(dummy.null_integer_field, None)
 
+
 class SkipBlanksTestCase(TestCase):
     def test_skip_blank(self):
         dummy = mommy.make_one(DummyBlankFieldsModel)
         self.assertEqual(dummy.blank_char_field, '')
         self.assertEqual(dummy.blank_text_field, '')
+
 
 class SkipDefaultsTestCase(TestCase):
     def test_skip_fields_with_default(self):

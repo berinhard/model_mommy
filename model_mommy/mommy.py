@@ -2,7 +2,8 @@
 from django.db.models.fields import AutoField, CharField, TextField, SlugField
 from django.db.models.fields import DateField, DateTimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
-from django.db.models.fields import PositiveSmallIntegerField, PositiveIntegerField
+from django.db.models.fields import PositiveSmallIntegerField
+from django.db.models.fields import PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
 from django.db.models.fields import URLField
@@ -10,27 +11,20 @@ from django.db.models.fields import URLField
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
-from django.contrib.contenttypes import generic
+from django.db.models import ForeignKey, ManyToManyField
 
 try:
     from django.db.models.fields import BigIntegerField
 except ImportError:
     BigIntegerField = IntegerField
 
-from django.db.models import ForeignKey, OneToOneField, ManyToManyField
-
-from string import letters
-from random import choice, randint
-from datetime import date
-from decimal import Decimal
 import generators
-import sys
-
 
 #TODO: improve related models handling
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
 MAX_SELF_REFERENCE_LOOPS = 2
+
 
 def make_one(model, **attrs):
     """
@@ -41,14 +35,17 @@ def make_one(model, **attrs):
     mommy = Mommy(model)
     return mommy.make_one(**attrs)
 
+
 def prepare_one(model, **attrs):
     """
-    Creates a BUT DOESN'T persist an instance from a given model its associated models.
+    Creates a BUT DOESN'T persist an instance from a given model its
+    associated models.
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
     """
     mommy = Mommy(model)
     return mommy.prepare(**attrs)
+
 
 def make_many(model, qty=5, **attrs):
     mommy = Mommy(model)
@@ -59,33 +56,34 @@ prepare_one.required = foreign_key_required
 make_many.required = foreign_key_required
 
 default_mapping = {
-    BooleanField:generators.gen_boolean,
-    IntegerField:generators.gen_integer,
-    BigIntegerField:generators.gen_integer,
-    SmallIntegerField:generators.gen_integer,
+    BooleanField: generators.gen_boolean,
+    IntegerField: generators.gen_integer,
+    BigIntegerField: generators.gen_integer,
+    SmallIntegerField: generators.gen_integer,
 
-    PositiveIntegerField:lambda: generators.gen_integer(0),
-    PositiveSmallIntegerField:lambda: generators.gen_integer(0),
+    PositiveIntegerField: lambda: generators.gen_integer(0),
+    PositiveSmallIntegerField: lambda: generators.gen_integer(0),
 
-    FloatField:generators.gen_float,
-    DecimalField:generators.gen_decimal,
+    FloatField: generators.gen_float,
+    DecimalField: generators.gen_decimal,
 
-    CharField:generators.gen_string,
-    TextField:generators.gen_text,
-    SlugField:generators.gen_slug,
+    CharField: generators.gen_string,
+    TextField: generators.gen_text,
+    SlugField: generators.gen_slug,
 
-    ForeignKey:make_one,
-    #OneToOneField:make_one,
-    ManyToManyField:make_many,
+    ForeignKey: make_one,
+    #OneToOneField: make_one,
+    ManyToManyField: make_many,
 
-    DateField:generators.gen_date,
-    DateTimeField:generators.gen_date,
+    DateField: generators.gen_date,
+    DateTimeField: generators.gen_date,
 
-    URLField:generators.gen_url,
-    EmailField:generators.gen_email,
+    URLField: generators.gen_url,
+    EmailField: generators.gen_email,
 
-    ContentType:generators.gen_content_type,
+    ContentType: generators.gen_content_type,
 }
+
 
 class Mommy(object):
     attr_mapping = {}
@@ -108,7 +106,7 @@ class Mommy(object):
         return self._make_one(commit=False, **attrs)
 
     def get_fields(self):
-        return self.model._meta.fields+self.model._meta.many_to_many
+        return self.model._meta.fields + self.model._meta.many_to_many
 
     #Method too big
     def _make_one(self, commit=True, **attrs):
@@ -120,8 +118,8 @@ class Mommy(object):
             if isinstance(field, (AutoField, generic.GenericRelation)):
                 continue
 
-            # If not specified, django automatically sets blank=True and default
-            # on BooleanFields so we don't need to check these
+            # If not specified, django automatically sets blank=True and
+            # default on BooleanFields so we don't need to check these
             if not isinstance(field, BooleanField):
                 if field.has_default() or field.blank:
                     continue
@@ -141,7 +139,6 @@ class Mommy(object):
                 else:
                     attrs[field.name] = self.generate_value(field)
 
-
         instance = self.model(**attrs)
 
         # m2m only works for persisted instances
@@ -157,15 +154,18 @@ class Mommy(object):
         return instance
 
     def generate_value(self, field):
-        '''Calls the generator associated with a field passing all required args.
+        '''
+        Calls the generator associated with a field passing all required args.
 
         Generator Resolution Precedence Order:
         -- attr_mapping - mapping per attribute name
         -- choices -- mapping from avaiable field choices
         -- type_mapping - mapping from user defined type associated generators
-        -- default_mapping - mapping from pre-defined type associated generators
+        -- default_mapping - mapping from pre-defined type associated
+           generators
 
-        `attr_mapping` and `type_mapping` can be defined easely overwriting the model.
+        `attr_mapping` and `type_mapping` can be defined easely overwriting the
+        model.
         '''
 
         if field.name in self.attr_mapping:
@@ -179,9 +179,11 @@ class Mommy(object):
         else:
             raise TypeError('%s is not supported by mommy.' % field.__class__)
 
-        # attributes like max_length, decimal_places are take in account when generating the value.
+        # attributes like max_length, decimal_places are take in account when
+        # generating the value.
         required_field_attrs = get_required_values(generator, field)
         return generator(**required_field_attrs)
+
 
 def get_required_values(generator, field):
     '''
@@ -195,7 +197,7 @@ def get_required_values(generator, field):
     if hasattr(generator, 'required'):
         for item in generator.required:
 
-            if callable(item): # mommy can deal with the nasty hacking too!
+            if callable(item):  # mommy can deal with the nasty hacking too!
                 key, value = item(field)
                 rt[key] = value
 
@@ -203,6 +205,7 @@ def get_required_values(generator, field):
                 rt[item] = getattr(field, item)
 
             else:
-                raise ValueError("Required value '%s' is of wrong type. Don't make mommy sad." % str(item))
+                raise ValueError("Required value '%s' is of wrong type. \
+                                  Don't make mommy sad." % str(item))
 
     return rt
