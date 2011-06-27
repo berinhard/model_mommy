@@ -29,6 +29,12 @@ class MommyCreatesSimpleModel(TestCase):
 
         self.assertEqual(person.id, None)
 
+    def test_make_many(self):
+        people = mommy.make_many(Person, qty=5)
+        self.assertEqual(Person.objects.count(), 5)
+
+        people = mommy.make_many(Person, name="George Washington")
+        self.assertTrue(all(p.name == "George Washington" for p in people))
 
 class MommyCreatesAssociatedModels(TestCase):
 

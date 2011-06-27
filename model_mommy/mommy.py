@@ -49,7 +49,7 @@ def prepare_one(model, **attrs):
 
 def make_many(model, qty=5, **attrs):
     mommy = Mommy(model)
-    return [mommy.make_one() for i in range(qty)]
+    return [mommy.make_one(**attrs) for i in range(qty)]
 
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required
