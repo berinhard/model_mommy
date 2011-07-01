@@ -76,7 +76,7 @@ default_mapping = {
     ManyToManyField: make_many,
 
     DateField: generators.gen_date,
-    DateTimeField: generators.gen_date,
+    DateTimeField: generators.gen_datetime,
 
     URLField: generators.gen_url,
     EmailField: generators.gen_email,
