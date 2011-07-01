@@ -1,5 +1,5 @@
+from datetime import date, datetime
 from decimal import Decimal
-from datetime import date
 
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
@@ -96,11 +96,11 @@ class DateFieldsFilling(FieldFillingTestCase):
 
 class DateTimeFieldsFilling(FieldFillingTestCase):
 
-    def test_fill_DateField_with_a_date(self):
+    def test_fill_DateTimeField_with_a_datetime(self):
         appointment_field = Person._meta.get_field('appointment')
         self.assertTrue(isinstance(appointment_field, DateTimeField))
 
-        self.assertTrue(isinstance(self.person.appointment, date))
+        self.assertTrue(isinstance(self.person.appointment, datetime))
 
 
 class FillingIntFields(TestCase):
