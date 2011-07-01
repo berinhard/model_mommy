@@ -2,3 +2,7 @@
 *.swp
 *.swo
 *.kpf
+bin/
+include/
+lib/
+*.egg-info/
