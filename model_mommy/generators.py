@@ -18,12 +18,21 @@ from random import randint, choice, random
 
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import get_models
+from django.core.files import File
+
+import os
+from os.path import abspath, join, dirname
+
 
 MAX_LENGTH = 300
 # Using sys.maxint here breaks a bunch of tests when running against a
 # Postgres database.
 MAX_INT = 10000
 
+def gen_file_field():
+    file_path = abspath(join(dirname(__file__),'mock_file.txt'))
+    fixture_txt_file = File(open(file_path))
+    return fixture_txt_file
 
 def gen_from_list(L):
     '''Makes sure all values of the field are generated from the list L

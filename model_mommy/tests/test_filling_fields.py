@@ -1,6 +1,9 @@
 from datetime import date, datetime
 from decimal import Decimal
 
+import os
+from os.path import abspath, join, dirname
+
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import CharField, TextField, SlugField
@@ -10,6 +13,8 @@ from django.db.models.fields import PositiveSmallIntegerField
 from django.db.models.fields import PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField, URLField
+from django.db.models import FileField
+from django.core.files import File
 
 try:
     from django.db.models.fields import BigIntegerField
@@ -23,12 +28,13 @@ from model_mommy.models import DummyIntModel, DummyPositiveIntModel
 from model_mommy.models import DummyNumbersModel
 from model_mommy.models import DummyDecimalModel, DummyEmailModel
 from model_mommy.models import DummyGenericForeignKeyModel
+from model_mommy.models import DummyFileFieldModel
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
-    'FillingEmailField', 'FillingGenericForeignKeyField',
+    'FillingEmailField', 'FillingGenericForeignKeyField','FillingFileField',
 ]
 
 
@@ -168,6 +174,7 @@ class FillingOthersNumericFields(TestCase):
 
 
 class URLFieldsFilling(FieldFillingTestCase):
+
     def test_fill_URLField_with_valid_url(self):
         blog_field = Person._meta.get_field('blog')
         self.assertTrue(isinstance(blog_field, URLField))
@@ -176,6 +183,7 @@ class URLFieldsFilling(FieldFillingTestCase):
 
 
 class FillingEmailField(TestCase):
+
     def test_filling_EmailField(self):
         obj = mommy.make_one(DummyEmailModel)
         field = DummyEmailModel._meta.get_field('email_field')
@@ -184,6 +192,26 @@ class FillingEmailField(TestCase):
 
 
 class FillingGenericForeignKeyField(TestCase):
+
     def test_filling_content_type_field(self):
         dummy = mommy.make_one(DummyGenericForeignKeyModel)
         self.assertTrue(isinstance(dummy.content_type, ContentType))
+
+class FillingFileField(TestCase):
+
+    def setUp(self):
+        path = abspath(join(dirname(__file__),'..','mock_file.txt'))
+        self.fixture_txt_file = File(open(path))
+
+    def test_filling_file_field(self):
+        dummy = mommy.make_one(DummyFileFieldModel)
+        field = DummyFileFieldModel._meta.get_field('file_field')
+        
+        self.assertTrue(isinstance(field,FileField))
+
+        import time
+        path = "/tmp/%s/mock_file.txt" % time.strftime('%Y/%m/%d')
+        
+        self.assertEqual(dummy.file_field.path, path)
+        dummy.file_field.delete()
+

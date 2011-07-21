@@ -7,6 +7,7 @@
 from decimal import Decimal
 
 from django.db import models
+from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
@@ -110,3 +111,8 @@ class DummyDefaultFieldsModel(models.Model):
                                                 default=Decimal('0'))
     default_email_field = models.EmailField(default='foo@bar.org')
     default_slug_field = models.SlugField(default='a-slug')
+
+class DummyFileFieldModel(models.Model):
+    
+    fs = FileSystemStorage(location='/tmp/')
+    file_field = models.FileField(upload_to="%Y/%m/%d", storage=fs)

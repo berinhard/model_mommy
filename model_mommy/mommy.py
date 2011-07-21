@@ -7,6 +7,7 @@ from django.db.models.fields import PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
 from django.db.models.fields import URLField
+from django.db.models  import FileField
 
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
@@ -80,6 +81,7 @@ default_mapping = {
 
     URLField: generators.gen_url,
     EmailField: generators.gen_email,
+    FileField: generators.gen_file_field,
 
     ContentType: generators.gen_content_type,
 }
