@@ -206,9 +206,7 @@ class FillingFileField(TestCase):
     def test_filling_file_field(self):
         self.dummy = mommy.make_one(DummyFileFieldModel)
         field = DummyFileFieldModel._meta.get_field('file_field')
-
         self.assertTrue(isinstance(field,FileField))
-
         import time
         path = "/tmp/%s/mock_file.txt" % time.strftime('%Y/%m/%d')
 
