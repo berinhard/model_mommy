@@ -204,14 +204,16 @@ class FillingFileField(TestCase):
         self.fixture_txt_file = File(open(path))
 
     def test_filling_file_field(self):
-        dummy = mommy.make_one(DummyFileFieldModel)
+        self.dummy = mommy.make_one(DummyFileFieldModel)
         field = DummyFileFieldModel._meta.get_field('file_field')
-        
+
         self.assertTrue(isinstance(field,FileField))
 
         import time
         path = "/tmp/%s/mock_file.txt" % time.strftime('%Y/%m/%d')
-        
-        self.assertEqual(dummy.file_field.path, path)
-        dummy.file_field.delete()
+
+        self.assertEqual(self.dummy.file_field.path, path)
+
+    def tearDown(self):
+        self.dummy.file_field.delete()
 
