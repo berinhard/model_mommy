@@ -8,6 +8,7 @@ from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
 from django.db.models.fields import URLField
 from django.db.models  import FileField
+from django.db.models import get_model
 
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
@@ -25,7 +26,6 @@ import generators
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
 MAX_SELF_REFERENCE_LOOPS = 2
-
 
 def make_one(model, **attrs):
     """
@@ -86,6 +86,8 @@ default_mapping = {
     ContentType: generators.gen_content_type,
 }
 
+class ModelNotFound(Exception):
+    pass
 
 class Mommy(object):
     attr_mapping = {}
@@ -93,7 +95,13 @@ class Mommy(object):
 
     def __init__(self, model):
         self.type_mapping = default_mapping.copy()
-        self.model = model
+        if isinstance(model, str):
+            app_label, model_name = model.split('.')
+            self.model = get_model(app_label, model_name)
+            if not self.model:
+                raise ModelNotFound("could not find model '%s' in the app '%s'." %(model_name, app_label))
+        else:
+            self.model = model
 
     def make_one(self, **attrs):
         '''Creates and persists an instance of the model

@@ -31,6 +31,12 @@ just call the mommy =):
 
 and your object is created! No boring attributes passing like 'foobar' every damn time.
 
+Import every model you need can be very boring, so, you can also call mommy using a string like this:
+
+    kid = mommy.make_one('model_mommy.Kid')
+
+Note that you must use 'app_label.model_name'. The model_name is case insensitive.
+
 mommy also handles relationships. Suppose the kid has a dog:
 
     class Dog(models.Model):

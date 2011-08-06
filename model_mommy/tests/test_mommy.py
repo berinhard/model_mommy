@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from model_mommy import mommy
+from model_mommy.mommy import ModelNotFound
 from model_mommy.models import Person, Dog, Store
 from model_mommy.models import UnsupportedModel, DummyGenericRelationModel
 from model_mommy.models import DummyNullFieldsModel, DummyBlankFieldsModel
@@ -35,6 +36,21 @@ class MommyCreatesSimpleModel(TestCase):
 
         people = mommy.make_many(Person, name="George Washington")
         self.assertTrue(all(p.name == "George Washington" for p in people))
+
+    def test_accept_model_as_string(self):
+        person = mommy.make_one('model_mommy.person')
+        self.assertTrue(isinstance(person, Person))
+        person = mommy.prepare_one('model_mommy.Person')
+        self.assertTrue(isinstance(person, Person))
+        people = mommy.make_many('model_mommy.person')
+        [self.assertTrue(isinstance(person, Person)) for person in people]
+
+    def test_raise_pretty_excpetion_if_model_not_found(self):
+        with self.assertRaises(ModelNotFound) as context_manager:
+            mommy.Mommy('not_existing.Model')
+        exception = context_manager.exception
+
+        self.assertEqual(exception.message, "could not find model 'Model' in the app 'not_existing'.")
 
 class MommyCreatesAssociatedModels(TestCase):
 
