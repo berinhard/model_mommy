@@ -22,6 +22,7 @@ except ImportError:
 
 import generators
 
+recipes = None
 #TODO: improve related models handling
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
@@ -51,6 +52,9 @@ def prepare_one(model, **attrs):
 def make_many(model, qty=5, **attrs):
     mommy = Mommy(model)
     return [mommy.make_one(**attrs) for i in range(qty)]
+
+def make_recipe(name):
+    [recipe.make for recipe in recipes if recipe.name == name]
 
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required
