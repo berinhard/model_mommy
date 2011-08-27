@@ -54,7 +54,9 @@ def make_many(model, qty=5, **attrs):
     return [mommy.make_one(**attrs) for i in range(qty)]
 
 def make_recipe(name):
-    [recipe.make for recipe in recipes if recipe.name == name]
+    for recipe in recipes:
+        if recipe.name == name:
+            return recipe.make()
 
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required
