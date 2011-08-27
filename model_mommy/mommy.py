@@ -23,6 +23,7 @@ except ImportError:
 import generators
 
 recipes = None
+
 #TODO: improve related models handling
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 

@@ -3,7 +3,7 @@
 from django.test import TestCase
 from model_mommy import mommy
 from model_mommy.models import Person
-from model_mommy.recipe import Recipe
+from model_mommy.recipe import Recipe, RecipeNameAlreadyUsed
 from datetime import date
 
 class TestDefiningRecipes(TestCase):
@@ -53,3 +53,12 @@ class TestDefiningRecipes(TestCase):
         self.assertEqual(person.appointment, recipe_attrs['appointment'])
         self.assertEqual(person.blog, recipe_attrs['blog'])
         self.assertEqual(person.wanted_games_qtd, recipe_attrs['wanted_games_qtd'])
+
+    def test_not_allow_duplicated_recipe_name(self):
+        recipe = Recipe('joe person', 'model_mommy.Person')
+        with self.assertRaises(RecipeNameAlreadyUsed) as context_manager:
+            Recipe('joe person', 'model_mommy.Person')
+        exception = context_manager.exception
+
+        self.assertEqual(exception.message, "recipe name 'joe person' already in use.")
+
