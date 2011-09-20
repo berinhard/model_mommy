@@ -26,7 +26,7 @@ import generators
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
 MAX_SELF_REFERENCE_LOOPS = 2
-MAX_MANY_QTY = 5
+MAX_MANY_QUANTITY = 5
 
 def make_one(model, **attrs):
     """
@@ -49,10 +49,10 @@ def prepare_one(model, **attrs):
     return mommy.prepare(**attrs)
 
 
-def make_many(model, qty=None, **attrs):
-    qty = qty or MAX_MANY_QTY
+def make_many(model, quantity=None, **attrs):
+    quantity = quantity or MAX_MANY_QUANTITY
     mommy = Mommy(model)
-    return [mommy.make_one(**attrs) for i in range(qty)]
+    return [mommy.make_one(**attrs) for i in range(quantity)]
 
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required

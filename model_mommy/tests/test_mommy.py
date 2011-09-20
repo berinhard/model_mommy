@@ -31,7 +31,7 @@ class MommyCreatesSimpleModel(TestCase):
         self.assertEqual(person.id, None)
 
     def test_make_many(self):
-        people = mommy.make_many(Person, qty=5)
+        people = mommy.make_many(Person, quantity=5)
         self.assertEqual(Person.objects.count(), 5)
 
         people = mommy.make_many(Person, name="George Washington")
@@ -75,7 +75,7 @@ class MommyCreatesAssociatedModels(TestCase):
 
     def test_create_many_to_many_with_set_default_quantity(self):
 
-        mommy.MAX_MANY_QTY = 2
+        mommy.MAX_MANY_QUANTITY = 2
 
         store = mommy.make_one(Store)
         self.assertEqual(store.employees.count(), 2)
