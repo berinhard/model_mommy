@@ -59,6 +59,19 @@ def make_recipe(name):
         if recipe.name == name:
             return recipe.make()
 
+def remember_recipe(apps=None, where='mommy_recipes'):
+    """
+      Loads all recipes defined in a folder(which needs to be a package).
+      By default, the folder name is 'mommy_recipes', but you can choose
+      another folder, passing the folder name as the seconde parameter.
+
+      It will look for recipes in all of INSTALLED_APPS, unless you specify
+      which apps you want to load the recipes.
+    """
+    from django.conf import settings
+    for app_name in settings.INSTALLED_APPS:
+        eval('from %s.%s i')
+
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required
 make_many.required = foreign_key_required
