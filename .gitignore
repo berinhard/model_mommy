@@ -6,3 +6,4 @@ bin/
 include/
 lib/
 *.egg-info/
+.idea

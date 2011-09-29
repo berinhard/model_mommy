@@ -28,6 +28,7 @@ recipes = None
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
 MAX_SELF_REFERENCE_LOOPS = 2
+MAX_MANY_QUANTITY = 5
 
 def make_one(model, **attrs):
     """
@@ -50,9 +51,10 @@ def prepare_one(model, **attrs):
     return mommy.prepare(**attrs)
 
 
-def make_many(model, qty=5, **attrs):
+def make_many(model, quantity=None, **attrs):
+    quantity = quantity or MAX_MANY_QUANTITY
     mommy = Mommy(model)
-    return [mommy.make_one(**attrs) for i in range(qty)]
+    return [mommy.make_one(**attrs) for i in range(quantity)]
 
 def make_recipe(name):
     for recipe in recipes:
