@@ -4,7 +4,7 @@ setuptools.setup(
     name="model_mommy",
     version="0.6.2",
     packages=["model_mommy"],
-    install_requires=["django"],
+    install_requires=["django", "unipath"],
     author="vandersonmota",
     author_email="vandersonmota@gmail.com",
     url="http://github.com/vandersonmota/model_mommy",
