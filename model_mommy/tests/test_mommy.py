@@ -141,6 +141,7 @@ class SkipDefaultsTestCase(TestCase):
         self.assertEqual(dummy.default_float_field, 123.0)
         self.assertEqual(dummy.default_date_field, '2011-01-01')
         self.assertEqual(dummy.default_date_time_field, '2011-01-01')
+        self.assertEqual(dummy.default_time_field, '00:00:00')
         self.assertEqual(dummy.default_decimal_field, Decimal('0'))
         self.assertEqual(dummy.default_email_field, 'foo@bar.org')
         self.assertEqual(dummy.default_slug_field, 'a-slug')

@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, time
 from decimal import Decimal
 
 import os
@@ -7,7 +7,7 @@ from os.path import abspath, join, dirname
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import CharField, TextField, SlugField
-from django.db.models.fields import DateField, DateTimeField, EmailField
+from django.db.models.fields import DateField, DateTimeField,TimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField
 from django.db.models.fields import PositiveIntegerField
@@ -35,6 +35,7 @@ __all__ = [
     'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
     'FillingEmailField', 'FillingGenericForeignKeyField','FillingFileField',
+    'TimeFieldsFilling',
 ]
 
 
@@ -107,6 +108,15 @@ class DateTimeFieldsFilling(FieldFillingTestCase):
         self.assertTrue(isinstance(appointment_field, DateTimeField))
 
         self.assertTrue(isinstance(self.person.appointment, datetime))
+
+
+class TimeFieldsFilling(FieldFillingTestCase):
+
+    def test_fill_TimeField_with_a_time(self):
+        birth_time_field = Person._meta.get_field('birth_time')
+        self.assertTrue(isinstance(birth_time_field, TimeField))
+
+        self.assertTrue(isinstance(self.person.birth_time, time))
 
 
 class FillingIntFields(TestCase):
