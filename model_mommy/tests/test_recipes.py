@@ -3,15 +3,10 @@
 from django.test import TestCase
 from model_mommy import mommy
 from model_mommy.models import Person
-from model_mommy.recipe import Recipe, RecipeNameAlreadyUsed
+from model_mommy.recipe import Recipe
 from datetime import date
 
 class TestDefiningRecipes(TestCase):
-
-    def test_remember_recipes(self):
-        assert mommy.recipes is None
-        mommy.remember_recipes()
-        [self.assertTrue(isinstance(Recipe, recipe)) for recipe in mommy.recipes]
 
     def test_flat_model_make_recipe_with_the_correct_attributes(self):
         recipe_attrs = {
@@ -24,12 +19,11 @@ class TestDefiningRecipes(TestCase):
           'blog': 'http://joe.blogspot.com',
           'wanted_games_qtd': 4,
         }
-        recipe = Recipe(
-          'joe person',
-          'model_mommy.Person',
+        person_recipe = Recipe(
+          Person,
           **recipe_attrs
         )
-        person = mommy.make_recipe('joe person')
+        person = person_recipe.make()
         self.assertEqual(person.name, recipe_attrs['name'])
         self.assertEqual(person.nickname, recipe_attrs['nickname'])
         self.assertEqual(person.age, recipe_attrs['age'])

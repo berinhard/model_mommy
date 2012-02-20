@@ -1,6 +1,7 @@
 from model_mommy.recipe import Recipe
+from model_mommy.models import Person
 
-Recipe('person', 'model_mommy.Person',
+person = Recipe(Person,
   name = 'John Doe',
   nickname = 'joe',
   age = 18,
