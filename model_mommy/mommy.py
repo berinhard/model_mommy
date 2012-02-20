@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
+from django.utils import importlib
+
 from django.db.models.fields import AutoField, CharField, TextField, SlugField
 from django.db.models.fields import DateField, DateTimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
@@ -57,31 +60,9 @@ def make_many(model, quantity=None, **attrs):
     return [mommy.make_one(**attrs) for i in range(quantity)]
 
 def make_recipe(name):
-    for recipe in recipes:
-        if recipe.name == name:
-            return recipe.make()
-
-def remember_recipes(apps=None, where='mommy_recipes'):
-    """
-      Loads all recipes defined in a folder(which needs to be a package).
-      By default, the folder name is 'mommy_recipes', but you can choose
-      another folder, passing the folder name as the seconde parameter.
-
-      It will look for recipes in all of INSTALLED_APPS, unless you specify
-      which apps you want to load the recipes.
-    """
-    from django.conf import settings
-    from django.utils import importlib
-    from unipath import Path
-    for app_name in settings.INSTALLED_APPS:
-        app = importlib.import_module(app_name)
-        recipesdir = Path(Path(app.__file__).parent, where)
-        for module in recipesdir.listdir():
-            if module.ext == '.py' and not module.name.startswith('__init__'):
-                recipe = importlib.import_module("%s.%s.%s" %(app_name, where, str(module.name)))
-
-
-
+    app, recipe_name = name.split('.')
+    recipes = importlib.import_module('.'.join([app, 'mommy_recipes']))
+    return getattr(recipes, recipe_name).make()
 
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required

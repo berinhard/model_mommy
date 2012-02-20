@@ -33,4 +33,6 @@ class TestDefiningRecipes(TestCase):
         self.assertEqual(person.blog, recipe_attrs['blog'])
         self.assertEqual(person.wanted_games_qtd, recipe_attrs['wanted_games_qtd'])
 
-
+    def test_find_recipe(self):
+        person = mommy.make_recipe('model_mommy.person')
+        self.assertTrue(isinstance(person, Person))
