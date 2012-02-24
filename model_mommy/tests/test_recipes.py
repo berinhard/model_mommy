@@ -9,6 +9,10 @@ from datetime import date
 class TestDefiningRecipes(TestCase):
 
     def test_flat_model_make_recipe_with_the_correct_attributes(self):
+        """
+          A 'flat model' means a model without associations, like
+          foreign keys, many to many and one to one
+        """
         recipe_attrs = {
           'name': 'John Doe',
           'nickname': 'joe',
