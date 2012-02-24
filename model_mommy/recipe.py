@@ -1,5 +1,4 @@
 #coding: utf-8
-from django.db.models import get_model
 
 class Recipe(object):
     def __init__(self, model, **attrs):
