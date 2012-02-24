@@ -15,6 +15,12 @@ class Recipe(object):
 
 
 def foreign_key(recipe_name):
+    """
+      This function should be used to define an foreign_key association in
+      mommy_recipes.py.
+      Since this uses some frame hacking, it's better not to call
+      from another place. (And there is no reason to)
+    """
     frame = inspect.stack()[1]
     mod = inspect.getmodule(frame[0])
     return getattr(mod, recipe_name)
