@@ -1,8 +1,8 @@
 #coding: utf-8
 
 #ATTENTION: Recipes defined for testing purposes only
-from model_mommy.recipe import Recipe
-from model_mommy.models import Person
+from model_mommy.recipe import Recipe, foreign_key
+from model_mommy.models import Person, Dog
 
 from datetime import date, datetime
 
@@ -15,4 +15,9 @@ person = Recipe(Person,
   wanted_games_qtd = 4,
   birthday = date.today(),
   appointment = datetime.now()
+)
+
+dog = Recipe(Dog,
+  breed = 'Pug',
+  owner = foreign_key('person')
 )
