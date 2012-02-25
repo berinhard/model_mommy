@@ -2,8 +2,8 @@
 
 from django.test import TestCase
 from model_mommy import mommy
-from model_mommy.models import Person
-from model_mommy.recipe import Recipe
+from model_mommy.models import Person, DummyNumbersModel, DummyBlankFieldsModel
+from model_mommy.recipe import Recipe, foreign_key
 from datetime import date
 
 class TestDefiningRecipes(TestCase):
@@ -45,3 +45,25 @@ class TestDefiningRecipes(TestCase):
     def test_find_recipe(self):
         person = mommy.make_recipe('model_mommy.person')
         self.assertTrue(isinstance(person, Person))
+
+    def test_accepts_callable(self):
+        r = Recipe(DummyBlankFieldsModel,
+            blank_char_field = lambda: 'callable!!'
+        )
+        value = r.make().blank_char_field
+        self.assertEqual(value, 'callable!!')
+
+class ForeignKeyTestCase(TestCase):
+    def test_returns_a_callable(self):
+        number_recipe = Recipe(DummyNumbersModel,
+            float_field = 1.6
+        )
+        method = foreign_key(number_recipe)
+        self.assertTrue(callable(method))
+        self.assertTrue(method.im_self, number_recipe)
+
+    def test_not_accept_other_type(self):
+        with self.assertRaises(TypeError) as c:
+            foreign_key('something')
+        exception = c.exception
+        self.assertEqual(exception.message, 'Not a recipe')

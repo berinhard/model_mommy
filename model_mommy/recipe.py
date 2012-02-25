@@ -1,5 +1,4 @@
 #coding: utf-8
-import inspect
 
 class Recipe(object):
     def __init__(self, model, **attrs):
@@ -9,18 +8,18 @@ class Recipe(object):
     def make(self):
         mapping = self.attr_mapping.copy()
         for k, v in self.attr_mapping.items():
-            if isinstance(v, Recipe):
-                mapping[k] = v.make()
+            if callable(v):
+                mapping[k] = v()
         return self.model.objects.create(**mapping)
 
 
-def foreign_key(recipe_name):
+def foreign_key(recipe):
     """
-      This function should be used to define an foreign_key association in
-      mommy_recipes.py.
-      Since this uses some frame hacking, it's better not to call
-      from another place. (And there is no reason to)
+      Returns the callable, so that the associated model
+      will not be created during the recipe definition.
     """
-    frame = inspect.stack()[1]
-    mod = inspect.getmodule(frame[0])
-    return getattr(mod, recipe_name)
+    if isinstance(recipe, Recipe):
+        return recipe.make
+    else:
+        raise TypeError('Not a recipe')
+

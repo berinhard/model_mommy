@@ -19,5 +19,5 @@ person = Recipe(Person,
 
 dog = Recipe(Dog,
     breed = 'Pug',
-    owner = foreign_key('person')
+    owner = foreign_key(person)
 )
