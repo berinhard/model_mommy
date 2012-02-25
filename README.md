@@ -71,6 +71,49 @@ model_mommy skips fields with null=True or blank=True. Also if the field has a d
 If you have a field that has any special validation, you should set the value by yourself.
 model_mommy should be used to handle the fields that doesn't have relation with the test that you're doing at the moment and don't require special validation(like unique, etc), but still required in order to create the object.
 
+## Recipes
+If you're not confortable with random data, or you have some custom fields, or even you just want to improve the semantics of data generation, there's hope for you.
+You can define a recipe, which is a set of rules to generate data for your models. You create a module called mommy_recipes.py at the app root:
+
+    from model_mommy.recipe import Recipe
+
+    person = Recipe(Person,
+        name = 'John Doe',
+        nickname = 'joe',
+        age = 18,
+        birthday = date.today(),
+        appointment = datetime.now()
+    )
+
+The variable 'person' serves as the recipe name, which will be used for data creation when you call:
+
+    from model_mommy import mommy
+    mommy.make_recipe('model_mommy.person')
+
+Where 'model_mommy' is the app name and 'person' is the recipe name
+
+You can also define foreign_key relations:
+
+    dog = Recipe(Dog,
+        breed = 'Pug',
+        owner = foreign_key(person)
+    )
+
+Notice that 'person' is a recipe. You may be thinking: "I can put the Person model instance directly in the owner field": And yes, you can. But i recommend using the foreign_key function for 2 reasons:
+
+  * Semantics: You know it's an foreign_key relation when you're reading
+  * The associated model will be created only when you call 'make_recipe' and not during recipe definition
+
+You can also pass callables as arguments, so that the values will be generated during 'make_recipe':
+    callable = date.today
+    person = Recipe(Person,
+        name = 'John Doe',
+        nickname = 'joe',
+        age = 18,
+        birthday = callable,
+    )
+
+
 ## Doubts? Loved it? Hated it? Suggestions?
 
 Mail us!:
