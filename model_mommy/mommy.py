@@ -59,10 +59,16 @@ def make_many(model, quantity=None, **attrs):
     mommy = Mommy(model)
     return [mommy.make_one(**attrs) for i in range(quantity)]
 
-def make_recipe(name):
+def _recipe(name):
     app, recipe_name = name.split('.')
     recipes = importlib.import_module('.'.join([app, 'mommy_recipes']))
-    return getattr(recipes, recipe_name).make()
+    return getattr(recipes, recipe_name)
+
+def make_recipe(name):
+    return _recipe(name).make()
+
+def prepare_recipe(name):
+    return _recipe(name).prepare()
 
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required
