@@ -96,6 +96,7 @@ Or if you don't want a persisted model:
 
 Where 'model_mommy' is the app name and 'person' is the recipe name
 
+### ForeignKeys
 You can also define foreign_key relations:
 
     dog = Recipe(Dog,
@@ -107,6 +108,8 @@ Notice that 'person' is a recipe. You may be thinking: "I can put the Person mod
 
   * Semantics: You know it's an foreign_key relation when you're reading
   * The associated model will be created only when you call 'make_recipe' and not during recipe definition
+
+### Passing Callables
 
 You can also pass callables as arguments, so that the values will be generated during 'make_recipe':
 
