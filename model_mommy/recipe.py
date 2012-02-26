@@ -5,18 +5,19 @@ class Recipe(object):
         self.attr_mapping = attrs
         self.model = model
 
-    def _mapping(self):
+    def _mapping(self, new_attrs):
         mapping = self.attr_mapping.copy()
         for k, v in self.attr_mapping.items():
             if callable(v):
                 mapping[k] = v()
+        mapping.update(new_attrs)
         return mapping
 
-    def make(self):
-        return self.model.objects.create(**self._mapping())
+    def make(self, **attrs):
+        return self.model.objects.create(**self._mapping(attrs))
 
-    def prepare(self):
-        return self.model(**self._mapping())
+    def prepare(self, **attrs):
+        return self.model(**self._mapping(attrs))
 
 
 def foreign_key(recipe):

@@ -64,11 +64,11 @@ def _recipe(name):
     recipes = importlib.import_module('.'.join([app, 'mommy_recipes']))
     return getattr(recipes, recipe_name)
 
-def make_recipe(name):
-    return _recipe(name).make()
+def make_recipe(mommy_recipe_name, **new_attrs):
+    return _recipe(mommy_recipe_name).make(**new_attrs)
 
-def prepare_recipe(name):
-    return _recipe(name).prepare()
+def prepare_recipe(mommy_recipe_name, **new_attrs):
+    return _recipe(mommy_recipe_name).prepare(**new_attrs)
 
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required
