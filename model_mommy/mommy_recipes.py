@@ -14,7 +14,8 @@ person = Recipe(Person,
     blog = 'http://joe.blogspot.com',
     wanted_games_qtd = 4,
     birthday = date.today(),
-    appointment = datetime.now()
+    appointment = datetime.now(),
+    birth_time = datetime.now
 )
 
 dog = Recipe(Dog,
