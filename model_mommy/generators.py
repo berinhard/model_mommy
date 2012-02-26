@@ -70,6 +70,10 @@ gen_date = datetime.date.today
 gen_datetime = datetime.datetime.now
 
 
+def gen_time():
+    return datetime.datetime.now().time()
+
+
 def gen_string(max_length):
     return ''.join(choice(string.printable) for i in range(max_length))
 gen_string.required = ['max_length']

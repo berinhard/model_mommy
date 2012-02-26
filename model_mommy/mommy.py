@@ -3,7 +3,7 @@ from django.conf import settings
 from django.utils import importlib
 
 from django.db.models.fields import AutoField, CharField, TextField, SlugField
-from django.db.models.fields import DateField, DateTimeField, EmailField
+from django.db.models.fields import DateField, DateTimeField, TimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField
 from django.db.models.fields import PositiveIntegerField
@@ -96,6 +96,7 @@ default_mapping = {
 
     DateField: generators.gen_date,
     DateTimeField: generators.gen_datetime,
+    TimeField: generators.gen_time,
 
     URLField: generators.gen_url,
     EmailField: generators.gen_email,

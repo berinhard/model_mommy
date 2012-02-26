@@ -23,6 +23,7 @@ class Person(models.Model):
     age = models.IntegerField()
     bio = models.TextField()
     birthday = models.DateField()
+    birth_time = models.TimeField()
     appointment = models.DateTimeField()
     blog = models.URLField()
 
@@ -107,12 +108,13 @@ class DummyDefaultFieldsModel(models.Model):
     default_float_field = models.FloatField(default=123.0)
     default_date_field = models.DateField(default='2011-01-01')
     default_date_time_field = models.DateTimeField(default='2011-01-01')
+    default_time_field = models.TimeField(default='00:00:00')
     default_decimal_field = models.DecimalField(max_digits=5, decimal_places=2,
                                                 default=Decimal('0'))
     default_email_field = models.EmailField(default='foo@bar.org')
     default_slug_field = models.SlugField(default='a-slug')
 
+
 class DummyFileFieldModel(models.Model):
-    
     fs = FileSystemStorage(location='/tmp/')
     file_field = models.FileField(upload_to="%Y/%m/%d", storage=fs)
