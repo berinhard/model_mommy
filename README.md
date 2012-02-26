@@ -71,6 +71,9 @@ model_mommy skips fields with null=True or blank=True. Also if the field has a d
 If you have a field that has any special validation, you should set the value by yourself.
 model_mommy should be used to handle the fields that doesn't have relation with the test that you're doing at the moment and don't require special validation(like unique, etc), but still required in order to create the object.
 
+###Currently supports the fields:
+CharField, TextField, FloatField, ForeignKey, Date and DateTimeField, BooleanField, URLField, and all the integer-type Fields
+
 ## Recipes
 If you're not confortable with random data, or you have some custom fields, or even you just want to improve the semantics of data generation, there's hope for you.
 You can define a recipe, which is a set of rules to generate data for your models. You create a module called mommy_recipes.py at the app root:
@@ -134,6 +137,4 @@ Mail us!:
  *  vanderson.mota **at** gmail **dot** com
  *  italo.maia **at** gmail **dot** com
 
-##Currently supports the fields:
-CharField, TextField, FloatField, ForeignKey, Date and DateTimeField, BooleanField, URLField, and all the integer-type Fields
 
