@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="model_mommy",
-    version="0.6.2",
+    version="0.7",
     packages=["model_mommy"],
     install_requires=["django", "unipath"],
     author="vandersonmota",
