@@ -90,6 +90,10 @@ The variable 'person' serves as the recipe name, which will be used for data cre
     from model_mommy import mommy
     mommy.make_recipe('model_mommy.person')
 
+Or if you don't want a persisted model:
+
+    mommy.prepare_recipe('model_mommy.person')
+
 Where 'model_mommy' is the app name and 'person' is the recipe name
 
 You can also define foreign_key relations:
@@ -105,6 +109,7 @@ Notice that 'person' is a recipe. You may be thinking: "I can put the Person mod
   * The associated model will be created only when you call 'make_recipe' and not during recipe definition
 
 You can also pass callables as arguments, so that the values will be generated during 'make_recipe':
+
     callable = date.today
     person = Recipe(Person,
         name = 'John Doe',
@@ -112,6 +117,11 @@ You can also pass callables as arguments, so that the values will be generated d
         age = 18,
         birthday = callable,
     )
+
+### Overriding recipe definitions
+You can have different values when calling **make_recipe** or **prepare_recipe**. This is useful when you have to create multiple objects and you have some unique field, for instance. You just have to pass the values as keyword args, like this:
+
+    mommy.make_recipe('model_mommy.person', name='Peter Parker')
 
 
 ## Doubts? Loved it? Hated it? Suggestions?
