@@ -64,27 +64,37 @@ class TestDefiningRecipes(TestCase):
         self.assertEqual(person.wanted_games_qtd, recipe_attrs['wanted_games_qtd'])
         self.assertEqual(person.id, None)
 
-    def test_model_with_foreign_key(self):
-        dog = mommy.make_recipe('model_mommy.dog')
-        self.assertEqual(dog.breed, 'Pug')
-        self.assertTrue(isinstance(dog.owner, Person))
-
-    def test_make_recipe(self):
-        person = mommy.make_recipe('model_mommy.person')
-        self.assertTrue(isinstance(person, Person))
-        self.assertNotEqual(person.id, None)
-
-    def test_make_recipe(self):
-        person = mommy.prepare_recipe('model_mommy.person')
-        self.assertTrue(isinstance(person, Person))
-        self.assertEqual(person.id, None)
-
     def test_accepts_callable(self):
         r = Recipe(DummyBlankFieldsModel,
             blank_char_field = lambda: 'callable!!'
         )
         value = r.make().blank_char_field
         self.assertEqual(value, 'callable!!')
+
+class TestExecutingRecipes(TestCase):
+    """
+      Tests for calling recipes defined in mommy_recipes.py
+    """
+    def test_model_with_foreign_key(self):
+        dog = mommy.make_recipe('model_mommy.dog')
+        self.assertEqual(dog.breed, 'Pug')
+        self.assertTrue(isinstance(dog.owner, Person))
+        self.assertNotEqual(dog.owner.id, None)
+
+        dog = mommy.prepare_recipe('model_mommy.dog')
+        self.assertEqual(dog.breed, 'Pug')
+        self.assertTrue(isinstance(dog.owner, Person))
+        self.assertNotEqual(dog.owner.id, None)
+
+    def test_make_recipe(self):
+        person = mommy.make_recipe('model_mommy.person')
+        self.assertTrue(isinstance(person, Person))
+        self.assertNotEqual(person.id, None)
+
+    def test_prepare_recipe(self):
+        person = mommy.prepare_recipe('model_mommy.person')
+        self.assertTrue(isinstance(person, Person))
+        self.assertEqual(person.id, None)
 
 class ForeignKeyTestCase(TestCase):
     def test_returns_a_callable(self):
