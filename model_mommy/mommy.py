@@ -60,7 +60,8 @@ def make_many(model, quantity=None, **attrs):
     return [mommy.make_one(**attrs) for i in range(quantity)]
 
 def _recipe(name):
-    app, recipe_name = name.split('.')
+    splited_name = name.split('.')
+    app, recipe_name = '.'.join(splited_name[0:-1]), splited_name[-1]
     recipes = importlib.import_module('.'.join([app, 'mommy_recipes']))
     return getattr(recipes, recipe_name)
 
