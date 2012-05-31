@@ -132,6 +132,11 @@ class TestExecutingRecipes(TestCase):
         self.assertEqual(person.name, 'Dennis Ritchie')
         self.assertEqual(person.age, 70)
 
+    def test_import_recipe_inside_deeper_modules(self):
+        recipe_name = 'model_mommy.tests.sub_package.person'
+        person = mommy.prepare_recipe(recipe_name)
+        self.assertEqual(person.name, 'John Deeper')
+
 class ForeignKeyTestCase(TestCase):
     def test_returns_a_callable(self):
         number_recipe = Recipe(DummyNumbersModel,
