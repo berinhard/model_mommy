@@ -104,22 +104,22 @@ class TestExecutingRecipes(TestCase):
     def test_model_with_foreign_key(self):
         dog = mommy.make_recipe('model_mommy.dog')
         self.assertEqual(dog.breed, 'Pug')
-        self.assertTrue(isinstance(dog.owner, Person))
+        self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
         dog = mommy.prepare_recipe('model_mommy.dog')
         self.assertEqual(dog.breed, 'Pug')
-        self.assertTrue(isinstance(dog.owner, Person))
+        self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
     def test_make_recipe(self):
         person = mommy.make_recipe('model_mommy.person')
-        self.assertTrue(isinstance(person, Person))
+        self.assertIsInstance(person, Person)
         self.assertNotEqual(person.id, None)
 
     def test_prepare_recipe(self):
         person = mommy.prepare_recipe('model_mommy.person')
-        self.assertTrue(isinstance(person, Person))
+        self.assertIsInstance(person, Person)
         self.assertEqual(person.id, None)
 
     def test_make_recipe_with_args(self):
@@ -142,7 +142,7 @@ class TestExecutingRecipes(TestCase):
         self.assertIsInstance(persons, list)
         self.assertEqual(len(persons), mommy.MAX_MANY_QUANTITY)
         for person in persons:
-            self.assertTrue(isinstance(person, Person))
+            self.assertIsInstance(person, Person)
             self.assertNotEqual(person.id, None)
 
     def test_make_many_recipes_with_specified_quantity(self):

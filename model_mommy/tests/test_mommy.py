@@ -16,14 +16,14 @@ class MommyCreatesSimpleModel(TestCase):
 
     def test_make_one_should_create_one_object(self):
         person = mommy.make_one(Person)
-        self.assertTrue(isinstance(person, Person))
+        self.assertIsInstance(person, Person)
 
         # makes sure it is the person we created
         self.assertTrue(Person.objects.filter(id=person.id))
 
     def test_prepare_one_should_not_persist_one_object(self):
         person = mommy.prepare_one(Person)
-        self.assertTrue(isinstance(person, Person))
+        self.assertIsInstance(person, Person)
 
         # makes sure database is clean
         self.assertEqual(Person.objects.all().count(), 0)
@@ -39,11 +39,11 @@ class MommyCreatesSimpleModel(TestCase):
 
     def test_accept_model_as_string(self):
         person = mommy.make_one('model_mommy.person')
-        self.assertTrue(isinstance(person, Person))
+        self.assertIsInstance(person, Person)
         person = mommy.prepare_one('model_mommy.Person')
-        self.assertTrue(isinstance(person, Person))
+        self.assertIsInstance(person, Person)
         people = mommy.make_many('model_mommy.person')
-        [self.assertTrue(isinstance(person, Person)) for person in people]
+        [self.assertIsInstance(person, Person) for person in people]
 
     def test_raise_pretty_excpetion_if_model_not_found(self):
         with self.assertRaises(ModelNotFound) as context_manager:
@@ -56,12 +56,12 @@ class MommyCreatesAssociatedModels(TestCase):
 
     def test_dependent_models_with_ForeignKey(self):
         dog = mommy.make_one(Dog)
-        self.assertTrue(isinstance(dog.owner, Person))
+        self.assertIsInstance(dog.owner, Person)
 
     def test_prepare_one_should_not_create_one_object(self):
         dog = mommy.prepare_one(Dog)
-        self.assertTrue(isinstance(dog, Dog))
-        self.assertTrue(isinstance(dog.owner, Person))
+        self.assertIsInstance(dog, Dog)
+        self.assertIsInstance(dog.owner, Person)
 
         # makes sure database is clean
         self.assertEqual(Person.objects.all().count(), 0)
@@ -109,13 +109,13 @@ class HandlingUnsupportedModels(TestCase):
 class HandlingModelsWithGenericRelationFields(TestCase):
     def test_create_model_with_generic_relation(self):
         dummy = mommy.make_one(DummyGenericRelationModel)
-        self.assertTrue(isinstance(dummy, DummyGenericRelationModel))
+        self.assertIsInstance(dummy, DummyGenericRelationModel)
 
 
 class HandlingContentTypeField(TestCase):
     def test_create_model_with_contenttype_field(self):
         dummy = mommy.make_one(DummyGenericForeignKeyModel)
-        self.assertTrue(isinstance(dummy, DummyGenericForeignKeyModel))
+        self.assertIsInstance(dummy, DummyGenericForeignKeyModel)
 
 
 class SkipNullsTestCase(TestCase):
