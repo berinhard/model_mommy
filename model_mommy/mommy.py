@@ -71,6 +71,10 @@ def make_recipe(mommy_recipe_name, **new_attrs):
 def prepare_recipe(mommy_recipe_name, **new_attrs):
     return _recipe(mommy_recipe_name).prepare(**new_attrs)
 
+def make_many_recipes(mommy_recipe_name, **new_attrs):
+    quantity = MAX_MANY_QUANTITY
+    return [make_recipe(mommy_recipe_name, **new_attrs) for x in range(quantity)]
+
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required
 make_many.required = foreign_key_required

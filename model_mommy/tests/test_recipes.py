@@ -137,6 +137,14 @@ class TestExecutingRecipes(TestCase):
         person = mommy.prepare_recipe(recipe_name)
         self.assertEqual(person.name, 'John Deeper')
 
+    def test_make_many_recipes(self):
+        persons = mommy.make_many_recipes('model_mommy.person')
+        self.assertIsInstance(persons, list)
+        self.assertEqual(len(persons), mommy.MAX_MANY_QUANTITY)
+        for person in persons:
+            self.assertTrue(isinstance(person, Person))
+            self.assertNotEqual(person.id, None)
+
 class ForeignKeyTestCase(TestCase):
     def test_returns_a_callable(self):
         number_recipe = Recipe(DummyNumbersModel,
