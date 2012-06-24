@@ -74,12 +74,9 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(store.customers.count(), 5)
 
     def test_create_many_to_many_with_set_default_quantity(self):
-
-        mommy.MAX_MANY_QUANTITY = 2
-
         store = mommy.make_one(Store)
-        self.assertEqual(store.employees.count(), 2)
-        self.assertEqual(store.customers.count(), 2)
+        self.assertEqual(store.employees.count(), mommy.MAX_MANY_QUANTITY)
+        self.assertEqual(store.customers.count(), mommy.MAX_MANY_QUANTITY)
 
     def test_simple_creating_person_with_parameters(self):
         kid = mommy.make_one(Person, happy=True, age=10, name='Mike')
