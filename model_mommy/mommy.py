@@ -71,7 +71,7 @@ def make_recipe(mommy_recipe_name, **new_attrs):
 def prepare_recipe(mommy_recipe_name, **new_attrs):
     return _recipe(mommy_recipe_name).prepare(**new_attrs)
 
-def make_many_recipes(mommy_recipe_name, quantity=None, **new_attrs):
+def make_many_from_recipe(mommy_recipe_name, quantity=None, **new_attrs):
     quantity = quantity or MAX_MANY_QUANTITY
     return [make_recipe(mommy_recipe_name, **new_attrs) for x in range(quantity)]
 

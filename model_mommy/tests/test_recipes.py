@@ -137,22 +137,22 @@ class TestExecutingRecipes(TestCase):
         person = mommy.prepare_recipe(recipe_name)
         self.assertEqual(person.name, 'John Deeper')
 
-    def test_make_many_recipes(self):
-        persons = mommy.make_many_recipes('model_mommy.person')
+    def test_make_many_from_recipe(self):
+        persons = mommy.make_many_from_recipe('model_mommy.person')
         self.assertIsInstance(persons, list)
         self.assertEqual(len(persons), mommy.MAX_MANY_QUANTITY)
         for person in persons:
             self.assertIsInstance(person, Person)
             self.assertNotEqual(person.id, None)
 
-    def test_make_many_recipes_with_specified_quantity(self):
+    def test_make_many_from_recipe_with_specified_quantity(self):
         quantity = 2
-        persons = mommy.make_many_recipes('model_mommy.person', quantity=quantity)
+        persons = mommy.make_many_from_recipe('model_mommy.person', quantity=quantity)
         self.assertIsInstance(persons, list)
         self.assertEqual(len(persons), quantity)
 
     def test_make_many_with_model_args(self):
-        persons = mommy.make_many_recipes('model_mommy.person', name='Dennis Ritchie', age=70)
+        persons = mommy.make_many_from_recipe('model_mommy.person', name='Dennis Ritchie', age=70)
         for person in persons:
             self.assertEqual(person.name, 'Dennis Ritchie')
             self.assertEqual(person.age, 70)
