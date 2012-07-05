@@ -39,6 +39,10 @@ class Dog(models.Model):
     breed = models.CharField(max_length=50)
 
 
+class LonelyPerson(models.Model):
+    only_friend = models.OneToOneField(Person)
+
+
 class Store(models.Model):
     customers = models.ManyToManyField(Person, related_name='favorite_stores')
     employees = models.ManyToManyField(Person, related_name='employers')

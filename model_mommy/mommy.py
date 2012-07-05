@@ -16,7 +16,7 @@ from django.db.models import get_model
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
-from django.db.models import ForeignKey, ManyToManyField
+from django.db.models import ForeignKey, ManyToManyField, OneToOneField
 
 try:
     from django.db.models.fields import BigIntegerField
@@ -92,7 +92,7 @@ default_mapping = {
     SlugField: generators.gen_slug,
 
     ForeignKey: make_one,
-    #OneToOneField: make_one,
+    OneToOneField: make_one,
     ManyToManyField: make_many,
 
     DateField: generators.gen_date,
