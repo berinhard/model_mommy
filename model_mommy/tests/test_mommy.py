@@ -96,6 +96,16 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(person.name, 'John')
         self.assertEqual(person.gender, 'M')
 
+    def test_ForeignKey_model_field_population(self):
+        dog = mommy.make_one(Dog, breed='X1', owner__name='Bob')
+        self.assertEqual('X1', dog.breed)
+        self.assertEqual('Bob', dog.owner.name)
+
+    def test_ForeignKey_model_field_population_should_work_with_prepare(self):
+        dog = mommy.prepare_one(Dog, breed='X1', owner__name='Bob')
+        self.assertEqual('X1', dog.breed)
+        self.assertEqual('Bob', dog.owner.name)
+
 
 class HandlingUnsupportedModels(TestCase):
     def test_unsupported_model_raises_an_explanatory_exception(self):
