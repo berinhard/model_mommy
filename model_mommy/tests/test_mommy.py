@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 from model_mommy.mommy import ModelNotFound
-from model_mommy.models import Person, Dog, Store
+from model_mommy.models import Person, Dog, Store, User
 from model_mommy.models import UnsupportedModel, DummyGenericRelationModel
 from model_mommy.models import DummyNullFieldsModel, DummyBlankFieldsModel
 from model_mommy.models import DummyDefaultFieldsModel
@@ -105,6 +105,14 @@ class MommyCreatesAssociatedModels(TestCase):
         dog = mommy.prepare_one(Dog, breed='X1', owner__name='Bob')
         self.assertEqual('X1', dog.breed)
         self.assertEqual('Bob', dog.owner.name)
+
+    def test_ForeignKey_model_field_population_for_not_required_fk(self):
+        user = mommy.make_one(User, profile__email="a@b.com")
+        self.assertEqual('a@b.com', user.profile.email)
+
+    def test_does_not_creates_null_ForeignKey(self):
+        user = mommy.make_one(User)
+        self.assertFalse(user.profile)
 
 
 class HandlingUnsupportedModels(TestCase):

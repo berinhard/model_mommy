@@ -144,11 +144,16 @@ class Mommy(object):
         is_fk_field = lambda x: '__' in x
         model_attrs = dict((k, v) for k, v in attrs.items() if not is_fk_field(k))
         fk_attrs = dict((k, v) for k, v in attrs.items() if is_fk_field(k))
+        fk_fields = [x.split('__')[0] for x in fk_attrs.keys() if is_fk_field(x)]
 
         for field in self.get_fields():
             field_value_not_defined = field.name not in model_attrs
 
             if isinstance(field, (AutoField, generic.GenericRelation)):
+                continue
+
+            if isinstance(field, ForeignKey) and field.name in fk_fields:
+                model_attrs[field.name] = self.generate_value(field, **fk_attrs)
                 continue
 
             # If not specified, django automatically sets blank=True and
@@ -170,7 +175,7 @@ class Mommy(object):
                 if field.null:
                     continue
                 else:
-                    model_attrs[field.name] = self.generate_value(field, **fk_attrs)
+                    model_attrs[field.name] = self.generate_value(field)
 
         instance = self.model(**model_attrs)
 
