@@ -130,7 +130,6 @@ class Mommy(object):
     def make_one(self, **attrs):
         '''Creates and persists an instance of the model
         associated with Mommy instance.'''
-
         return self._make_one(commit=True, **attrs)
 
     def prepare(self, **attrs):
@@ -201,7 +200,6 @@ class Mommy(object):
         `attr_mapping` and `type_mapping` can be defined easely overwriting the
         model.
         '''
-
         if field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):

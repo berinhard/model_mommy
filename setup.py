@@ -4,7 +4,8 @@ setuptools.setup(
     name="model_mommy",
     version="0.7",
     packages=["model_mommy"],
-    install_requires=["django<=1.3.1"],
+    include_package_data=True,  # declarations in MANIFEST.in
+    install_requires=["Django <=1.4"],
     author="vandersonmota",
     author_email="vandersonmota@gmail.com",
     url="http://github.com/vandersonmota/model_mommy",

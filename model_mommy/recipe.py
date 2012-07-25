@@ -29,4 +29,3 @@ def foreign_key(recipe):
         return recipe.make
     else:
         raise TypeError('Not a recipe')
-
