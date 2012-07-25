@@ -10,18 +10,14 @@ callable (which will receive `field` as first argument), it should return a
 list in the format (key, value) where key is the argument name for generator
 and value is the value for that argument.
 """
-
-import string
 import datetime
 from decimal import Decimal
-from random import randint, choice, random
-
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import get_models
-from django.core.files import File
-
-import os
+from django.core.files.base import ContentFile
 from os.path import abspath, join, dirname
+from random import randint, choice, random
+import string
 
 
 MAX_LENGTH = 300
@@ -29,10 +25,13 @@ MAX_LENGTH = 300
 # Postgres database.
 MAX_INT = 10000
 
+
 def gen_file_field():
-    file_path = abspath(join(dirname(__file__),'mock_file.txt'))
-    fixture_txt_file = File(open(file_path))
-    return fixture_txt_file
+    name = 'mock_file.txt'
+    file_path = abspath(join(dirname(__file__), name))
+    with open(file_path, 'rb') as f:
+        return ContentFile(f.read(), name=name)
+
 
 def gen_from_list(L):
     '''Makes sure all values of the field are generated from the list L
