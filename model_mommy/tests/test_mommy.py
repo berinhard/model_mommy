@@ -5,7 +5,7 @@ from django.test import TestCase
 
 from model_mommy import mommy
 from model_mommy.mommy import ModelNotFound
-from model_mommy.models import Person, Dog, Store
+from model_mommy.models import Person, Dog, Store, LonelyPerson
 from model_mommy.models import UnsupportedModel, DummyGenericRelationModel
 from model_mommy.models import DummyNullFieldsModel, DummyBlankFieldsModel
 from model_mommy.models import DummyDefaultFieldsModel
@@ -67,8 +67,14 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(Person.objects.all().count(), 0)
         self.assertEqual(Dog.objects.all().count(), 0)
 
-    def test_create_many_to_many(self):
+    def test_create_one_to_one(self):
+        lonely_person = mommy.make_one(LonelyPerson)
 
+        self.assertEquals(LonelyPerson.objects.all().count(), 1)
+        self.assertTrue(isinstance(lonely_person.only_friend, Person))
+        self.assertEquals(Person.objects.all().count(), 1)
+
+    def test_create_many_to_many(self):
         store = mommy.make_one(Store)
         self.assertEqual(store.employees.count(), 5)
         self.assertEqual(store.customers.count(), 5)
