@@ -53,6 +53,10 @@ You can also specify values for one or more attribute.
     another_kid = mommy.make_one(Kid, age = 3)
     assert another_kid.age == 3
 
+With relationships with ForeignKey fields, you can also set the related objects attributes like this:
+
+    bobs_dog = mommy.make_one(Dog, owner__name='Bob')
+
 But, if don't need a persisted object, mommy can handle this for you as well:
 
     from model_mommy import mommy

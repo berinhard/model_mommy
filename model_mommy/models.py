@@ -15,6 +15,19 @@ from django.contrib.contenttypes import generic
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
 
+class Profile(models.Model):
+    email = models.EmailField()
+
+
+class User(models.Model):
+    profile = models.ForeignKey(Profile, blank=True, null=True)
+
+
+class PaymentBill(models.Model):
+    user = models.ForeignKey(User)
+    value = models.FloatField()
+
+
 class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CH)
     happy = models.BooleanField(default=True)

@@ -144,11 +144,19 @@ class Mommy(object):
     #Method too big
     def _make_one(self, commit=True, **attrs):
         m2m_dict = {}
+        is_fk_field = lambda x: '__' in x
+        model_attrs = dict((k, v) for k, v in attrs.items() if not is_fk_field(k))
+        fk_attrs = dict((k, v) for k, v in attrs.items() if is_fk_field(k))
+        fk_fields = [x.split('__')[0] for x in fk_attrs.keys() if is_fk_field(x)]
 
         for field in self.get_fields():
-            field_value_not_defined = field.name not in attrs
+            field_value_not_defined = field.name not in model_attrs
 
             if isinstance(field, (AutoField, generic.GenericRelation)):
+                continue
+
+            if isinstance(field, ForeignKey) and field.name in fk_fields:
+                model_attrs[field.name] = self.generate_value(field, **fk_attrs)
                 continue
 
             # If not specified, django automatically sets blank=True and
@@ -164,15 +172,15 @@ class Mommy(object):
                     else:
                         m2m_dict[field.name] = self.generate_value(field)
                 else:
-                    m2m_dict[field.name] = attrs.pop(field.name)
+                    m2m_dict[field.name] = model_attrs.pop(field.name)
 
             elif field_value_not_defined:
                 if field.null:
                     continue
                 else:
-                    attrs[field.name] = self.generate_value(field)
+                    model_attrs[field.name] = self.generate_value(field)
 
-        instance = self.model(**attrs)
+        instance = self.model(**model_attrs)
 
         # m2m only works for persisted instances
         if commit:
@@ -186,7 +194,7 @@ class Mommy(object):
 
         return instance
 
-    def generate_value(self, field):
+    def generate_value(self, field, **fk_attrs):
         '''
         Calls the generator associated with a field passing all required args.
 
@@ -213,8 +221,12 @@ class Mommy(object):
 
         # attributes like max_length, decimal_places are take in account when
         # generating the value.
-        required_field_attrs = get_required_values(generator, field)
-        return generator(**required_field_attrs)
+        generator_attrs = get_required_values(generator, field)
+
+        if isinstance(field, ForeignKey):
+            generator_attrs.update(filter_fk_attrs(field, **fk_attrs))
+
+        return generator(**generator_attrs)
 
 
 def get_required_values(generator, field):
@@ -241,3 +253,16 @@ def get_required_values(generator, field):
                                   Don't make mommy sad." % str(item))
 
     return rt
+
+def filter_fk_attrs(field, **fk_attrs):
+    clean_dict = {}
+
+    for k, v in fk_attrs.items():
+        if k.startswith(field.name + '__'):
+            splited_key = k.split('__')
+            key = '__'.join(splited_key[1:])
+            clean_dict[key] = v
+        else:
+            clean_dict[k] = v
+
+    return clean_dict
