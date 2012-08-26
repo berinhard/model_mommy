@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="model_mommy",
-    version="0.7",
+    version="0.8",
     packages=["model_mommy"],
     include_package_data=True,  # declarations in MANIFEST.in
     install_requires=["Django <1.5"],
