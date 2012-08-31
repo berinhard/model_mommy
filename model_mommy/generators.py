@@ -11,6 +11,7 @@ list in the format (key, value) where key is the argument name for generator
 and value is the value for that argument.
 """
 import datetime
+from django import VERSION
 from decimal import Decimal
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import get_models
@@ -25,12 +26,17 @@ MAX_LENGTH = 300
 # Postgres database.
 MAX_INT = 10000
 
+def get_content_file(content, name):
+    if VERSION[1] < 4:
+        return ContentFile(content)
+    elif VERSION >= 4:
+        return ContentFile(content, name=name)
 
 def gen_file_field():
     name = 'mock_file.txt'
     file_path = abspath(join(dirname(__file__), name))
     with open(file_path, 'rb') as f:
-        return ContentFile(f.read(), name=name)
+        return get_content_file(f.read(), name=name)
 
 
 def gen_from_list(L):

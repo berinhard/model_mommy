@@ -217,7 +217,9 @@ class FillingFileField(TestCase):
         import time
         path = "/tmp/%s/mock_file.txt" % time.strftime('%Y/%m/%d')
 
-        self.assertEqual(self.dummy.file_field.path, path)
+        from django import VERSION
+        if VERSION[1] >= 4:
+            self.assertEqual(self.dummy.file_field.path, path)
 
     def tearDown(self):
         self.dummy.file_field.delete()
