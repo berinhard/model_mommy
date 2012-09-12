@@ -29,7 +29,7 @@ MAX_INT = 10000
 def get_content_file(content, name):
     if VERSION[1] < 4:
         return ContentFile(content)
-    elif VERSION >= 4:
+    elif VERSION[1] >= 4:
         return ContentFile(content, name=name)
 
 def gen_file_field():
