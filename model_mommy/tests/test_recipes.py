@@ -112,6 +112,17 @@ class TestExecutingRecipes(TestCase):
         self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
+    def test_model_with_foreign_key_as_str(self):
+        dog = mommy.make_recipe('model_mommy.other_dog')
+        self.assertEqual(dog.breed, 'Basset')
+        self.assertIsInstance(dog.owner, Person)
+        self.assertNotEqual(dog.owner.id, None)
+
+        dog = mommy.prepare_recipe('model_mommy.other_dog')
+        self.assertEqual(dog.breed, 'Basset')
+        self.assertIsInstance(dog.owner, Person)
+        self.assertNotEqual(dog.owner.id, None)
+
     def test_make_recipe(self):
         person = mommy.make_recipe('model_mommy.person')
         self.assertIsInstance(person, Person)
@@ -168,6 +179,6 @@ class ForeignKeyTestCase(TestCase):
 
     def test_not_accept_other_type(self):
         with self.assertRaises(TypeError) as c:
-            foreign_key('something')
+            foreign_key(2)
         exception = c.exception
         self.assertEqual(exception.message, 'Not a recipe')

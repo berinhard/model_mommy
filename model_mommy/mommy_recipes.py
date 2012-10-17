@@ -22,3 +22,8 @@ dog = Recipe(Dog,
     breed = 'Pug',
     owner = foreign_key(person)
 )
+
+other_dog = Recipe(Dog,
+    breed = 'Basset',
+    owner = foreign_key('person')
+)

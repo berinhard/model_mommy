@@ -1,4 +1,8 @@
 #coding: utf-8
+import inspect
+
+class RecipeNotFound(Exception):
+    pass
 
 class Recipe(object):
     def __init__(self, model, **attrs):
@@ -27,5 +31,13 @@ def foreign_key(recipe):
     """
     if isinstance(recipe, Recipe):
         return recipe.make
+    elif isinstance(recipe, str):
+        frame = inspect.stack()[1]
+        caller_module = inspect.getmodule(frame[0])
+        recipe = getattr(caller_module, recipe)
+        if recipe:
+            return recipe.make
+        else:
+            raise RecipeNotFound
     else:
         raise TypeError('Not a recipe')
