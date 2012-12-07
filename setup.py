@@ -2,9 +2,10 @@ import setuptools
 
 setuptools.setup(
     name="model_mommy",
-    version="0.6.2",
+    version="0.8.1",
     packages=["model_mommy"],
-    install_requires=["django"],
+    include_package_data=True,  # declarations in MANIFEST.in
+    install_requires=["Django <1.5"],
     author="vandersonmota",
     author_email="vandersonmota@gmail.com",
     url="http://github.com/vandersonmota/model_mommy",

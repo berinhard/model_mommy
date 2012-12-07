@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
+from django.utils import importlib
+
 from django.db.models.fields import AutoField, CharField, TextField, SlugField
-from django.db.models.fields import DateField, DateTimeField, EmailField
+from django.db.models.fields import DateField, DateTimeField, TimeField, EmailField
 from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField
 from django.db.models.fields import PositiveIntegerField
@@ -13,7 +16,7 @@ from django.db.models import get_model
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 
-from django.db.models import ForeignKey, ManyToManyField
+from django.db.models import ForeignKey, ManyToManyField, OneToOneField
 
 try:
     from django.db.models.fields import BigIntegerField
@@ -21,6 +24,8 @@ except ImportError:
     BigIntegerField = IntegerField
 
 import generators
+
+recipes = None
 
 #TODO: improve related models handling
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
@@ -54,6 +59,22 @@ def make_many(model, quantity=None, **attrs):
     mommy = Mommy(model)
     return [mommy.make_one(**attrs) for i in range(quantity)]
 
+def _recipe(name):
+    splited_name = name.split('.')
+    app, recipe_name = '.'.join(splited_name[0:-1]), splited_name[-1]
+    recipes = importlib.import_module('.'.join([app, 'mommy_recipes']))
+    return getattr(recipes, recipe_name)
+
+def make_recipe(mommy_recipe_name, **new_attrs):
+    return _recipe(mommy_recipe_name).make(**new_attrs)
+
+def prepare_recipe(mommy_recipe_name, **new_attrs):
+    return _recipe(mommy_recipe_name).prepare(**new_attrs)
+
+def make_many_from_recipe(mommy_recipe_name, quantity=None, **new_attrs):
+    quantity = quantity or MAX_MANY_QUANTITY
+    return [make_recipe(mommy_recipe_name, **new_attrs) for x in range(quantity)]
+
 make_one.required = foreign_key_required
 prepare_one.required = foreign_key_required
 make_many.required = foreign_key_required
@@ -75,11 +96,12 @@ default_mapping = {
     SlugField: generators.gen_slug,
 
     ForeignKey: make_one,
-    #OneToOneField: make_one,
+    OneToOneField: make_one,
     ManyToManyField: make_many,
 
     DateField: generators.gen_date,
     DateTimeField: generators.gen_datetime,
+    TimeField: generators.gen_time,
 
     URLField: generators.gen_url,
     EmailField: generators.gen_email,
@@ -108,7 +130,6 @@ class Mommy(object):
     def make_one(self, **attrs):
         '''Creates and persists an instance of the model
         associated with Mommy instance.'''
-
         return self._make_one(commit=True, **attrs)
 
     def prepare(self, **attrs):
@@ -123,11 +144,19 @@ class Mommy(object):
     #Method too big
     def _make_one(self, commit=True, **attrs):
         m2m_dict = {}
+        is_fk_field = lambda x: '__' in x
+        model_attrs = dict((k, v) for k, v in attrs.items() if not is_fk_field(k))
+        fk_attrs = dict((k, v) for k, v in attrs.items() if is_fk_field(k))
+        fk_fields = [x.split('__')[0] for x in fk_attrs.keys() if is_fk_field(x)]
 
         for field in self.get_fields():
-            field_value_not_defined = field.name not in attrs
+            field_value_not_defined = field.name not in model_attrs
 
             if isinstance(field, (AutoField, generic.GenericRelation)):
+                continue
+
+            if isinstance(field, ForeignKey) and field.name in fk_fields:
+                model_attrs[field.name] = self.generate_value(field, **fk_attrs)
                 continue
 
             # If not specified, django automatically sets blank=True and
@@ -143,15 +172,15 @@ class Mommy(object):
                     else:
                         m2m_dict[field.name] = self.generate_value(field)
                 else:
-                    m2m_dict[field.name] = attrs.pop(field.name)
+                    m2m_dict[field.name] = model_attrs.pop(field.name)
 
             elif field_value_not_defined:
                 if field.null:
                     continue
                 else:
-                    attrs[field.name] = self.generate_value(field)
+                    model_attrs[field.name] = self.generate_value(field)
 
-        instance = self.model(**attrs)
+        instance = self.model(**model_attrs)
 
         # m2m only works for persisted instances
         if commit:
@@ -165,7 +194,7 @@ class Mommy(object):
 
         return instance
 
-    def generate_value(self, field):
+    def generate_value(self, field, **fk_attrs):
         '''
         Calls the generator associated with a field passing all required args.
 
@@ -179,7 +208,6 @@ class Mommy(object):
         `attr_mapping` and `type_mapping` can be defined easely overwriting the
         model.
         '''
-
         if field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
@@ -193,8 +221,12 @@ class Mommy(object):
 
         # attributes like max_length, decimal_places are take in account when
         # generating the value.
-        required_field_attrs = get_required_values(generator, field)
-        return generator(**required_field_attrs)
+        generator_attrs = get_required_values(generator, field)
+
+        if isinstance(field, ForeignKey):
+            generator_attrs.update(filter_fk_attrs(field, **fk_attrs))
+
+        return generator(**generator_attrs)
 
 
 def get_required_values(generator, field):
@@ -221,3 +253,16 @@ def get_required_values(generator, field):
                                   Don't make mommy sad." % str(item))
 
     return rt
+
+def filter_fk_attrs(field, **fk_attrs):
+    clean_dict = {}
+
+    for k, v in fk_attrs.items():
+        if k.startswith(field.name + '__'):
+            splited_key = k.split('__')
+            key = '__'.join(splited_key[1:])
+            clean_dict[key] = v
+        else:
+            clean_dict[k] = v
+
+    return clean_dict

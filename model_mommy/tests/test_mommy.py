@@ -5,7 +5,8 @@ from django.test import TestCase
 
 from model_mommy import mommy
 from model_mommy.mommy import ModelNotFound
-from model_mommy.models import Person, Dog, Store
+from model_mommy.models import Person, Dog, Store, LonelyPerson
+from model_mommy.models import User, PaymentBill
 from model_mommy.models import UnsupportedModel, DummyGenericRelationModel
 from model_mommy.models import DummyNullFieldsModel, DummyBlankFieldsModel
 from model_mommy.models import DummyDefaultFieldsModel
@@ -16,14 +17,14 @@ class MommyCreatesSimpleModel(TestCase):
 
     def test_make_one_should_create_one_object(self):
         person = mommy.make_one(Person)
-        self.assertTrue(isinstance(person, Person))
+        self.assertIsInstance(person, Person)
 
         # makes sure it is the person we created
         self.assertTrue(Person.objects.filter(id=person.id))
 
     def test_prepare_one_should_not_persist_one_object(self):
         person = mommy.prepare_one(Person)
-        self.assertTrue(isinstance(person, Person))
+        self.assertIsInstance(person, Person)
 
         # makes sure database is clean
         self.assertEqual(Person.objects.all().count(), 0)
@@ -39,11 +40,11 @@ class MommyCreatesSimpleModel(TestCase):
 
     def test_accept_model_as_string(self):
         person = mommy.make_one('model_mommy.person')
-        self.assertTrue(isinstance(person, Person))
+        self.assertIsInstance(person, Person)
         person = mommy.prepare_one('model_mommy.Person')
-        self.assertTrue(isinstance(person, Person))
+        self.assertIsInstance(person, Person)
         people = mommy.make_many('model_mommy.person')
-        [self.assertTrue(isinstance(person, Person)) for person in people]
+        [self.assertIsInstance(person, Person) for person in people]
 
     def test_raise_pretty_excpetion_if_model_not_found(self):
         with self.assertRaises(ModelNotFound) as context_manager:
@@ -56,30 +57,33 @@ class MommyCreatesAssociatedModels(TestCase):
 
     def test_dependent_models_with_ForeignKey(self):
         dog = mommy.make_one(Dog)
-        self.assertTrue(isinstance(dog.owner, Person))
+        self.assertIsInstance(dog.owner, Person)
 
     def test_prepare_one_should_not_create_one_object(self):
         dog = mommy.prepare_one(Dog)
-        self.assertTrue(isinstance(dog, Dog))
-        self.assertTrue(isinstance(dog.owner, Person))
+        self.assertIsInstance(dog, Dog)
+        self.assertIsInstance(dog.owner, Person)
 
         # makes sure database is clean
         self.assertEqual(Person.objects.all().count(), 0)
         self.assertEqual(Dog.objects.all().count(), 0)
 
-    def test_create_many_to_many(self):
+    def test_create_one_to_one(self):
+        lonely_person = mommy.make_one(LonelyPerson)
 
+        self.assertEquals(LonelyPerson.objects.all().count(), 1)
+        self.assertTrue(isinstance(lonely_person.only_friend, Person))
+        self.assertEquals(Person.objects.all().count(), 1)
+
+    def test_create_many_to_many(self):
         store = mommy.make_one(Store)
         self.assertEqual(store.employees.count(), 5)
         self.assertEqual(store.customers.count(), 5)
 
     def test_create_many_to_many_with_set_default_quantity(self):
-
-        mommy.MAX_MANY_QUANTITY = 2
-
         store = mommy.make_one(Store)
-        self.assertEqual(store.employees.count(), 2)
-        self.assertEqual(store.customers.count(), 2)
+        self.assertEqual(store.employees.count(), mommy.MAX_MANY_QUANTITY)
+        self.assertEqual(store.customers.count(), mommy.MAX_MANY_QUANTITY)
 
     def test_simple_creating_person_with_parameters(self):
         kid = mommy.make_one(Person, happy=True, age=10, name='Mike')
@@ -96,6 +100,28 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(person.name, 'John')
         self.assertEqual(person.gender, 'M')
 
+    def test_ForeignKey_model_field_population(self):
+        dog = mommy.make_one(Dog, breed='X1', owner__name='Bob')
+        self.assertEqual('X1', dog.breed)
+        self.assertEqual('Bob', dog.owner.name)
+
+    def test_ForeignKey_model_field_population_should_work_with_prepare(self):
+        dog = mommy.prepare_one(Dog, breed='X1', owner__name='Bob')
+        self.assertEqual('X1', dog.breed)
+        self.assertEqual('Bob', dog.owner.name)
+
+    def test_ForeignKey_model_field_population_for_not_required_fk(self):
+        user = mommy.make_one(User, profile__email="a@b.com")
+        self.assertEqual('a@b.com', user.profile.email)
+
+    def test_does_not_creates_null_ForeignKey(self):
+        user = mommy.make_one(User)
+        self.assertFalse(user.profile)
+
+    def test_ensure_recursive_ForeignKey_population(self):
+        bill = mommy.make_one(PaymentBill, user__profile__email="a@b.com")
+        self.assertEqual('a@b.com', bill.user.profile.email)
+
 
 class HandlingUnsupportedModels(TestCase):
     def test_unsupported_model_raises_an_explanatory_exception(self):
@@ -109,13 +135,13 @@ class HandlingUnsupportedModels(TestCase):
 class HandlingModelsWithGenericRelationFields(TestCase):
     def test_create_model_with_generic_relation(self):
         dummy = mommy.make_one(DummyGenericRelationModel)
-        self.assertTrue(isinstance(dummy, DummyGenericRelationModel))
+        self.assertIsInstance(dummy, DummyGenericRelationModel)
 
 
 class HandlingContentTypeField(TestCase):
     def test_create_model_with_contenttype_field(self):
         dummy = mommy.make_one(DummyGenericForeignKeyModel)
-        self.assertTrue(isinstance(dummy, DummyGenericForeignKeyModel))
+        self.assertIsInstance(dummy, DummyGenericForeignKeyModel)
 
 
 class SkipNullsTestCase(TestCase):
@@ -141,6 +167,7 @@ class SkipDefaultsTestCase(TestCase):
         self.assertEqual(dummy.default_float_field, 123.0)
         self.assertEqual(dummy.default_date_field, '2011-01-01')
         self.assertEqual(dummy.default_date_time_field, '2011-01-01')
+        self.assertEqual(dummy.default_time_field, '00:00:00')
         self.assertEqual(dummy.default_decimal_field, Decimal('0'))
         self.assertEqual(dummy.default_email_field, 'foo@bar.org')
         self.assertEqual(dummy.default_slug_field, 'a-slug')
