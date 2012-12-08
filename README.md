@@ -130,6 +130,20 @@ You can have different values when calling **make_recipe** or **prepare_recipe**
     mommy.make_recipe('model_mommy.person', name='Peter Parker')
 
 
+## Dealing with ManyToManyFields
+Model mommy populates ManyToManyFields by default, but you can change this behaviour if you want to. This is desirable to speed up your tests. To do so, you just need to set a boolean flag during the creation of your object as we can see below:
+
+```
+class Person(models.Model):
+    name = models.CharField(max_lengt=30)
+
+class Course(models.Model):
+    name = models.CharField(max_lengt=30)
+    students = models.ManyToManyField(Person)
+
+course = mommy.make_one(Course, make_m2m=True)
+```
+
 ## Doubts? Loved it? Hated it? Suggestions?
 
 Mail us!:
