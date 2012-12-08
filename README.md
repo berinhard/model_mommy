@@ -130,7 +130,7 @@ You can have different values when calling **make_recipe** or **prepare_recipe**
     mommy.make_recipe('model_mommy.person', name='Peter Parker')
 
 
-## Dealing with ManyToManyFields
+### Dealing with ManyToManyFields
 Model mommy populates ManyToManyFields by default, but you can change this behaviour if you want to. This is desirable to speed up your tests. To do so, you just need to set a boolean flag during the creation of your object as we can see below:
 
 ```
