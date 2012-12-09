@@ -10,14 +10,17 @@ callable (which will receive `field` as first argument), it should return a
 list in the format (key, value) where key is the argument name for generator
 and value is the value for that argument.
 """
-import datetime
+
+
 from django import VERSION
-from decimal import Decimal
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import get_models
 from django.core.files.base import ContentFile
+from django.db.models import get_models
+
+from decimal import Decimal
 from os.path import abspath, join, dirname
 from random import randint, choice, random
+import datetime
 import string
 
 
