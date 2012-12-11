@@ -13,8 +13,9 @@ from django.db.models.fields import PositiveSmallIntegerField
 from django.db.models.fields import PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField, URLField
-from django.db.models import FileField
+from django.db.models import FileField, ImageField
 from django.core.files import File
+from django.core.files.images import ImageFile
 
 try:
     from django.db.models.fields import BigIntegerField
@@ -29,13 +30,14 @@ from model_mommy.models import DummyNumbersModel
 from model_mommy.models import DummyDecimalModel, DummyEmailModel
 from model_mommy.models import DummyGenericForeignKeyModel
 from model_mommy.models import DummyFileFieldModel
+from model_mommy.models import DummyImageFieldModel
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
     'FillingEmailField', 'FillingGenericForeignKeyField','FillingFileField',
-    'TimeFieldsFilling',
+    'TimeFieldsFilling', 'FillingImageFileField',
 ]
 
 
@@ -224,3 +226,24 @@ class FillingFileField(TestCase):
     def tearDown(self):
         self.dummy.file_field.delete()
 
+class FillingImageFileField(TestCase):
+
+    def setUp(self):
+        path = abspath(join(dirname(__file__),'..','mock-img.jpeg'))
+        self.fixture_img_file = ImageFile(open(path))
+
+    def test_filling_image_file_field(self):
+        self.dummy = mommy.make_one(DummyImageFieldModel)
+        field = DummyImageFieldModel._meta.get_field('image_field')
+        self.assertIsInstance(field, ImageField)
+        import time
+        path = "/tmp/%s/mock-img.jpeg" % time.strftime('%Y/%m/%d')
+
+        from django import VERSION
+        if VERSION[1] >= 4:
+            self.assertEqual(self.dummy.image_field.path, path)
+        self.assertTrue(self.dummy.image_field.width)
+        self.assertTrue(self.dummy.image_field.height)
+
+    def tearDown(self):
+        self.dummy.image_field.delete()

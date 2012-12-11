@@ -10,7 +10,7 @@ from django.db.models.fields import PositiveIntegerField
 from django.db.models.fields import FloatField, DecimalField
 from django.db.models.fields import BooleanField
 from django.db.models.fields import URLField
-from django.db.models  import FileField
+from django.db.models  import FileField, ImageField
 from django.db.models import get_model
 
 from django.contrib.contenttypes import generic
@@ -106,6 +106,7 @@ default_mapping = {
     URLField: generators.gen_url,
     EmailField: generators.gen_email,
     FileField: generators.gen_file_field,
+    ImageField: generators.gen_image_field,
 
     ContentType: generators.gen_content_type,
 }
