@@ -41,6 +41,12 @@ def gen_file_field():
     with open(file_path, 'rb') as f:
         return get_content_file(f.read(), name=name)
 
+def gen_image_field():
+    name = 'mock-img.jpeg'
+    file_path = abspath(join(dirname(__file__), name))
+    with open(file_path, 'rb') as f:
+        return get_content_file(f.read(), name=name)
+
 
 def gen_from_list(L):
     '''Makes sure all values of the field are generated from the list L

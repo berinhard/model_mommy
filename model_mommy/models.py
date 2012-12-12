@@ -135,3 +135,8 @@ class DummyDefaultFieldsModel(models.Model):
 class DummyFileFieldModel(models.Model):
     fs = FileSystemStorage(location='/tmp/')
     file_field = models.FileField(upload_to="%Y/%m/%d", storage=fs)
+
+
+class DummyImageFieldModel(models.Model):
+    fs = FileSystemStorage(location='/tmp/')
+    image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)

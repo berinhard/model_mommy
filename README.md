@@ -92,7 +92,7 @@ If you have a field that has any special validation, you should set the value by
 model_mommy should be used to handle the fields that doesn't have relation with the test that you're doing at the moment and don't require special validation(like unique, etc), but still required in order to create the object.
 
 ###Currently supports the fields:
-CharField, TextField, FloatField, ForeignKey, Date and DateTimeField, BooleanField, URLField, and all the integer-type Fields
+BooleanField, IntegerField, BigIntegerField, SmallIntegerField, PositiveIntegerField, PositiveSmallIntegerField, FloatField, DecimalField, CharField, TextField, SlugField, ForeignKey, OneToOneField, ManyToManyField, DateField, DateTimeField, TimeField, URLField, EmailField, FileField and ImageField.
 
 ## Recipes
 If you're not confortable with random data, or you have some custom fields, or even you just want to improve the semantics of data generation, there's hope for you.
