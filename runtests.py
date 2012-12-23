@@ -2,6 +2,20 @@
 
 from os.path import dirname, join
 import sys
+from optparse import OptionParser
+
+
+def parse_args():
+    parser = OptionParser()
+    options, args = parser.parse_args()
+
+    # Build labels
+    if args:
+        labels = ["model_mommy.%s" % label for label in args]
+    else:
+        labels = ['model_mommy']
+
+    return options, labels
 
 
 def configure_settings():
@@ -41,12 +55,7 @@ def get_runner(settings):
 
 
 def runtests():
-    args = sys.argv[1:]
-    if args:
-        test_labels = ["model_mommy.%s" % arg for arg in args]
-    else:
-        test_labels = ['model_mommy']
-
+    options, test_labels = parse_args()
     settings = configure_settings()
     runner = get_runner(settings)
     sys.exit(runner.run_tests(test_labels))
