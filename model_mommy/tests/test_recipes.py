@@ -4,7 +4,8 @@ from django.test import TestCase
 from model_mommy import mommy
 from model_mommy.models import Person, DummyNumbersModel, DummyBlankFieldsModel
 from model_mommy.recipe import Recipe, foreign_key
-from datetime import date, datetime
+from model_mommy.timezone import now
+
 
 class TestDefiningRecipes(TestCase):
     def setUp(self):
@@ -13,11 +14,11 @@ class TestDefiningRecipes(TestCase):
           'nickname': 'joe',
           'age': 18,
           'bio': 'Someone in the crowd',
-          'birthday': date.today(),
-          'appointment': date.today(),
+          'birthday': now().date(),
+          'appointment': now(),
           'blog': 'http://joe.blogspot.com',
           'wanted_games_qtd': 4,
-          'birth_time': datetime.now()
+          'birth_time': now()
         }
         self.person_recipe = Recipe(
           Person,
