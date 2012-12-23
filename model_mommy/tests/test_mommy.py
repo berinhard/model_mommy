@@ -11,6 +11,7 @@ from model_mommy.models import UnsupportedModel, DummyGenericRelationModel
 from model_mommy.models import DummyNullFieldsModel, DummyBlankFieldsModel
 from model_mommy.models import DummyDefaultFieldsModel
 from model_mommy.models import DummyGenericForeignKeyModel
+from model_mommy.timezone import smart_datetime as datetime
 
 
 class MommyCreatesSimpleModel(TestCase):
@@ -165,8 +166,8 @@ class SkipDefaultsTestCase(TestCase):
         self.assertEqual(dummy.default_text_field, 'default')
         self.assertEqual(dummy.default_int_field, 123)
         self.assertEqual(dummy.default_float_field, 123.0)
-        self.assertEqual(dummy.default_date_field, '2011-01-01')
-        self.assertEqual(dummy.default_date_time_field, '2011-01-01')
+        self.assertEqual(dummy.default_date_field, '2012-01-01')
+        self.assertEqual(dummy.default_date_time_field, datetime(2012, 1, 1))
         self.assertEqual(dummy.default_time_field, '00:00:00')
         self.assertEqual(dummy.default_decimal_field, Decimal('0'))
         self.assertEqual(dummy.default_email_field, 'foo@bar.org')
