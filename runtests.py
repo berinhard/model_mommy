@@ -3,10 +3,12 @@
 from os.path import dirname, join
 import sys
 from optparse import OptionParser
+import warnings
 
 
 def parse_args():
     parser = OptionParser()
+    parser.add_option('--use-tz', dest='USE_TZ', action='store_true')
     options, args = parser.parse_args()
 
     # Build labels
@@ -18,7 +20,7 @@ def parse_args():
     return options, labels
 
 
-def configure_settings():
+def configure_settings(options):
     from django.conf import settings
 
     # If DJANGO_SETTINGS_MODULE envvar exists the settings will be
@@ -39,6 +41,13 @@ def configure_settings():
             TEST_ROOT=join(dirname(__file__), 'model_mommy', 'tests'),
         )
 
+        # Force the use of timezone aware datetime and change Django's warning to
+        # be treated as errors.
+        if options.USE_TZ:
+            params.update(USE_TZ=True)
+            warnings.filterwarnings('error', r"DateTimeField received a naive datetime",
+                                    RuntimeWarning, r'django\.db\.models\.fields')
+
         # Configure Django's settings
         settings.configure(**params)
 
@@ -56,7 +65,7 @@ def get_runner(settings):
 
 def runtests():
     options, test_labels = parse_args()
-    settings = configure_settings()
+    settings = configure_settings(options)
     runner = get_runner(settings)
     sys.exit(runner.run_tests(test_labels))
 
