@@ -1,9 +1,6 @@
 from datetime import date, datetime, time
 from decimal import Decimal
 
-import os
-from os.path import abspath, join, dirname
-
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import CharField, TextField, SlugField
@@ -209,7 +206,7 @@ class FillingGenericForeignKeyField(TestCase):
 class FillingFileField(TestCase):
 
     def setUp(self):
-        path = abspath(join(dirname(__file__),'..','mock_file.txt'))
+        path = mommy.mock_file_txt
         self.fixture_txt_file = File(open(path))
 
     def test_filling_file_field(self):
@@ -229,7 +226,7 @@ class FillingFileField(TestCase):
 class FillingImageFileField(TestCase):
 
     def setUp(self):
-        path = abspath(join(dirname(__file__),'..','mock-img.jpeg'))
+        path = mommy.mock_file_jpeg
         self.fixture_img_file = ImageFile(open(path))
 
     def test_filling_image_file_field(self):

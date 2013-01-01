@@ -27,6 +27,11 @@ import generators
 
 recipes = None
 
+from os.path import dirname, join
+mock_file_jpeg = join(dirname(__file__), 'mock-img.jpeg')
+mock_file_txt = join(dirname(__file__), 'mock_file.txt')
+
+
 #TODO: improve related models handling
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
