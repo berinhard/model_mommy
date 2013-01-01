@@ -5,13 +5,13 @@ from django.test import TestCase
 
 from model_mommy import mommy
 from model_mommy.mommy import ModelNotFound
-from model_mommy.models import Person, Dog, Store, LonelyPerson
-from model_mommy.models import User, PaymentBill
-from model_mommy.models import UnsupportedModel, DummyGenericRelationModel
-from model_mommy.models import DummyNullFieldsModel, DummyBlankFieldsModel
-from model_mommy.models import DummyDefaultFieldsModel
-from model_mommy.models import DummyGenericForeignKeyModel
 from model_mommy.timezone import smart_datetime as datetime
+from test.generic.models import Person, Dog, Store, LonelyPerson
+from test.generic.models import User, PaymentBill
+from test.generic.models import UnsupportedModel, DummyGenericRelationModel
+from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
+from test.generic.models import DummyDefaultFieldsModel
+from test.generic.models import DummyGenericForeignKeyModel
 
 
 class MommyCreatesSimpleModel(TestCase):
@@ -40,11 +40,11 @@ class MommyCreatesSimpleModel(TestCase):
         self.assertTrue(all(p.name == "George Washington" for p in people))
 
     def test_accept_model_as_string(self):
-        person = mommy.make_one('model_mommy.person')
+        person = mommy.make_one('generic.person')
         self.assertIsInstance(person, Person)
-        person = mommy.prepare_one('model_mommy.Person')
+        person = mommy.prepare_one('generic.Person')
         self.assertIsInstance(person, Person)
-        people = mommy.make_many('model_mommy.person')
+        people = mommy.make_many('generic.person')
         [self.assertIsInstance(person, Person) for person in people]
 
     def test_raise_pretty_excpetion_if_model_not_found(self):

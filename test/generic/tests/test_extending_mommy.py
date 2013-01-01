@@ -2,8 +2,8 @@ from django.db.models.fields import BooleanField
 from django.test import TestCase
 
 from model_mommy import mommy
-from model_mommy.models import Person
 from model_mommy.generators import gen_from_list
+from test.generic.models import Person
 
 __all__ = ['SimpleExtendMommy', 'LessSimpleExtendMommy']
 

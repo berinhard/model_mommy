@@ -1,6 +1,6 @@
 #coding: utf-8
-from model_mommy.models import Person
 from model_mommy.recipe import Recipe, foreign_key
+from test.generic.models import Person
 
 from datetime import date, datetime
 
