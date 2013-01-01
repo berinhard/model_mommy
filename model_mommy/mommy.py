@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
 from django.utils import importlib
 
 from django.db.models.fields import AutoField, CharField, TextField, SlugField
