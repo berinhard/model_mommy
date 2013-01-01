@@ -13,9 +13,9 @@ def parse_args():
 
     # Build labels
     if args:
-        labels = ["model_mommy.%s" % label for label in args]
+        labels = ["generic.%s" % label for label in args]
     else:
-        labels = ['model_mommy']
+        labels = ['generic']
 
     return options, labels
 
@@ -35,10 +35,10 @@ def configure_settings(options):
             },
             INSTALLED_APPS = (
                 'django.contrib.contenttypes',
-                'model_mommy',
+                'test.generic',
             ),
             SITE_ID=1,
-            TEST_ROOT=join(dirname(__file__), 'model_mommy', 'tests'),
+            TEST_ROOT=join(dirname(__file__), 'test', 'generic', 'tests'),
         )
 
         # Force the use of timezone aware datetime and change Django's warning to
