@@ -185,20 +185,17 @@ Mail us!:
 
 # Hacking
 
-### 1. prepare a virtual environment
+### 1. Prepare your hacking environment.
 
 ```console
-pip install virtualenvwrapper
-mkvirtualenv --no-site-packages --distribute
+git clone git@github.com:vandersonmota/model_mommy.git
+cd model_mommy
+virtualenv .
+source bin/activate
+python setup.py develop test
 ```
 
-### 2. install the requirements
-
-```console
-pip install -r requirements.txt
-```
-
-### 3. run the tests
+### 2. Run the tests
 
 ```console
 tox
