@@ -6,7 +6,7 @@ setuptools.setup(
     version="0.8.1",
     packages=["model_mommy"],
     include_package_data=True,  # declarations in MANIFEST.in
-    install_requires=[],
+    install_requires=open('requirements.txt').readlines(),
     tests_require=[
         'django<1.5',
         'pil',
