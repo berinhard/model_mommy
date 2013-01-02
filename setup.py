@@ -1,11 +1,25 @@
 import setuptools
 
+
+tests_require = [
+    'django<1.5',
+    'pil',
+    'tox',
+]
+
+install_requires = [
+    'django<1.5',
+]
+
+
 setuptools.setup(
     name="model_mommy",
     version="0.8.1",
     packages=["model_mommy"],
     include_package_data=True,  # declarations in MANIFEST.in
-    install_requires=["Django <1.5"],
+    install_requires=install_requires,
+    tests_require=tests_require,
+    test_suite='runtests.runtests',
     author="vandersonmota",
     author_email="vandersonmota@gmail.com",
     url="http://github.com/vandersonmota/model_mommy",
