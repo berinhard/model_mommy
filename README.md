@@ -188,19 +188,22 @@ Using the `foreign_key` is important for 2 reasons:
 * The associated instance will be created only when you call `make_recipe` and not during recipe definition;
 
 
-### Passing Callables
+### Recipes with callables
 
-You can also pass callables as arguments, so that the values will be generated during 'make_recipe':
+It's possible to use callables as recipe's attribute value.
 
 ```python
-callable = date.today
+from datetime import date
+from model_mommy.recipe import Recipe
+from family.models import Person
+
 person = Recipe(Person,
-    name = 'John Doe',
-    nickname = 'joe',
-    age = 18,
-    birthday = callable,
+    birthday = date.today,
 )
 ```
+
+When you call `make_recipe`, *Mommy* will set the attribute to the value returned by the callable.
+
 
 ### Overriding recipe definitions
 You can have different values when calling **make_recipe** or **prepare_recipe**. This is useful when you have to create multiple objects and you have some unique field, for instance. You just have to pass the values as keyword args, like this:
