@@ -163,21 +163,30 @@ mommy.prepare_recipe('family.person')
 ```
 
 
-### ForeignKeys
+### Recipes with foreign keys
 
-You can also define foreign_key relations:
+You can define `foreign_key` relations:
 
 ```python
+from model_mommy import mommy
+from model_mommy.recipe import Recipe, foreign_key
+from family.models import Dog
+
 dog = Recipe(Dog,
     breed = 'Pug',
     owner = foreign_key(person)
 )
 ```
 
-Notice that 'person' is a recipe. You may be thinking: "I can put the Person model instance directly in the owner field": And yes, you can. But i recommend using the foreign_key function for 2 reasons:
+Notice that `person` is a *recipe*.
 
-  * Semantics: You know it's an foreign_key relation when you're reading
-  * The associated model will be created only when you call 'make_recipe' and not during recipe definition
+You may be thinking: "I can put the Person model instance directly in the owner field". That's not recommended.
+
+Using the `foreign_key` is important for 2 reasons:
+
+* Semantics. You'll know that attribute is a foreign key when you're reading;
+* The associated instance will be created only when you call `make_recipe` and not during recipe definition;
+
 
 ### Passing Callables
 
