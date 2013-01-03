@@ -107,10 +107,15 @@ By default, *model-mommy* skips fields with `null=True` or `blank=True`. Also if
 You can override this behavior by explicitly defining values.
 
 
-## When you shouldn't let mommy do the things for you:
+### When shouldn't you let mommy generate things for you?
 
-If you have a field that has any special validation, you should set the value by yourself.
-model_mommy should be used to handle the fields that doesn't have relation with the test that you're doing at the moment and don't require special validation(like unique, etc), but still required in order to create the object.
+If you have fields with special validation, you should set their values by yourself.
+
+*Model-mommy* should handle fields that:
+
+1. don't matter for the test you're writing;
+2. don't require special validation (like unique, etc);
+3. are required to create the object.
 
 ###Currently supports the fields:
 BooleanField, IntegerField, BigIntegerField, SmallIntegerField, PositiveIntegerField, PositiveSmallIntegerField, FloatField, DecimalField, CharField, TextField, SlugField, ForeignKey, OneToOneField, ManyToManyField, DateField, DateTimeField, TimeField, URLField, EmailField, FileField and ImageField.
