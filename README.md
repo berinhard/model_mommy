@@ -48,20 +48,24 @@ Importing every model over and over again is boring. So let *Mommy* import them 
 Note that you must use `app_label.model_name`. The `model_name` is case insensitive.
 
 
-mommy also handles relationships. Suppose the kid has a dog:
+### Model Relationships
+
+*Mommy* also handles relationships. Say the kid has a dog:
 
 ```python
 class Dog(models.Model):
     owner = models.ForeignKey('Kid')
 ```
 
-when you do:
+when you ask *Mommy*:
 
 ```python
-rex = mommy.make_one(Dog)
+from model_mommy import mommy
+
+rex = mommy.make_one('family.Dog')
 ```
 
-it will also create the Kid, automatically.
+She will also create the `Kid`, automagically.
 
 You can also specify values for one or more attribute.
 
