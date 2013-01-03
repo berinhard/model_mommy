@@ -10,9 +10,10 @@ With a simple and powerful API you can create many objects with a single line of
 pip install model_mommy
 ```
 
-## Basic Usage:
 
-If you have a model like this in your app:
+## Basic usage
+
+Let's say you have an app **family** with a model like this:
 
 ```python
 class Kid(models.Model):
@@ -25,23 +26,27 @@ class Kid(models.Model):
     appointment = models.DateTimeField()
 ```
 
-just call the mommy =):
+To create a persisted instance, just call *Mommy*:
 
 ```python
 from model_mommy import mommy
-from model_mommy.models import Kid
+from family.models import Kid
 
 kid = mommy.make_one(Kid)
 ```
 
-and your object is created! No boring attributes passing like 'foobar' every damn time.
+No need to pass attributes every damn time.
 
-Import every model you need can be very boring, so, you can also call mommy using a string like this:
+Importing every model over and over again is boring. So let *Mommy* import them for you:
 
 ```python
-kid = mommy.make_one('model_mommy.Kid')
+    from model_mommy import mommy
+
+    kid = mommy.make_one('family.Kid')
 ```
-Note that you must use 'app_label.model_name'. The model_name is case insensitive.
+
+Note that you must use `app_label.model_name`. The `model_name` is case insensitive.
+
 
 mommy also handles relationships. Suppose the kid has a dog:
 
