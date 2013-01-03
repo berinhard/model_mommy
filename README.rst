@@ -183,7 +183,16 @@ You can define `foreign_key` relations:
 
     from model_mommy import mommy
     from model_mommy.recipe import Recipe, foreign_key
-    from family.models import Dog
+    from family.models import Person, Dog
+
+
+    person = Recipe(Person,
+        name = 'John Doe',
+        nickname = 'joe',
+        age = 18,
+        birthday = date.today(),
+        appointment = datetime.now()
+    )
 
     dog = Recipe(Dog,
         breed = 'Pug',
