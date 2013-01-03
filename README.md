@@ -4,7 +4,7 @@
 With a simple and powerful API you can create many objects with a single line of code.
 
 
-# Installing
+## Install
 
 ```console
 pip install model_mommy
