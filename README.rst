@@ -275,7 +275,6 @@ Inspiration
 Doubts? Loved it? Hated it? Suggestions?
 ========================================
 
-Mail us:
+Join our mailing list for support, development and ideas!
 
-*  vanderson.mota **at** gmail **dot** com
-*  italo.maia **at** gmail **dot** com
+*  https://groups.google.com/group/model-mommy
