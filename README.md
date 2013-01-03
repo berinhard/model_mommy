@@ -117,8 +117,15 @@ If you have fields with special validation, you should set their values by yours
 2. don't require special validation (like unique, etc);
 3. are required to create the object.
 
-###Currently supports the fields:
-BooleanField, IntegerField, BigIntegerField, SmallIntegerField, PositiveIntegerField, PositiveSmallIntegerField, FloatField, DecimalField, CharField, TextField, SlugField, ForeignKey, OneToOneField, ManyToManyField, DateField, DateTimeField, TimeField, URLField, EmailField, FileField and ImageField.
+
+### Currently supported fields
+
+* BooleanField, IntegerField, BigIntegerField, SmallIntegerField, PositiveIntegerField, PositiveSmallIntegerField, FloatField, DecimalField
+* CharField, TextField, SlugField, URLField, EmailField
+* ForeignKey, OneToOneField, ManyToManyField
+* DateField, DateTimeField, TimeField
+* FileField, ImageField
+
 
 ## Recipes
 If you're not confortable with random data, or you have some custom fields, or even you just want to improve the semantics of data generation, there's hope for you.
