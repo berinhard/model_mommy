@@ -13,7 +13,7 @@ setuptools.setup(
     long_description=open(join(dirname(__file__), "README.rst")).read(),
     packages=["model_mommy"],
     include_package_data=True,  # declarations in MANIFEST.in
-    install_requires=["Django <1.5", "PIL"],
+    install_requires=open(join(dirname(__file__), "requirements.txt")).readlines(),
     keywords="django testing factory python",
     classifiers=[
         'Framework :: Django',

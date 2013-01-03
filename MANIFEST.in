@@ -1,1 +1,2 @@
 include model_mommy/mock_file.txt
+include requirements.txt
