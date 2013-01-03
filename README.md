@@ -99,9 +99,13 @@ kid = mommy.prepare_one('family.Kid')
 
 It works like `make_one`, but it doesn't persist the instance.
 
+
 ## How mommy behaves?
 
-model_mommy skips fields with null=True or blank=True. Also if the field has a default value, mommy will use it.
+By default, *model-mommy* skips fields with `null=True` or `blank=True`. Also if a field has a *default* value, it will be used.
+
+You can override this behavior by explicitly defining values.
+
 
 ## When you shouldn't let mommy do the things for you:
 
