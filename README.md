@@ -226,22 +226,22 @@ Mail us:
  *  italo.maia **at** gmail **dot** com
 
 
-# Hacking
+## Contributing
 
-### 1. prepare a virtual environment
+### 1. Prepare a virtual environment.
 
 ```console
 pip install virtualenvwrapper
 mkvirtualenv --no-site-packages --distribute
 ```
 
-### 2. install the requirements
+### 2. Install the requirements.
 
 ```console
 pip install -r requirements.txt
 ```
 
-### 3. run the tests
+### 3. Run the tests.
 
 ```console
 make test
