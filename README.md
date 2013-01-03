@@ -128,11 +128,14 @@ If you have fields with special validation, you should set their values by yours
 
 
 ## Recipes
-If you're not confortable with random data, or you have some custom fields, or even you just want to improve the semantics of data generation, there's hope for you.
-You can define a recipe, which is a set of rules to generate data for your models. You create a module called mommy_recipes.py at the app root:
+
+If you're not confortable with random data, or you have some custom fields, or even you just want to improve the semantics of the generated data, there's hope for you.
+
+You can define a **recipe**, which is a set of rules to generate data for your models. Create a module called `mommy_recipes.py` at your app's root directory:
 
 ```python
 from model_mommy.recipe import Recipe
+from family.models import Person
 
 person = Recipe(Person,
     name = 'John Doe',
@@ -143,20 +146,22 @@ person = Recipe(Person,
 )
 ```
 
-The variable 'person' serves as the recipe name, which will be used for data creation when you call:
+The variable `person` serves as the recipe name:
 
 ```python
 from model_mommy import mommy
-mommy.make_recipe('model_mommy.person')
+
+mommy.make_recipe('family.person')
 ```
 
-Or if you don't want a persisted model:
+Or if you don't want a persisted instance:
 
 ```python
-mommy.prepare_recipe('model_mommy.person')
+from model_mommy import mommy
+
+mommy.prepare_recipe('family.person')
 ```
 
-Where 'model_mommy' is the app name and 'person' is the recipe name
 
 ### ForeignKeys
 
