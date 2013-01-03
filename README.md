@@ -67,17 +67,23 @@ rex = mommy.make_one('family.Dog')
 
 She will also create the `Kid`, automagically.
 
-You can also specify values for one or more attribute.
+
+### Defining some attributes
+
+Of course it's possible to explicitly set values for attributes.
 
 ```python
-another_kid = mommy.make_one(Kid, age = 3)
-assert another_kid.age == 3
+from model_mommy import mommy
+
+another_kid = mommy.make_one('family.Kid', age=3)
 ```
 
-With relationships with ForeignKey fields, you can also set the related objects attributes like this:
+Related objects attributes are also reachable:
 
 ```python
-bobs_dog = mommy.make_one(Dog, owner__name='Bob')
+from model_mommy import mommy
+
+bobs_dog = mommy.make_one('family.Dog', owner__name='Bob')
 ```
 
 But, if don't need a persisted object, mommy can handle this for you as well:
