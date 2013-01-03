@@ -1,7 +1,7 @@
-# Creating objects for testing shouldn't hurt
+# Model Mommy: Smart fixtures for better tests
 
-model_mommy is a tool for creating objects for testing in Django, inspired in ruby's ObjectDaddy and FactoryGirl.
-It generate the values according with the field type, but i will add support to custom values as well.
+*Model-mommy* offers you a smart way to create fixtures for testing in Django.
+With a simple and powerful API you can create many objects with a single line of code.
 
 
 # Installing
