@@ -206,11 +206,17 @@ When you call `make_recipe`, *Mommy* will set the attribute to the value returne
 
 
 ### Overriding recipe definitions
-You can have different values when calling **make_recipe** or **prepare_recipe**. This is useful when you have to create multiple objects and you have some unique field, for instance. You just have to pass the values as keyword args, like this:
+
+Passing values when calling `make_recipe` or `prepare_recipe` will override the recipe rule.
 
 ```python
+from model_mommy import mommy
+
 mommy.make_recipe('model_mommy.person', name='Peter Parker')
 ```
+
+This is useful when you have to create multiple objects and you have some unique field, for instance.
+
 
 #
 ## Doubts? Loved it? Hated it? Suggestions?
