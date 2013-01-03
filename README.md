@@ -218,14 +218,6 @@ mommy.make_recipe('model_mommy.person', name='Peter Parker')
 This is useful when you have to create multiple objects and you have some unique field, for instance.
 
 
-## Doubts? Loved it? Hated it? Suggestions?
-
-Mail us:
-
- *  vanderson.mota **at** gmail **dot** com
- *  italo.maia **at** gmail **dot** com
-
-
 ## Contributing
 
 ### 1. Prepare a virtual environment.
@@ -246,3 +238,11 @@ pip install -r requirements.txt
 ```console
 make test
 ```
+
+
+## Doubts? Loved it? Hated it? Suggestions?
+
+Mail us:
+
+ *  vanderson.mota **at** gmail **dot** com
+ *  italo.maia **at** gmail **dot** com
