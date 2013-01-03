@@ -240,6 +240,11 @@ make test
 ```
 
 
+## Inspiration
+
+*Model-mommy* was inspired by many great open source software like ruby's ObjectDaddy and FactoryGirl.
+
+
 ## Doubts? Loved it? Hated it? Suggestions?
 
 Mail us:
