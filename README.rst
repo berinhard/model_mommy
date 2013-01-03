@@ -237,22 +237,22 @@ Contributing
 
 1. Prepare a virtual environment.
 
-    .. code-block:: console
+.. code-block:: console
 
-        pip install virtualenvwrapper
-        mkvirtualenv --no-site-packages --distribute
+    pip install virtualenvwrapper
+    mkvirtualenv --no-site-packages --distribute
 
 2. Install the requirements.
 
-    .. code-block:: console
+.. code-block:: console
 
-        pip install -r requirements.txt
+    pip install -r requirements.txt
 
 3. Run the tests.
 
-    .. code-block:: console
+.. code-block:: console
 
-        make test
+    make test
 
 
 Inspiration
@@ -266,5 +266,5 @@ Doubts? Loved it? Hated it? Suggestions?
 
 Mail us:
 
- *  vanderson.mota **at** gmail **dot** com
- *  italo.maia **at** gmail **dot** com
+*  vanderson.mota **at** gmail **dot** com
+*  italo.maia **at** gmail **dot** com
