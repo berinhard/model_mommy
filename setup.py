@@ -12,4 +12,11 @@ setuptools.setup(
     include_package_data=True,  # declarations in MANIFEST.in
     install_requires=["Django <1.5", "PIL"],
     keywords="django testing factory python",
+    classifiers=[
+        'Framework :: Django',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: Apache License',
+        'Operating System :: OS Independent',
+        'Topic :: Software Development',
+    ],
 )
