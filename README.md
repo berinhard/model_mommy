@@ -86,16 +86,18 @@ from model_mommy import mommy
 bobs_dog = mommy.make_one('family.Dog', owner__name='Bob')
 ```
 
-But, if don't need a persisted object, mommy can handle this for you as well:
+
+### Non persistent objects
+
+If don't need a persisted object, *Mommy* can handle this for you as well:
 
 ```python
 from model_mommy import mommy
-from model_mommy.models import Kid
 
-kid = mommy.prepare_one(Kid)
+kid = mommy.prepare_one('family.Kid')
 ```
 
-It works like make_one, but like was said, it doesn't persist the instance.
+It works like `make_one`, but it doesn't persist the instance.
 
 ## How mommy behaves?
 
