@@ -196,8 +196,8 @@ You may be thinking: "I can put the Person model instance directly in the owner 
 
 Using the `foreign_key` is important for 2 reasons:
 
-  * Semantics. You'll know that attribute is a foreign key when you're reading;
-  * The associated instance will be created only when you call `make_recipe` and not during recipe definition;
+* Semantics. You'll know that attribute is a foreign key when you're reading;
+* The associated instance will be created only when you call `make_recipe` and not during recipe definition;
 
 
 Recipes with callables
