@@ -2,6 +2,7 @@
 from django.utils import importlib
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
+from django.db.models.loading import cache
 from django.db.models import (\
     CharField, EmailField, SlugField, TextField, URLField,
     DateField, DateTimeField, TimeField,
@@ -122,12 +123,27 @@ class Mommy(object):
         self.make_m2m = make_m2m
         self.type_mapping = default_mapping.copy()
         if isinstance(model, basestring):
-            app_label, model_name = model.split('.')
-            self.model = get_model(app_label, model_name)
+            if '.' in model:
+                app_label, model_name = model.split('.')
+                self.model = get_model(app_label, model_name)
+            else:
+                self.model = self._get_model(model)
             if not self.model:
                 raise ModelNotFound("could not find model '%s' in the app '%s'." %(model_name, app_label))
         else:
             self.model = model
+
+
+    def _get_model(self, name):
+        '''
+        Return the first model found.
+        '''
+        name = name.lower()
+
+        for app_model in cache.app_models.values():
+            for n, m in app_model.items():
+                if name == n:
+                    return m
 
     def make_one(self, **attrs):
         '''Creates and persists an instance of the model
