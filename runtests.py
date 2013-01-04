@@ -28,6 +28,7 @@ def configure_settings(options):
             INSTALLED_APPS = (
                 'django.contrib.contenttypes',
                 'test.generic',
+                'test.ambiguous',
             ),
             SITE_ID=1,
             TEST_ROOT=join(dirname(__file__), 'test', 'generic', 'tests'),

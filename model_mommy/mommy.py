@@ -115,6 +115,11 @@ default_mapping = {
 class ModelNotFound(Exception):
     pass
 
+
+class AmbiguousModelName(Exception):
+    pass
+
+
 class Mommy(object):
     attr_mapping = {}
     type_mapping = None
@@ -136,14 +141,25 @@ class Mommy(object):
 
     def _get_model(self, name):
         '''
-        Return the first model found.
+        Get a model by name.
+
+        If a model with that name exists in more than one app,
+        raises AmbiguousModelNameException.
         '''
         name = name.lower()
+        model = None
 
         for app_model in cache.app_models.values():
             for n, m in app_model.items():
                 if name == n:
-                    return m
+                    if model:
+                        raise AmbiguousModelName('%s is a model in more than one app. '
+                                                 'Use the form "app.model".' % name.title())
+                    else:
+                        model = m
+
+        return model
+
 
     def make_one(self, **attrs):
         '''Creates and persists an instance of the model

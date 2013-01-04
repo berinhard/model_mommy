@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from model_mommy import mommy
-from model_mommy.mommy import ModelNotFound
+from model_mommy.mommy import ModelNotFound, AmbiguousModelName
 from model_mommy.timezone import smart_datetime as datetime
 from test.generic.models import Person, Dog, Store, LonelyPerson
 from test.generic.models import User, PaymentBill
@@ -30,6 +30,10 @@ class MommyGetModel(TestCase):
     def test_model_string(self):
         obj = mommy.prepare_one('Person')
         self.assertIsInstance(obj, Person)
+
+    def test_raise_on_ambiguous_model_string(self):
+        with self.assertRaises(AmbiguousModelName):
+            obj = mommy.prepare_one('Ambiguous')
 
 
 class MommyCreatesSimpleModel(TestCase):
