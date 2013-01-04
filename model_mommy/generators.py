@@ -11,16 +11,14 @@ list in the format (key, value) where key is the argument name for generator
 and value is the value for that argument.
 """
 
-
+import string
+from decimal import Decimal
+from os.path import abspath, join, dirname
+from random import randint, choice, random
 from django import VERSION
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.db.models import get_models
-
-from decimal import Decimal
-from os.path import abspath, join, dirname
-from random import randint, choice, random
-import string
 
 from model_mommy.timezone import now
 

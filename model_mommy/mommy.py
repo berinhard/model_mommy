@@ -1,24 +1,19 @@
 # -*- coding: utf-8 -*-
 from django.utils import importlib
-
-from django.db.models.fields import AutoField, CharField, TextField, SlugField
-from django.db.models.fields import DateField, DateTimeField, TimeField, EmailField
-from django.db.models.fields import IntegerField, SmallIntegerField
-from django.db.models.fields import PositiveSmallIntegerField
-from django.db.models.fields import PositiveIntegerField
-from django.db.models.fields import FloatField, DecimalField
-from django.db.models.fields import BooleanField
-from django.db.models.fields import URLField
-from django.db.models  import FileField, ImageField
-from django.db.models import get_model
-
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-
-from django.db.models import ForeignKey, ManyToManyField, OneToOneField
+from django.db.models import (\
+    CharField, EmailField, SlugField, TextField, URLField,
+    DateField, DateTimeField, TimeField,
+    AutoField, IntegerField, SmallIntegerField,
+    PositiveIntegerField, PositiveSmallIntegerField,
+    BooleanField, DecimalField, FloatField,
+    FileField, ImageField,
+    ForeignKey, ManyToManyField, OneToOneField,
+    get_model)
 
 try:
-    from django.db.models.fields import BigIntegerField
+    from django.db.models import BigIntegerField
 except ImportError:
     BigIntegerField = IntegerField
 
