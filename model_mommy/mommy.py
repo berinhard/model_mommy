@@ -123,6 +123,8 @@ class AmbiguousModelName(Exception):
 class Mommy(object):
     attr_mapping = {}
     type_mapping = None
+    _unique_models = None
+    _ambiguous_models = None
 
     def __init__(self, model, make_m2m=True):
         self.make_m2m = make_m2m
@@ -138,7 +140,6 @@ class Mommy(object):
         else:
             self.model = model
 
-
     def _get_model(self, name):
         '''
         Get a model by name.
@@ -147,19 +148,35 @@ class Mommy(object):
         raises AmbiguousModelNameException.
         '''
         name = name.lower()
-        model = None
+
+        if self._unique_models is None:
+            self._populate()
+
+        if name in self._ambiguous_models:
+            raise AmbiguousModelName('%s is a model in more than one app. '
+                                     'Use the form "app.model".' % name.title())
+
+        return self._unique_models.get(name)
+
+    def _populate(self):
+        '''
+        Cache models for faster self._get_model.
+        '''
+        unique_models = {}
+        ambiguous_models = []
 
         for app_model in cache.app_models.values():
-            for n, m in app_model.items():
-                if name == n:
-                    if model:
-                        raise AmbiguousModelName('%s is a model in more than one app. '
-                                                 'Use the form "app.model".' % name.title())
-                    else:
-                        model = m
+            for name, model in app_model.items():
+                if name not in unique_models:
+                    unique_models[name] = model
+                else:
+                    ambiguous_models.append(name)
 
-        return model
+        for name in ambiguous_models:
+            unique_models.pop(name)
 
+        self._ambiguous_models = ambiguous_models
+        self._unique_models = unique_models
 
     def make_one(self, **attrs):
         '''Creates and persists an instance of the model
