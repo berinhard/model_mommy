@@ -188,6 +188,8 @@ class Mommy(object):
     attr_mapping = {}
     type_mapping = None
 
+    # Note: we're using one finder for all Mommy instances to avoid
+    # rebuilding the model cache for every make_* or prepare_* call.
     finder = ModelFinder()
 
     def __init__(self, model, make_m2m=True):
