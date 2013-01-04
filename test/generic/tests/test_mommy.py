@@ -69,12 +69,10 @@ class MommyCreatesSimpleModel(TestCase):
         people = mommy.make_many('generic.person')
         [self.assertIsInstance(person, Person) for person in people]
 
-    def test_raise_pretty_excpetion_if_model_not_found(self):
-        with self.assertRaises(ModelNotFound) as context_manager:
+    def test_raise_pretty_exception_if_model_not_found(self):
+        with self.assertRaises(ModelNotFound):
             mommy.Mommy('not_existing.Model')
-        exception = context_manager.exception
 
-        self.assertEqual(exception.message, "could not find model 'Model' in the app 'not_existing'.")
 
 class MommyCreatesAssociatedModels(TestCase):
 
