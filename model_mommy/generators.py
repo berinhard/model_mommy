@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
-
-__doc__ = """
+"""
 Generators are callables that return a value used to populate a field.
 
 If this callable has a `required` attribute (a list, mostly), for each item in
