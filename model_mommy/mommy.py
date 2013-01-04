@@ -21,6 +21,7 @@ import generators
 
 recipes = None
 
+# FIXME: use pkg_resource
 from os.path import dirname, join
 mock_file_jpeg = join(dirname(__file__), 'mock-img.jpeg')
 mock_file_txt = join(dirname(__file__), 'mock_file.txt')
