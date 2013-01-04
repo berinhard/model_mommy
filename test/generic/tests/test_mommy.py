@@ -19,6 +19,14 @@ class MommyGetModel(TestCase):
         obj = mommy.prepare_one(u'generic.Person')
         self.assertIsInstance(obj, Person)
 
+    def test_model_class(self):
+        obj = mommy.prepare_one(Person)
+        self.assertIsInstance(obj, Person)
+
+    def test_app_model_string(self):
+        obj = mommy.prepare_one('generic.Person')
+        self.assertIsInstance(obj, Person)
+
 
 class MommyCreatesSimpleModel(TestCase):
 
