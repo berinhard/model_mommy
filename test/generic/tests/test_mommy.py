@@ -14,6 +14,12 @@ from test.generic.models import DummyDefaultFieldsModel
 from test.generic.models import DummyGenericForeignKeyModel
 
 
+class MommyGetModel(TestCase):
+    def test_unicode_regression(self):
+        obj = mommy.prepare_one(u'generic.Person')
+        self.assertIsInstance(obj, Person)
+
+
 class MommyCreatesSimpleModel(TestCase):
 
     def test_make_one_should_create_one_object(self):

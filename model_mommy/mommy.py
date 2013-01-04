@@ -121,7 +121,7 @@ class Mommy(object):
     def __init__(self, model, make_m2m=True):
         self.make_m2m = make_m2m
         self.type_mapping = default_mapping.copy()
-        if isinstance(model, str):
+        if isinstance(model, basestring):
             app_label, model_name = model.split('.')
             self.model = get_model(app_label, model_name)
             if not self.model:
