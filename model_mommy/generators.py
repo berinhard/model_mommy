@@ -28,9 +28,9 @@ MAX_LENGTH = 300
 MAX_INT = 10000
 
 def get_content_file(content, name):
-    if VERSION[1] < 4:
+    if VERSION < (1, 4):
         return ContentFile(content)
-    elif VERSION[1] >= 4:
+    else:
         return ContentFile(content, name=name)
 
 def gen_file_field():
