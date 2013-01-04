@@ -2,7 +2,8 @@
 from django.utils import importlib
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.loading import cache
+from django.db.models.loading import cache, get_model
+from django.db.models.base import ModelBase
 from django.db.models import (\
     CharField, EmailField, SlugField, TextField, URLField,
     DateField, DateTimeField, TimeField,
@@ -10,8 +11,7 @@ from django.db.models import (\
     PositiveIntegerField, PositiveSmallIntegerField,
     BooleanField, DecimalField, FloatField,
     FileField, ImageField,
-    ForeignKey, ManyToManyField, OneToOneField,
-    get_model)
+    ForeignKey, ManyToManyField, OneToOneField)
 
 try:
     from django.db.models import BigIntegerField
@@ -120,27 +120,32 @@ class AmbiguousModelName(Exception):
     pass
 
 
-class Mommy(object):
-    attr_mapping = {}
-    type_mapping = None
+class ModelFinder(object):
+    '''
+    Encapsulates all the logic for finding a model to Mommy.
+    '''
     _unique_models = None
     _ambiguous_models = None
 
-    def __init__(self, model, make_m2m=True):
-        self.make_m2m = make_m2m
-        self.type_mapping = default_mapping.copy()
-        if isinstance(model, basestring):
-            if '.' in model:
-                app_label, model_name = model.split('.')
-                self.model = get_model(app_label, model_name)
-            else:
-                self.model = self._get_model(model)
-            if not self.model:
-                raise ModelNotFound("could not find model '%s' in the app '%s'." %(model_name, app_label))
-        else:
-            self.model = model
+    def get_model(self, name):
+        '''
+        Get a model.
 
-    def _get_model(self, name):
+        :param name String on the form 'applabel.modelname' or 'modelname'.
+        :return a model class.
+        '''
+        if '.' in name:
+            app_label, model_name = name.split('.')
+            model =  get_model(app_label, model_name)
+        else:
+            model = self.get_model_by_name(name)
+
+        if not model:
+            raise ModelNotFound("Could not find model '%s'." % name.title())
+
+        return model
+
+    def get_model_by_name(self, name):
         '''
         Get a model by name.
 
@@ -177,6 +182,22 @@ class Mommy(object):
 
         self._ambiguous_models = ambiguous_models
         self._unique_models = unique_models
+
+
+class Mommy(object):
+    attr_mapping = {}
+    type_mapping = None
+
+    finder = ModelFinder()
+
+    def __init__(self, model, make_m2m=True):
+        self.make_m2m = make_m2m
+        self.type_mapping = default_mapping.copy()
+
+        if isinstance(model, ModelBase):
+            self.model = model
+        else:
+            self.model = self.finder.get_model(model)
 
     def make_one(self, **attrs):
         '''Creates and persists an instance of the model
