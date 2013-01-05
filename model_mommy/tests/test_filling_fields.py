@@ -30,14 +30,13 @@ from model_mommy.models import DummyNumbersModel
 from model_mommy.models import DummyDecimalModel, DummyEmailModel
 from model_mommy.models import DummyGenericForeignKeyModel
 from model_mommy.models import DummyFileFieldModel
-from model_mommy.models import DummyImageFieldModel
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
     'FillingEmailField', 'FillingGenericForeignKeyField','FillingFileField',
-    'TimeFieldsFilling', 'FillingImageFileField',
+    'TimeFieldsFilling',
 ]
 
 
@@ -226,24 +225,30 @@ class FillingFileField(TestCase):
     def tearDown(self):
         self.dummy.file_field.delete()
 
-class FillingImageFileField(TestCase):
+try:
+    from model_mommy.models import DummyImageFieldModel
+    __all__ += ['FillingImageFileField']
 
-    def setUp(self):
-        path = abspath(join(dirname(__file__),'..','mock-img.jpeg'))
-        self.fixture_img_file = ImageFile(open(path))
+    class FillingImageFileField(TestCase):
 
-    def test_filling_image_file_field(self):
-        self.dummy = mommy.make_one(DummyImageFieldModel)
-        field = DummyImageFieldModel._meta.get_field('image_field')
-        self.assertIsInstance(field, ImageField)
-        import time
-        path = "/tmp/%s/mock-img.jpeg" % time.strftime('%Y/%m/%d')
+        def setUp(self):
+            path = abspath(join(dirname(__file__),'..','mock-img.jpeg'))
+            self.fixture_img_file = ImageFile(open(path))
 
-        from django import VERSION
-        if VERSION[1] >= 4:
-            self.assertEqual(self.dummy.image_field.path, path)
-        self.assertTrue(self.dummy.image_field.width)
-        self.assertTrue(self.dummy.image_field.height)
+        def test_filling_image_file_field(self):
+            self.dummy = mommy.make_one(DummyImageFieldModel)
+            field = DummyImageFieldModel._meta.get_field('image_field')
+            self.assertIsInstance(field, ImageField)
+            import time
+            path = "/tmp/%s/mock-img.jpeg" % time.strftime('%Y/%m/%d')
 
-    def tearDown(self):
-        self.dummy.image_field.delete()
+            from django import VERSION
+            if VERSION[1] >= 4:
+                self.assertEqual(self.dummy.image_field.path, path)
+            self.assertTrue(self.dummy.image_field.width)
+            self.assertTrue(self.dummy.image_field.height)
+
+        def tearDown(self):
+            self.dummy.image_field.delete()
+except ImportError:
+    pass

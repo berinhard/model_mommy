@@ -137,6 +137,10 @@ class DummyFileFieldModel(models.Model):
     file_field = models.FileField(upload_to="%Y/%m/%d", storage=fs)
 
 
-class DummyImageFieldModel(models.Model):
-    fs = FileSystemStorage(location='/tmp/')
-    image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)
+try:
+    import PIL
+    class DummyImageFieldModel(models.Model):
+        fs = FileSystemStorage(location='/tmp/')
+        image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)
+except ImportError:
+    pass
