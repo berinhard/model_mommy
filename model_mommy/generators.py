@@ -94,7 +94,7 @@ def gen_time():
 
 
 def gen_string(max_length):
-    return ''.join(choice(string.printable) for i in range(max_length))
+    return ''.join(choice(string.ascii_letters) for i in range(max_length))
 gen_string.required = ['max_length']
 
 
