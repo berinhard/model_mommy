@@ -201,5 +201,5 @@ pip install -r requirements.txt
 ### 3. run the tests
 
 ```console
-make test
+tox
 ```

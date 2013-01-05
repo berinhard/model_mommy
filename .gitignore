@@ -7,3 +7,5 @@ include/
 lib/
 *.egg-info/
 .idea
+.tox
+

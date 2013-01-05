@@ -1,32 +1,73 @@
 #!/usr/bin/env python
 
-import os
+from os.path import dirname, join
 import sys
+from optparse import OptionParser
+import warnings
 
-parent = os.path.abspath(os.path.dirname(__file__))
-tests_dir = os.path.join(parent, 'model_mommy', 'tests')
-sys.path.insert(0, parent)
-sys.path.insert(0, tests_dir)
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'test_settings'
+def parse_args():
+    parser = OptionParser()
+    parser.add_option('--use-tz', dest='USE_TZ', action='store_true')
+    options, args = parser.parse_args()
+
+    # Build labels
+    if args:
+        labels = ["model_mommy.%s" % label for label in args]
+    else:
+        labels = ['model_mommy']
+
+    return options, labels
+
+
+def configure_settings(options):
+    from django.conf import settings
+
+    # If DJANGO_SETTINGS_MODULE envvar exists the settings will be
+    # configured by it. Otherwise it will use the parameters bellow.
+    if not settings.configured:
+        params = dict(
+            DATABASES={
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': ':memory:',
+                }
+            },
+            INSTALLED_APPS = (
+                'django.contrib.contenttypes',
+                'model_mommy',
+            ),
+            SITE_ID=1,
+            TEST_ROOT=join(dirname(__file__), 'model_mommy', 'tests'),
+        )
+
+        # Force the use of timezone aware datetime and change Django's warning to
+        # be treated as errors.
+        if options.USE_TZ:
+            params.update(USE_TZ=True)
+            warnings.filterwarnings('error', r"DateTimeField received a naive datetime",
+                                    RuntimeWarning, r'django\.db\.models\.fields')
+
+        # Configure Django's settings
+        settings.configure(**params)
+
+    return settings
+
+
+def get_runner(settings):
+    '''
+    Asks Django for the TestRunner defined in settings or the default one.
+    '''
+    from django.test.utils import get_runner
+    TestRunner = get_runner(settings)
+    return TestRunner(verbosity=1, interactive=True, failfast=False)
 
 
 def runtests():
-    args = sys.argv[1:]
-    if args:
-        test_labels = ["model_mommy.%s" % arg for arg in args]
-    else:
-        test_labels = ['model_mommy']
-
-    try:
-        from django.test.simple import run_tests
-        result = run_tests(test_labels, 1, True)
-        sys.exit(result)
-    except ImportError:
-        from django.test.simple import DjangoTestSuiteRunner
-        test_suite = DjangoTestSuiteRunner(1, True)
-        result = test_suite.run_tests(test_labels)
-        sys.exit(result)
+    options, test_labels = parse_args()
+    settings = configure_settings(options)
+    runner = get_runner(settings)
+    sys.exit(runner.run_tests(test_labels))
 
 
 if __name__ == '__main__':
