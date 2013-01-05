@@ -85,6 +85,11 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(store.employees.count(), mommy.MAX_MANY_QUANTITY)
         self.assertEqual(store.customers.count(), mommy.MAX_MANY_QUANTITY)
 
+    def test_does_not_create_many_to_many_if_flaged(self):
+        store = mommy.make_one(Store, make_m2m=False)
+        self.assertEqual(store.employees.count(), 0)
+        self.assertEqual(store.customers.count(), 0)
+
     def test_simple_creating_person_with_parameters(self):
         kid = mommy.make_one(Person, happy=True, age=10, name='Mike')
         self.assertEqual(kid.age, 10)

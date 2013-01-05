@@ -33,13 +33,13 @@ foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 MAX_SELF_REFERENCE_LOOPS = 2
 MAX_MANY_QUANTITY = 5
 
-def make_one(model, **attrs):
+def make_one(model, make_m2m=True, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
     """
-    mommy = Mommy(model)
+    mommy = Mommy(model, make_m2m=make_m2m)
     return mommy.make_one(**attrs)
 
 
@@ -118,7 +118,8 @@ class Mommy(object):
     attr_mapping = {}
     type_mapping = None
 
-    def __init__(self, model):
+    def __init__(self, model, make_m2m=True):
+        self.make_m2m = make_m2m
         self.type_mapping = default_mapping.copy()
         if isinstance(model, str):
             app_label, model_name = model.split('.')
@@ -170,6 +171,8 @@ class Mommy(object):
                 if field_value_not_defined:
                     if field.null:
                         continue
+                    elif not self.make_m2m:
+                        m2m_dict[field.name] = []
                     else:
                         m2m_dict[field.name] = self.generate_value(field)
                 else:
