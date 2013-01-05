@@ -2,8 +2,8 @@
 
 #ATTENTION: Recipes defined for testing purposes only
 from model_mommy.recipe import Recipe, foreign_key
-from model_mommy.models import Person, Dog
 from model_mommy.timezone import now
+from test.generic.models import Person, Dog
 
 
 person = Recipe(Person,

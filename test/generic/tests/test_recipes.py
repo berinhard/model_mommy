@@ -2,9 +2,9 @@
 
 from django.test import TestCase
 from model_mommy import mommy
-from model_mommy.models import Person, DummyNumbersModel, DummyBlankFieldsModel
 from model_mommy.recipe import Recipe, foreign_key
 from model_mommy.timezone import now
+from test.generic.models import Person, DummyNumbersModel, DummyBlankFieldsModel
 
 
 class TestDefiningRecipes(TestCase):
@@ -103,54 +103,54 @@ class TestExecutingRecipes(TestCase):
       Tests for calling recipes defined in mommy_recipes.py
     """
     def test_model_with_foreign_key(self):
-        dog = mommy.make_recipe('model_mommy.dog')
+        dog = mommy.make_recipe('test.generic.dog')
         self.assertEqual(dog.breed, 'Pug')
         self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
-        dog = mommy.prepare_recipe('model_mommy.dog')
+        dog = mommy.prepare_recipe('test.generic.dog')
         self.assertEqual(dog.breed, 'Pug')
         self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
     def test_model_with_foreign_key_as_str(self):
-        dog = mommy.make_recipe('model_mommy.other_dog')
+        dog = mommy.make_recipe('test.generic.other_dog')
         self.assertEqual(dog.breed, 'Basset')
         self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
-        dog = mommy.prepare_recipe('model_mommy.other_dog')
+        dog = mommy.prepare_recipe('test.generic.other_dog')
         self.assertEqual(dog.breed, 'Basset')
         self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
     def test_make_recipe(self):
-        person = mommy.make_recipe('model_mommy.person')
+        person = mommy.make_recipe('test.generic.person')
         self.assertIsInstance(person, Person)
         self.assertNotEqual(person.id, None)
 
     def test_prepare_recipe(self):
-        person = mommy.prepare_recipe('model_mommy.person')
+        person = mommy.prepare_recipe('test.generic.person')
         self.assertIsInstance(person, Person)
         self.assertEqual(person.id, None)
 
     def test_make_recipe_with_args(self):
-        person = mommy.make_recipe('model_mommy.person', name='Dennis Ritchie', age=70)
+        person = mommy.make_recipe('test.generic.person', name='Dennis Ritchie', age=70)
         self.assertEqual(person.name, 'Dennis Ritchie')
         self.assertEqual(person.age, 70)
 
     def test_prepare_recipe_with_args(self):
-        person = mommy.prepare_recipe('model_mommy.person', name='Dennis Ritchie', age=70)
+        person = mommy.prepare_recipe('test.generic.person', name='Dennis Ritchie', age=70)
         self.assertEqual(person.name, 'Dennis Ritchie')
         self.assertEqual(person.age, 70)
 
     def test_import_recipe_inside_deeper_modules(self):
-        recipe_name = 'model_mommy.tests.sub_package.person'
+        recipe_name = 'test.generic.tests.sub_package.person'
         person = mommy.prepare_recipe(recipe_name)
         self.assertEqual(person.name, 'John Deeper')
 
     def test_make_many_from_recipe(self):
-        persons = mommy.make_many_from_recipe('model_mommy.person')
+        persons = mommy.make_many_from_recipe('test.generic.person')
         self.assertIsInstance(persons, list)
         self.assertEqual(len(persons), mommy.MAX_MANY_QUANTITY)
         for person in persons:
@@ -159,12 +159,12 @@ class TestExecutingRecipes(TestCase):
 
     def test_make_many_from_recipe_with_specified_quantity(self):
         quantity = 2
-        persons = mommy.make_many_from_recipe('model_mommy.person', quantity=quantity)
+        persons = mommy.make_many_from_recipe('test.generic.person', quantity=quantity)
         self.assertIsInstance(persons, list)
         self.assertEqual(len(persons), quantity)
 
     def test_make_many_with_model_args(self):
-        persons = mommy.make_many_from_recipe('model_mommy.person', name='Dennis Ritchie', age=70)
+        persons = mommy.make_many_from_recipe('test.generic.person', name='Dennis Ritchie', age=70)
         for person in persons:
             self.assertEqual(person.name, 'Dennis Ritchie')
             self.assertEqual(person.age, 70)

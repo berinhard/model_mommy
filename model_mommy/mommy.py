@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from django.conf import settings
 from django.utils import importlib
 
 from django.db.models.fields import AutoField, CharField, TextField, SlugField
@@ -26,6 +25,11 @@ except ImportError:
 import generators
 
 recipes = None
+
+from os.path import dirname, join
+mock_file_jpeg = join(dirname(__file__), 'mock-img.jpeg')
+mock_file_txt = join(dirname(__file__), 'mock_file.txt')
+
 
 #TODO: improve related models handling
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]

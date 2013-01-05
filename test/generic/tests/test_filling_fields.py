@@ -1,9 +1,6 @@
 from datetime import date, datetime, time
 from decimal import Decimal
 
-import os
-from os.path import abspath, join, dirname
-
 from django.test import TestCase
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import CharField, TextField, SlugField
@@ -24,12 +21,13 @@ except ImportError:
     #BigIntegerField = IntegerField
 
 from model_mommy import mommy
-from model_mommy.models import Person
-from model_mommy.models import DummyIntModel, DummyPositiveIntModel
-from model_mommy.models import DummyNumbersModel
-from model_mommy.models import DummyDecimalModel, DummyEmailModel
-from model_mommy.models import DummyGenericForeignKeyModel
-from model_mommy.models import DummyFileFieldModel
+from test.generic.models import Person
+from test.generic.models import DummyIntModel, DummyPositiveIntModel
+from test.generic.models import DummyNumbersModel
+from test.generic.models import DummyDecimalModel, DummyEmailModel
+from test.generic.models import DummyGenericForeignKeyModel
+from test.generic.models import DummyFileFieldModel
+from test.generic.models import DummyImageFieldModel
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
@@ -57,7 +55,7 @@ class FieldFillingTestCase(TestCase):
 class FillingFromChoice(FieldFillingTestCase):
 
     def test_if_gender_is_populated_from_choices(self):
-        from model_mommy.models import GENDER_CH
+        from test.generic.models import GENDER_CH
         self.assertTrue(self.person.gender in map(lambda x: x[0], GENDER_CH))
 
 
@@ -208,7 +206,7 @@ class FillingGenericForeignKeyField(TestCase):
 class FillingFileField(TestCase):
 
     def setUp(self):
-        path = abspath(join(dirname(__file__),'..','mock_file.txt'))
+        path = mommy.mock_file_txt
         self.fixture_txt_file = File(open(path))
 
     def test_filling_file_field(self):
@@ -225,30 +223,24 @@ class FillingFileField(TestCase):
     def tearDown(self):
         self.dummy.file_field.delete()
 
-try:
-    from model_mommy.models import DummyImageFieldModel
-    __all__ += ['FillingImageFileField']
+class FillingImageFileField(TestCase):
 
-    class FillingImageFileField(TestCase):
+    def setUp(self):
+        path = mommy.mock_file_jpeg
+        self.fixture_img_file = ImageFile(open(path))
 
-        def setUp(self):
-            path = abspath(join(dirname(__file__),'..','mock-img.jpeg'))
-            self.fixture_img_file = ImageFile(open(path))
+    def test_filling_image_file_field(self):
+        self.dummy = mommy.make_one(DummyImageFieldModel)
+        field = DummyImageFieldModel._meta.get_field('image_field')
+        self.assertIsInstance(field, ImageField)
+        import time
+        path = "/tmp/%s/mock-img.jpeg" % time.strftime('%Y/%m/%d')
 
-        def test_filling_image_file_field(self):
-            self.dummy = mommy.make_one(DummyImageFieldModel)
-            field = DummyImageFieldModel._meta.get_field('image_field')
-            self.assertIsInstance(field, ImageField)
-            import time
-            path = "/tmp/%s/mock-img.jpeg" % time.strftime('%Y/%m/%d')
+        from django import VERSION
+        if VERSION[1] >= 4:
+            self.assertEqual(self.dummy.image_field.path, path)
+        self.assertTrue(self.dummy.image_field.width)
+        self.assertTrue(self.dummy.image_field.height)
 
-            from django import VERSION
-            if VERSION[1] >= 4:
-                self.assertEqual(self.dummy.image_field.path, path)
-            self.assertTrue(self.dummy.image_field.width)
-            self.assertTrue(self.dummy.image_field.height)
-
-        def tearDown(self):
-            self.dummy.image_field.delete()
-except ImportError:
-    pass
+    def tearDown(self):
+        self.dummy.image_field.delete()

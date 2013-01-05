@@ -9,15 +9,7 @@ import warnings
 def parse_args():
     parser = OptionParser()
     parser.add_option('--use-tz', dest='USE_TZ', action='store_true')
-    options, args = parser.parse_args()
-
-    # Build labels
-    if args:
-        labels = ["model_mommy.%s" % label for label in args]
-    else:
-        labels = ['model_mommy']
-
-    return options, labels
+    return parser.parse_args()
 
 
 def configure_settings(options):
@@ -35,15 +27,15 @@ def configure_settings(options):
             },
             INSTALLED_APPS = (
                 'django.contrib.contenttypes',
-                'model_mommy',
+                'test.generic',
             ),
             SITE_ID=1,
-            TEST_ROOT=join(dirname(__file__), 'model_mommy', 'tests'),
+            TEST_ROOT=join(dirname(__file__), 'test', 'generic', 'tests'),
         )
 
         # Force the use of timezone aware datetime and change Django's warning to
         # be treated as errors.
-        if options.USE_TZ:
+        if getattr(options, 'USE_TZ', False):
             params.update(USE_TZ=True)
             warnings.filterwarnings('error', r"DateTimeField received a naive datetime",
                                     RuntimeWarning, r'django\.db\.models\.fields')
@@ -63,12 +55,15 @@ def get_runner(settings):
     return TestRunner(verbosity=1, interactive=True, failfast=False)
 
 
-def runtests():
-    options, test_labels = parse_args()
+def runtests(options=None, labels=None):
+    if not labels:
+        labels = ['generic']
+
     settings = configure_settings(options)
     runner = get_runner(settings)
-    sys.exit(runner.run_tests(test_labels))
+    sys.exit(runner.run_tests(labels))
 
 
 if __name__ == '__main__':
-    runtests()
+    options, labels = parse_args()
+    runtests(options, labels)
