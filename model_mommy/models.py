@@ -12,6 +12,9 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
+from model_mommy.timezone import smart_datetime as datetime
+
+
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
 
@@ -123,8 +126,8 @@ class DummyDefaultFieldsModel(models.Model):
     default_text_field = models.TextField(default='default')
     default_int_field = models.IntegerField(default=123)
     default_float_field = models.FloatField(default=123.0)
-    default_date_field = models.DateField(default='2011-01-01')
-    default_date_time_field = models.DateTimeField(default='2011-01-01')
+    default_date_field = models.DateField(default='2012-01-01')
+    default_date_time_field = models.DateTimeField(default=datetime(2012, 01, 01))
     default_time_field = models.TimeField(default='00:00:00')
     default_decimal_field = models.DecimalField(max_digits=5, decimal_places=2,
                                                 default=Decimal('0'))
