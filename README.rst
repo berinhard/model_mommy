@@ -49,9 +49,18 @@ Importing every model over and over again is boring. So let *Mommy* import them 
 
     from model_mommy import mommy
 
+    # 1st form: app_label.model_name
     kid = mommy.make_one('family.Kid')
 
-Note that you must use `app_label.model_name`. The `model_name` is case insensitive.
+    # 2nd form: model_name
+    dog = mommy.make_one('Dog')
+
+
+.. [1] You can only use the 2nd form on unique model names. If you have an app
+       *family* with a *Dog*, and an app *farm* with a *Dog*, you must use the
+       `app_label.model_name` form.
+
+.. [2] `model_name` is case insensitive.
 
 
 Model Relationships
