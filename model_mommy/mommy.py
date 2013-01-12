@@ -1,24 +1,20 @@
 # -*- coding: utf-8 -*-
 from django.utils import importlib
-
-from django.db.models.fields import AutoField, CharField, TextField, SlugField
-from django.db.models.fields import DateField, DateTimeField, TimeField, EmailField
-from django.db.models.fields import IntegerField, SmallIntegerField
-from django.db.models.fields import PositiveSmallIntegerField
-from django.db.models.fields import PositiveIntegerField
-from django.db.models.fields import FloatField, DecimalField
-from django.db.models.fields import BooleanField
-from django.db.models.fields import URLField
-from django.db.models  import FileField, ImageField
-from django.db.models import get_model
-
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-
-from django.db.models import ForeignKey, ManyToManyField, OneToOneField
+from django.db.models.loading import cache, get_model
+from django.db.models.base import ModelBase
+from django.db.models import (\
+    CharField, EmailField, SlugField, TextField, URLField,
+    DateField, DateTimeField, TimeField,
+    AutoField, IntegerField, SmallIntegerField,
+    PositiveIntegerField, PositiveSmallIntegerField,
+    BooleanField, DecimalField, FloatField,
+    FileField, ImageField,
+    ForeignKey, ManyToManyField, OneToOneField)
 
 try:
-    from django.db.models.fields import BigIntegerField
+    from django.db.models import BigIntegerField
 except ImportError:
     BigIntegerField = IntegerField
 
@@ -26,6 +22,7 @@ import generators
 
 recipes = None
 
+# FIXME: use pkg_resource
 from os.path import dirname, join
 mock_file_jpeg = join(dirname(__file__), 'mock-img.jpeg')
 mock_file_txt = join(dirname(__file__), 'mock_file.txt')
@@ -118,20 +115,91 @@ default_mapping = {
 class ModelNotFound(Exception):
     pass
 
+
+class AmbiguousModelName(Exception):
+    pass
+
+
+class ModelFinder(object):
+    '''
+    Encapsulates all the logic for finding a model to Mommy.
+    '''
+    _unique_models = None
+    _ambiguous_models = None
+
+    def get_model(self, name):
+        '''
+        Get a model.
+
+        :param name String on the form 'applabel.modelname' or 'modelname'.
+        :return a model class.
+        '''
+        if '.' in name:
+            app_label, model_name = name.split('.')
+            model =  get_model(app_label, model_name)
+        else:
+            model = self.get_model_by_name(name)
+
+        if not model:
+            raise ModelNotFound("Could not find model '%s'." % name.title())
+
+        return model
+
+    def get_model_by_name(self, name):
+        '''
+        Get a model by name.
+
+        If a model with that name exists in more than one app,
+        raises AmbiguousModelNameException.
+        '''
+        name = name.lower()
+
+        if self._unique_models is None:
+            self._populate()
+
+        if name in self._ambiguous_models:
+            raise AmbiguousModelName('%s is a model in more than one app. '
+                                     'Use the form "app.model".' % name.title())
+
+        return self._unique_models.get(name)
+
+    def _populate(self):
+        '''
+        Cache models for faster self._get_model.
+        '''
+        unique_models = {}
+        ambiguous_models = []
+
+        for app_model in cache.app_models.values():
+            for name, model in app_model.items():
+                if name not in unique_models:
+                    unique_models[name] = model
+                else:
+                    ambiguous_models.append(name)
+
+        for name in ambiguous_models:
+            unique_models.pop(name)
+
+        self._ambiguous_models = ambiguous_models
+        self._unique_models = unique_models
+
+
 class Mommy(object):
     attr_mapping = {}
     type_mapping = None
 
+    # Note: we're using one finder for all Mommy instances to avoid
+    # rebuilding the model cache for every make_* or prepare_* call.
+    finder = ModelFinder()
+
     def __init__(self, model, make_m2m=True):
         self.make_m2m = make_m2m
         self.type_mapping = default_mapping.copy()
-        if isinstance(model, str):
-            app_label, model_name = model.split('.')
-            self.model = get_model(app_label, model_name)
-            if not self.model:
-                raise ModelNotFound("could not find model '%s' in the app '%s'." %(model_name, app_label))
-        else:
+
+        if isinstance(model, ModelBase):
             self.model = model
+        else:
+            self.model = self.finder.get_model(model)
 
     def make_one(self, **attrs):
         '''Creates and persists an instance of the model

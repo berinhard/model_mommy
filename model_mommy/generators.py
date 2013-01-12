@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
-
-__doc__ = """
+"""
 Generators are callables that return a value used to populate a field.
 
 If this callable has a `required` attribute (a list, mostly), for each item in
@@ -11,16 +10,14 @@ list in the format (key, value) where key is the argument name for generator
 and value is the value for that argument.
 """
 
-
+import string
+from decimal import Decimal
+from os.path import abspath, join, dirname
+from random import randint, choice, random
 from django import VERSION
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.db.models import get_models
-
-from decimal import Decimal
-from os.path import abspath, join, dirname
-from random import randint, choice, random
-import string
 
 from model_mommy.timezone import now
 
@@ -31,9 +28,9 @@ MAX_LENGTH = 300
 MAX_INT = 10000
 
 def get_content_file(content, name):
-    if VERSION[1] < 4:
+    if VERSION < (1, 4):
         return ContentFile(content)
-    elif VERSION[1] >= 4:
+    else:
         return ContentFile(content, name=name)
 
 def gen_file_field():

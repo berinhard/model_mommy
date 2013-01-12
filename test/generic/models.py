@@ -143,3 +143,7 @@ class DummyFileFieldModel(models.Model):
 class DummyImageFieldModel(models.Model):
     fs = FileSystemStorage(location='/tmp/')
     image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)
+
+
+class Ambiguous(models.Model):
+    name = models.CharField(max_length=20)

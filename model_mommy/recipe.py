@@ -1,6 +1,7 @@
 #coding: utf-8
 import inspect
 
+
 class RecipeNotFound(Exception):
     pass
 

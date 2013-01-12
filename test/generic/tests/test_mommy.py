@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from model_mommy import mommy
-from model_mommy.mommy import ModelNotFound
+from model_mommy.mommy import ModelNotFound, AmbiguousModelName
 from model_mommy.timezone import smart_datetime as datetime
 from test.generic.models import Person, Dog, Store, LonelyPerson
 from test.generic.models import User, PaymentBill
@@ -12,6 +12,35 @@ from test.generic.models import UnsupportedModel, DummyGenericRelationModel
 from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
 from test.generic.models import DummyDefaultFieldsModel
 from test.generic.models import DummyGenericForeignKeyModel
+
+
+class ModelFinderTest(TestCase):
+    def test_unicode_regression(self):
+        obj = mommy.prepare_one(u'generic.Person')
+        self.assertIsInstance(obj, Person)
+
+    def test_model_class(self):
+        obj = mommy.prepare_one(Person)
+        self.assertIsInstance(obj, Person)
+
+    def test_app_model_string(self):
+        obj = mommy.prepare_one('generic.Person')
+        self.assertIsInstance(obj, Person)
+
+    def test_model_string(self):
+        obj = mommy.prepare_one('Person')
+        self.assertIsInstance(obj, Person)
+
+    def test_raise_on_ambiguous_model_string(self):
+        with self.assertRaises(AmbiguousModelName):
+            obj = mommy.prepare_one('Ambiguous')
+
+    def test_raise_model_not_found(self):
+        with self.assertRaises(ModelNotFound):
+            mommy.Mommy('non_existing.Model')
+
+        with self.assertRaises(ModelNotFound):
+            mommy.Mommy('NonExistingModel')
 
 
 class MommyCreatesSimpleModel(TestCase):
@@ -39,20 +68,6 @@ class MommyCreatesSimpleModel(TestCase):
         people = mommy.make_many(Person, name="George Washington")
         self.assertTrue(all(p.name == "George Washington" for p in people))
 
-    def test_accept_model_as_string(self):
-        person = mommy.make_one('generic.person')
-        self.assertIsInstance(person, Person)
-        person = mommy.prepare_one('generic.Person')
-        self.assertIsInstance(person, Person)
-        people = mommy.make_many('generic.person')
-        [self.assertIsInstance(person, Person) for person in people]
-
-    def test_raise_pretty_excpetion_if_model_not_found(self):
-        with self.assertRaises(ModelNotFound) as context_manager:
-            mommy.Mommy('not_existing.Model')
-        exception = context_manager.exception
-
-        self.assertEqual(exception.message, "could not find model 'Model' in the app 'not_existing'.")
 
 class MommyCreatesAssociatedModels(TestCase):
 
