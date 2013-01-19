@@ -194,6 +194,7 @@ class Mommy(object):
 
     def __init__(self, model, make_m2m=True):
         self.make_m2m = make_m2m
+        self.m2m_dict = {}
         self.type_mapping = default_mapping.copy()
 
         if isinstance(model, ModelBase):
@@ -215,9 +216,7 @@ class Mommy(object):
     def get_fields(self):
         return self.model._meta.fields + self.model._meta.many_to_many
 
-    #Method too big
     def _make_one(self, commit=True, **attrs):
-        m2m_dict = {}
         is_fk_field = lambda x: '__' in x
         model_attrs = dict((k, v) for k, v in attrs.items() if not is_fk_field(k))
         fk_attrs = dict((k, v) for k, v in attrs.items() if is_fk_field(k))
@@ -240,30 +239,33 @@ class Mommy(object):
                     continue
 
             if isinstance(field, ManyToManyField):
-                if field_value_not_defined:
-                    if field.null:
-                        continue
-                    elif not self.make_m2m:
-                        m2m_dict[field.name] = []
-                    else:
-                        m2m_dict[field.name] = self.generate_value(field)
-                else:
-                    m2m_dict[field.name] = model_attrs.pop(field.name)
-
+                self.m2m_dict[field.name] = self.m2m_value(field, model_attrs)
             elif field_value_not_defined:
                 if field.null:
                     continue
                 else:
                     model_attrs[field.name] = self.generate_value(field)
 
-        instance = self.model(**model_attrs)
+        return self.instance(model_attrs, _commit=commit)
 
+    def m2m_value(self, field, attrs):
+        if field.name not in attrs:
+            if not self.make_m2m or field.null:
+                value =  []
+            else:
+                value = self.generate_value(field)
+        else:
+            value = model_attrs.pop(field.name)
+
+        return value
+
+    def instance(self, attrs, _commit):
+        instance = self.model(**attrs)
         # m2m only works for persisted instances
-        if commit:
+        if _commit:
             instance.save()
-
             # m2m relation is treated differently
-            for key, value in m2m_dict.items():
+            for key, value in self.m2m_dict.items():
                 m2m_relation = getattr(instance, key)
                 for model_instance in value:
                     m2m_relation.add(model_instance)
