@@ -168,6 +168,8 @@ You can define a **recipe**, which is a set of rules to generate data for your m
         appointment = datetime.now()
     )
 
+Note you don't have to declare all the fields if you don't want to. Omitted fields will be generated automatically.
+
 The variable `person` serves as the recipe name:
 
 .. code-block:: python
