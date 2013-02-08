@@ -14,6 +14,9 @@ class Recipe(object):
     def _mapping(self, new_attrs):
         mapping = self.attr_mapping.copy()
         for k, v in self.attr_mapping.items():
+            # do not generate values if field value is provided
+            if new_attrs.get(k):
+                continue
             if callable(v):
                 mapping[k] = v()
         mapping.update(new_attrs)

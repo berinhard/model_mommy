@@ -210,3 +210,16 @@ class ForeignKeyTestCase(TestCase):
             foreign_key(2)
         exception = c.exception
         self.assertEqual(exception.message, 'Not a recipe')
+
+    def test_do_not_create_related_model(self):
+        """
+          It should not attempt to create other object when
+          passing an argument
+        """
+        person = mommy.make_recipe('test.generic.person')
+        self.assertEqual(Person.objects.count(), 1)
+        mommy.make_recipe('test.generic.dog', owner=person)
+        self.assertEqual(Person.objects.count(), 1)
+        mommy.prepare_recipe('test.generic.dog', owner=person)
+        self.assertEqual(Person.objects.count(), 1)
+
