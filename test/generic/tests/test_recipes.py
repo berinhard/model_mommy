@@ -111,6 +111,20 @@ class TestDefiningRecipes(TestCase):
         self.assertTrue(person.wanted_games_qtd)
         self.assertTrue(person.id)
 
+    def test_prepare_recipe_without_all_model_needed_data(self):
+        person_recipe = Recipe(Person, name='John Doe')
+        person = person_recipe.prepare()
+        self.assertEqual('John Doe', person.name)
+        self.assertTrue(person.nickname)
+        self.assertTrue(person.age)
+        self.assertTrue(person.bio)
+        self.assertTrue(person.birthday)
+        self.assertTrue(person.appointment)
+        self.assertTrue(person.blog)
+        self.assertTrue(person.wanted_games_qtd)
+        self.assertFalse(person.id)
+
+
 class TestExecutingRecipes(TestCase):
     """
       Tests for calling recipes defined in mommy_recipes.py

@@ -23,7 +23,7 @@ class Recipe(object):
         return mommy.make_one(self.model, **self._mapping(attrs))
 
     def prepare(self, **attrs):
-        return self.model(**self._mapping(attrs))
+        return mommy.prepare_one(self.model, **self._mapping(attrs))
 
 
 def foreign_key(recipe):
