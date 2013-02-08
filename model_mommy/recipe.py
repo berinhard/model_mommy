@@ -1,5 +1,6 @@
 #coding: utf-8
 import inspect
+import mommy
 
 
 class RecipeNotFound(Exception):
@@ -19,10 +20,10 @@ class Recipe(object):
         return mapping
 
     def make(self, **attrs):
-        return self.model.objects.create(**self._mapping(attrs))
+        return mommy.make_one(self.model, **self._mapping(attrs))
 
     def prepare(self, **attrs):
-        return self.model(**self._mapping(attrs))
+        return mommy.prepare_one(self.model, **self._mapping(attrs))
 
 
 def foreign_key(recipe):
