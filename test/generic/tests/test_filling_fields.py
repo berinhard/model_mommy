@@ -89,6 +89,14 @@ class BooleanFieldsFilling(FieldFillingTestCase):
         self.assertIsInstance(happy_field, BooleanField)
 
         self.assertIsInstance(self.person.happy, bool)
+        self.assertTrue(self.person.happy)
+
+    def test_fill_BooleanField_with_false_if_default_is_false(self):
+        unhappy_field = Person._meta.get_field('unhappy')
+        self.assertIsInstance(unhappy_field, BooleanField)
+
+        self.assertIsInstance(self.person.unhappy, bool)
+        self.assertFalse(self.person.unhappy)
 
 
 class DateFieldsFilling(FieldFillingTestCase):

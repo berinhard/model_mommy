@@ -232,11 +232,8 @@ class Mommy(object):
                 model_attrs[field.name] = self.generate_value(field, **fk_attrs)
                 continue
 
-            # If not specified, django automatically sets blank=True and
-            # default on BooleanFields so we don't need to check these
-            if not isinstance(field, BooleanField):
-                if field.has_default() or field.blank:
-                    continue
+            if not field.name in self.attr_mapping and (field.has_default() or field.blank):
+                continue
 
             if isinstance(field, ManyToManyField):
                 self.m2m_dict[field.name] = self.m2m_value(field, model_attrs)

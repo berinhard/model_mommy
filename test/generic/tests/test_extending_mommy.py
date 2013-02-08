@@ -52,12 +52,17 @@ class LessSimpleExtendMommy(TestCase):
         gen_oposite.required = ['default']
 
         class SadPeopleMommy(mommy.Mommy):
-            attr_mapping = {'happy': gen_oposite}
+            attr_mapping = {
+                'happy': gen_oposite,
+                'unhappy': gen_oposite,
+            }
 
         happy_field = Person._meta.get_field('happy')
+        unhappy_field = Person._meta.get_field('unhappy')
         mom = SadPeopleMommy(Person)
         person = mom.make_one()
         self.assertEqual(person.happy, not happy_field.default)
+        self.assertEqual(person.unhappy, not unhappy_field.default)
 
     def test_fail_pass_non_string_to_generator_required(self):
         gen_age = lambda x: 10
