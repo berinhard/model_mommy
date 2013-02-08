@@ -21,18 +21,6 @@ class SimpleExtendMommy(TestCase):
 
         self.assertTrue(kid.age in age_list)
 
-    def test_type_mapping_overwriting_boolean_model_behavior(self):
-        class SadPeopleMommy(mommy.Mommy):
-            def __init__(self, model):
-                super(SadPeopleMommy, self).__init__(model)
-                self.type_mapping.update({BooleanField: lambda: False})
-
-        assert Person._meta.get_field('happy').default is True
-        sad_people_mommy = SadPeopleMommy(Person)
-        person = sad_people_mommy.make_one()
-
-        self.assertEqual(person.happy, False)
-
 
 class LessSimpleExtendMommy(TestCase):
 
