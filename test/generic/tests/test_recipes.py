@@ -214,7 +214,7 @@ class ForeignKeyTestCase(TestCase):
     def test_do_not_create_related_model(self):
         """
           It should not attempt to create other object when
-          passing an argument
+          passing the object as argument
         """
         person = mommy.make_recipe('test.generic.person')
         self.assertEqual(Person.objects.count(), 1)
@@ -223,3 +223,15 @@ class ForeignKeyTestCase(TestCase):
         mommy.prepare_recipe('test.generic.dog', owner=person)
         self.assertEqual(Person.objects.count(), 1)
 
+    def test_do_query_lookup(self):
+        """
+          It should not attempt to create other object when
+          using query lookup syntax
+        """
+        dog = mommy.make_recipe('test.generic.dog', owner__name='James')
+        self.assertEqual(Person.objects.count(), 1)
+        self.assertEqual(dog.owner.name, 'James')
+
+        dog = mommy.prepare_recipe('test.generic.dog', owner__name='James')
+        self.assertEqual(Person.objects.count(), 1)
+        self.assertEqual(dog.owner.name, 'James')
