@@ -222,7 +222,7 @@ class ForeignKeyTestCase(TestCase):
         mommy.prepare_recipe('test.generic.dog', owner=person)
         self.assertEqual(Person.objects.count(), 1)
 
-    def test_do_query_lookup(self):
+    def test_do_query_lookup_for_recipes_make_method(self):
         """
           It should not attempt to create other object when
           using query lookup syntax
@@ -231,6 +231,11 @@ class ForeignKeyTestCase(TestCase):
         self.assertEqual(Person.objects.count(), 1)
         self.assertEqual(dog.owner.name, 'James')
 
+    def test_do_query_lookup_for_recipes_prepare_method(self):
+        """
+          It should not attempt to create other object when
+          using query lookup syntax
+        """
         dog = mommy.prepare_recipe('test.generic.dog', owner__name='James')
         self.assertEqual(Person.objects.count(), 1)
         self.assertEqual(dog.owner.name, 'James')
