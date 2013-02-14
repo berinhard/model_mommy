@@ -12,6 +12,8 @@ class Recipe(object):
         self.model = model
 
     def _mapping(self, new_attrs):
+        fk_fields_attrs = dict((k, v) for k, v in new_attrs.items() if '__' in k)
+        new_attrs = dict((k, v) for k, v in new_attrs.items() if not '__' in k)
         mapping = self.attr_mapping.copy()
         for k, v in self.attr_mapping.items():
             # do not generate values if field value is provided
@@ -20,7 +22,8 @@ class Recipe(object):
             if callable(v):
                 mapping[k] = v()
             elif isinstance(v, RecipeForeignKey):
-                mapping[k] = v.recipe.make()
+                recipe_attrs = mommy.filter_fk_attrs(k, **fk_fields_attrs)
+                mapping[k] = v.recipe.make(**recipe_attrs)
         mapping.update(new_attrs)
         return mapping
 
