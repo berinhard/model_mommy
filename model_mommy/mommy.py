@@ -299,7 +299,7 @@ class Mommy(object):
         generator_attrs = get_required_values(generator, field)
 
         if isinstance(field, ForeignKey):
-            generator_attrs.update(filter_fk_attrs(field, **fk_attrs))
+            generator_attrs.update(filter_fk_attrs(field.name, **fk_attrs))
 
         return generator(**generator_attrs)
 
@@ -329,11 +329,11 @@ def get_required_values(generator, field):
 
     return rt
 
-def filter_fk_attrs(field, **fk_attrs):
+def filter_fk_attrs(field_name, **fk_attrs):
     clean_dict = {}
 
     for k, v in fk_attrs.items():
-        if k.startswith(field.name + '__'):
+        if k.startswith(field_name + '__'):
             splited_key = k.split('__')
             key = '__'.join(splited_key[1:])
             clean_dict[key] = v
