@@ -2,7 +2,7 @@
 
 from django.test import TestCase
 from model_mommy import mommy
-from model_mommy.recipe import Recipe, foreign_key
+from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
 from model_mommy.timezone import now
 from test.generic.models import Person, DummyNumbersModel, DummyBlankFieldsModel
 
@@ -197,13 +197,12 @@ class TestExecutingRecipes(TestCase):
             self.assertEqual(person.age, 70)
 
 class ForeignKeyTestCase(TestCase):
-    def test_returns_a_callable(self):
+    def test_foreign_key_method_returns_a_recipe_foreign_key_object(self):
         number_recipe = Recipe(DummyNumbersModel,
             float_field = 1.6
         )
-        method = foreign_key(number_recipe)
-        self.assertTrue(callable(method))
-        self.assertTrue(method.im_self, number_recipe)
+        obj = foreign_key(number_recipe)
+        self.assertIsInstance(obj, RecipeForeignKey)
 
     def test_not_accept_other_type(self):
         with self.assertRaises(TypeError) as c:
