@@ -19,6 +19,7 @@ except ImportError:
     BigIntegerField = IntegerField
 
 import generators
+from exceptions import ModelNotFound, AmbiguousModelName
 
 recipes = None
 
@@ -112,13 +113,6 @@ default_mapping = {
     ContentType: generators.gen_content_type,
 }
 
-class ModelNotFound(Exception):
-    pass
-
-
-class AmbiguousModelName(Exception):
-    pass
-
 
 class ModelFinder(object):
     '''
@@ -150,7 +144,7 @@ class ModelFinder(object):
         Get a model by name.
 
         If a model with that name exists in more than one app,
-        raises AmbiguousModelNameException.
+        raises AmbiguousModelName.
         '''
         name = name.lower()
 
