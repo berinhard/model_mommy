@@ -35,14 +35,14 @@ foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 MAX_SELF_REFERENCE_LOOPS = 2
 MAX_MANY_QUANTITY = 5
 
-def make_one(model, make_m2m=True, **attrs):
+def make(model, make_m2m=True, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
     """
     mommy = Mommy(model, make_m2m=make_m2m)
-    return mommy.make_one(**attrs)
+    return mommy.make(**attrs)
 
 
 def prepare_one(model, **attrs):
@@ -59,7 +59,7 @@ def prepare_one(model, **attrs):
 def make_many(model, quantity=None, **attrs):
     quantity = quantity or MAX_MANY_QUANTITY
     mommy = Mommy(model)
-    return [mommy.make_one(**attrs) for i in range(quantity)]
+    return [mommy.make(**attrs) for i in range(quantity)]
 
 def _recipe(name):
     splited_name = name.split('.')
@@ -77,7 +77,7 @@ def make_many_from_recipe(mommy_recipe_name, quantity=None, **new_attrs):
     quantity = quantity or MAX_MANY_QUANTITY
     return [make_recipe(mommy_recipe_name, **new_attrs) for x in range(quantity)]
 
-make_one.required = foreign_key_required
+make.required = foreign_key_required
 prepare_one.required = foreign_key_required
 make_many.required = foreign_key_required
 
@@ -97,8 +97,8 @@ default_mapping = {
     TextField: generators.gen_text,
     SlugField: generators.gen_slug,
 
-    ForeignKey: make_one,
-    OneToOneField: make_one,
+    ForeignKey: make,
+    OneToOneField: make,
     ManyToManyField: make_many,
 
     DateField: generators.gen_date,
@@ -196,21 +196,21 @@ class Mommy(object):
         else:
             self.model = self.finder.get_model(model)
 
-    def make_one(self, **attrs):
+    def make(self, **attrs):
         '''Creates and persists an instance of the model
         associated with Mommy instance.'''
-        return self._make_one(commit=True, **attrs)
+        return self._make(commit=True, **attrs)
 
     def prepare(self, **attrs):
         '''Creates, but do not persists, an instance of the model
         associated with Mommy instance.'''
         self.type_mapping[ForeignKey] = prepare_one
-        return self._make_one(commit=False, **attrs)
+        return self._make(commit=False, **attrs)
 
     def get_fields(self):
         return self.model._meta.fields + self.model._meta.many_to_many
 
-    def _make_one(self, commit=True, **attrs):
+    def _make(self, commit=True, **attrs):
         is_fk_field = lambda x: '__' in x
         model_attrs = dict((k, v) for k, v in attrs.items() if not is_fk_field(k))
         fk_attrs = dict((k, v) for k, v in attrs.items() if is_fk_field(k))

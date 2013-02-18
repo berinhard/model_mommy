@@ -25,7 +25,7 @@ class Recipe(object):
         return mapping
 
     def make(self, **attrs):
-        return mommy.make_one(self.model, **self._mapping(attrs))
+        return mommy.make(self.model, **self._mapping(attrs))
 
     def prepare(self, **attrs):
         return mommy.prepare_one(self.model, **self._mapping(attrs))

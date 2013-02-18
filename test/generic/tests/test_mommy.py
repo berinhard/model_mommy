@@ -45,8 +45,8 @@ class ModelFinderTest(TestCase):
 
 class MommyCreatesSimpleModel(TestCase):
 
-    def test_make_one_should_create_one_object(self):
-        person = mommy.make_one(Person)
+    def test_make_should_create_one_object(self):
+        person = mommy.make(Person)
         self.assertIsInstance(person, Person)
 
         # makes sure it is the person we created
@@ -72,7 +72,7 @@ class MommyCreatesSimpleModel(TestCase):
 class MommyCreatesAssociatedModels(TestCase):
 
     def test_dependent_models_with_ForeignKey(self):
-        dog = mommy.make_one(Dog)
+        dog = mommy.make(Dog)
         self.assertIsInstance(dog.owner, Person)
 
     def test_prepare_one_should_not_create_one_object(self):

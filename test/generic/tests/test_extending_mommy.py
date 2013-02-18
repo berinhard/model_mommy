@@ -17,7 +17,7 @@ class SimpleExtendMommy(TestCase):
             attr_mapping = {'age': gen_from_list(age_list)}
 
         mom = KidMommy(Person)
-        kid = mom.make_one()
+        kid = mom.make()
 
         self.assertTrue(kid.age in age_list)
 
@@ -32,7 +32,7 @@ class LessSimpleExtendMommy(TestCase):
             attr_mapping = {'happy': gen_oposite}
 
         mom = SadPeopleMommy(Person)
-        self.assertRaises(AttributeError, mom.make_one)
+        self.assertRaises(AttributeError, mom.make)
 
     #TODO: put a better name
     def test_string_to_generator_required(self):
@@ -48,7 +48,7 @@ class LessSimpleExtendMommy(TestCase):
         happy_field = Person._meta.get_field('happy')
         unhappy_field = Person._meta.get_field('unhappy')
         mom = SadPeopleMommy(Person)
-        person = mom.make_one()
+        person = mom.make()
         self.assertEqual(person.happy, not happy_field.default)
         self.assertEqual(person.unhappy, not unhappy_field.default)
 
@@ -62,20 +62,20 @@ class LessSimpleExtendMommy(TestCase):
 
         # for int
         gen_age.required = [10]
-        self.assertRaises(ValueError, mom.make_one)
+        self.assertRaises(ValueError, mom.make)
 
         # for float
         gen_age.required = [10.10]
-        self.assertRaises(ValueError, mom.make_one)
+        self.assertRaises(ValueError, mom.make)
 
         # for iterable
         gen_age.required = [[]]
-        self.assertRaises(ValueError, mom.make_one)
+        self.assertRaises(ValueError, mom.make)
 
         # for iterable/dict
         gen_age.required = [{}]
-        self.assertRaises(ValueError, mom.make_one)
+        self.assertRaises(ValueError, mom.make)
 
         # for boolean
         gen_age.required = [True]
-        self.assertRaises(ValueError, mom.make_one)
+        self.assertRaises(ValueError, mom.make)

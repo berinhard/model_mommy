@@ -49,7 +49,7 @@ def assert_not_raise(method, parameters, exception):
 class FieldFillingTestCase(TestCase):
 
     def setUp(self):
-        self.person = mommy.make_one(Person)
+        self.person = mommy.make(Person)
 
 
 class FillingFromChoice(FieldFillingTestCase):
@@ -129,7 +129,7 @@ class TimeFieldsFilling(FieldFillingTestCase):
 class FillingIntFields(TestCase):
 
     def setUp(self):
-        self.dummy_int_model = mommy.make_one(DummyIntModel)
+        self.dummy_int_model = mommy.make(DummyIntModel)
 
     def test_fill_IntegerField_with_a_random_number(self):
         int_field = DummyIntModel._meta.get_field('int_field')
@@ -154,7 +154,7 @@ class FillingIntFields(TestCase):
 class FillingPositiveIntFields(TestCase):
 
     def setUp(self):
-        self.dummy_positive_int_model = mommy.make_one(DummyPositiveIntModel)
+        self.dummy_positive_int_model = mommy.make(DummyPositiveIntModel)
 
     def test_fill_PositiveSmallIntegerField_with_a_random_number(self):
         field = DummyPositiveIntModel._meta.get_field('positive_small_int_field')
@@ -174,13 +174,13 @@ class FillingPositiveIntFields(TestCase):
 
 class FillingOthersNumericFields(TestCase):
     def test_filling_FloatField_with_a_random_float(self):
-        self.dummy_numbers_model = mommy.make_one(DummyNumbersModel)
+        self.dummy_numbers_model = mommy.make(DummyNumbersModel)
         float_field = DummyNumbersModel._meta.get_field('float_field')
         self.assertIsInstance(float_field, FloatField)
         self.assertIsInstance(self.dummy_numbers_model.float_field, float)
 
     def test_filling_DecimalField_with_random_decimal(self):
-        self.dummy_decimal_model = mommy.make_one(DummyDecimalModel)
+        self.dummy_decimal_model = mommy.make(DummyDecimalModel)
         decimal_field = DummyDecimalModel._meta.get_field('decimal_field')
 
         self.assertIsInstance(decimal_field, DecimalField)
@@ -199,7 +199,7 @@ class URLFieldsFilling(FieldFillingTestCase):
 class FillingEmailField(TestCase):
 
     def test_filling_EmailField(self):
-        obj = mommy.make_one(DummyEmailModel)
+        obj = mommy.make(DummyEmailModel)
         field = DummyEmailModel._meta.get_field('email_field')
         self.assertIsInstance(field, EmailField)
         self.assertIsInstance(obj.email_field, basestring)
@@ -208,7 +208,7 @@ class FillingEmailField(TestCase):
 class FillingGenericForeignKeyField(TestCase):
 
     def test_filling_content_type_field(self):
-        dummy = mommy.make_one(DummyGenericForeignKeyModel)
+        dummy = mommy.make(DummyGenericForeignKeyModel)
         self.assertIsInstance(dummy.content_type, ContentType)
 
 class FillingFileField(TestCase):
@@ -218,7 +218,7 @@ class FillingFileField(TestCase):
         self.fixture_txt_file = File(open(path))
 
     def test_filling_file_field(self):
-        self.dummy = mommy.make_one(DummyFileFieldModel)
+        self.dummy = mommy.make(DummyFileFieldModel)
         field = DummyFileFieldModel._meta.get_field('file_field')
         self.assertIsInstance(field, FileField)
         import time
@@ -238,7 +238,7 @@ class FillingImageFileField(TestCase):
         self.fixture_img_file = ImageFile(open(path))
 
     def test_filling_image_file_field(self):
-        self.dummy = mommy.make_one(DummyImageFieldModel)
+        self.dummy = mommy.make(DummyImageFieldModel)
         field = DummyImageFieldModel._meta.get_field('image_field')
         self.assertIsInstance(field, ImageField)
         import time
