@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.test import TestCase
 
 from model_mommy import mommy
-from model_mommy.mommy import ModelNotFound, AmbiguousModelName
+from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
 from test.generic.models import Person, Dog, Store, LonelyPerson
 from test.generic.models import User, PaymentBill
@@ -61,7 +61,25 @@ class MommyCreatesSimpleModel(TestCase):
 
         self.assertEqual(person.id, None)
 
-    def test_make_many(self):
+
+class MommyRepeatedCreatesSimpleModel(TestCase):
+
+    def test_make_should_create_objects_respecting_quantity_parameter(self):
+        people = mommy.make(Person, _quantity=5)
+        self.assertEqual(Person.objects.count(), 5)
+
+        people = mommy.make(Person, _quantity=5, name="George Washington")
+        self.assertTrue(all(p.name == "George Washington" for p in people))
+
+    def test_make_raises_correct_exception_if_invalid_quantity(self):
+        self.assertRaises(
+            InvalidQuantityException, mommy.make, model=Person, _quantity="hi"
+        )
+        self.assertRaises(
+            InvalidQuantityException, mommy.make, model=Person, _quantity=-1
+        )
+
+    def test_make_many_method(self):
         people = mommy.make_many(Person, quantity=5)
         self.assertEqual(Person.objects.count(), 5)
 

@@ -19,7 +19,7 @@ except ImportError:
     BigIntegerField = IntegerField
 
 import generators
-from exceptions import ModelNotFound, AmbiguousModelName
+from exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 
 recipes = None
 
@@ -34,15 +34,20 @@ foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
 MAX_MANY_QUANTITY = 5
 
-def make(model, make_m2m=True, **attrs):
+def make(model, _quantity=None, make_m2m=True, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
     """
     mommy = Mommy(model, make_m2m=make_m2m)
-    return mommy.make(**attrs)
+    if _quantity and (not isinstance(_quantity, int) or _quantity < 1):
+        raise InvalidQuantityException
 
+    if _quantity:
+        return [mommy.make(**attrs) for i in range(_quantity)]
+    else:
+        return mommy.make(**attrs)
 
 def prepare(model, **attrs):
     """
