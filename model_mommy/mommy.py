@@ -81,10 +81,6 @@ def make_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
 def prepare_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
     return _recipe(mommy_recipe_name).prepare(_quantity=_quantity, **new_attrs)
 
-def make_many_from_recipe(mommy_recipe_name, quantity=None, **new_attrs):
-    quantity = quantity or MAX_MANY_QUANTITY
-    return [make_recipe(mommy_recipe_name, **new_attrs) for x in range(quantity)]
-
 
 def __m2m_generator(model, **attrs):
     return make(model, _quantity=MAX_MANY_QUANTITY, **attrs)
@@ -370,3 +366,10 @@ def prepare_one(model, **attrs):
     warnings.warn(msg, DeprecationWarning)
     mommy = Mommy(model)
     return mommy.prepare(**attrs)
+
+
+def make_many_from_recipe(mommy_recipe_name, quantity=None, **new_attrs):
+    msg = "make_many_from_recipe is deprecated. You should use the method make_recipe with the _quantity parameter instead."
+    warnings.warn(msg, DeprecationWarning)
+    quantity = quantity or MAX_MANY_QUANTITY
+    return [make_recipe(mommy_recipe_name, **new_attrs) for x in range(quantity)]
