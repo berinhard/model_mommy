@@ -10,3 +10,7 @@ class ModelNotFound(Exception):
 
 class AmbiguousModelName(Exception):
     pass
+
+
+class InvalidQuantityException(Exception):
+    pass
