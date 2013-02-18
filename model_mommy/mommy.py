@@ -75,8 +75,8 @@ def _recipe(name):
     recipes = importlib.import_module('.'.join([app, 'mommy_recipes']))
     return getattr(recipes, recipe_name)
 
-def make_recipe(mommy_recipe_name, **new_attrs):
-    return _recipe(mommy_recipe_name).make(**new_attrs)
+def make_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
+    return _recipe(mommy_recipe_name).make(_quantity=_quantity, **new_attrs)
 
 def prepare_recipe(mommy_recipe_name, **new_attrs):
     return _recipe(mommy_recipe_name).prepare(**new_attrs)
