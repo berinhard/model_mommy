@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import warnings
+
 from django.utils import importlib
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
@@ -66,11 +68,6 @@ def prepare(model, _quantity=None, **attrs):
     else:
         return mommy.prepare(**attrs)
 
-
-def make_many(model, quantity=None, **attrs):
-    quantity = quantity or MAX_MANY_QUANTITY
-    mommy = Mommy(model)
-    return [mommy.make(**attrs) for i in range(quantity)]
 
 def _recipe(name):
     splited_name = name.split('.')
@@ -350,3 +347,26 @@ def filter_fk_attrs(field_name, **fk_attrs):
             clean_dict[k] = v
 
     return clean_dict
+
+
+### DEPRECATED METHODS (should be removed on the future)
+def make_many(model, quantity=None, **attrs):
+    msg = "make_many is deprecated. You should use make with _quantity parameter."
+    warnings.warn(msg, DeprecationWarning)
+    quantity = quantity or MAX_MANY_QUANTITY
+    mommy = Mommy(model)
+    return [mommy.make(**attrs) for i in range(quantity)]
+
+
+def make_one(model, make_m2m=True, **attrs):
+    msg = "make_one is deprecated. You should use the method make instead."
+    warnings.warn(msg, DeprecationWarning)
+    mommy = Mommy(model, make_m2m=make_m2m)
+    return mommy.make(**attrs)
+
+
+def prepare_one(model, **attrs):
+    msg = "prepare_one is deprecated. You should use the method prepare instead."
+    warnings.warn(msg, DeprecationWarning)
+    mommy = Mommy(model)
+    return mommy.prepare(**attrs)

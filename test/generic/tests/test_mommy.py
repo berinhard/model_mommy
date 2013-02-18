@@ -61,6 +61,25 @@ class MommyCreatesSimpleModel(TestCase):
 
         self.assertEqual(person.id, None)
 
+    def test_make_one_should_create_one_object(self):
+        """
+        make_one method is deprecated, so this test must be removed when the
+        method is removed
+        """
+        person = mommy.make_one(Person)
+        self.assertIsInstance(person, Person)
+        self.assertTrue(Person.objects.filter(id=person.id))
+
+    def test_prepare_one_should_not_persist_one_object(self):
+        """
+        prepare_one method is deprecated, so this test must be removed when the
+        method is removed
+        """
+        person = mommy.prepare_one(Person)
+        self.assertIsInstance(person, Person)
+        self.assertEqual(Person.objects.all().count(), 0)
+        self.assertEqual(person.id, None)
+
 
 class MommyRepeatedCreatesSimpleModel(TestCase):
 
@@ -96,6 +115,10 @@ class MommyRepeatedCreatesSimpleModel(TestCase):
         )
 
     def test_make_many_method(self):
+        """
+        make_many method is deprecated, so this test must be removed when the
+        method is removed
+        """
         people = mommy.make_many(Person, quantity=5)
         self.assertEqual(Person.objects.count(), 5)
 
