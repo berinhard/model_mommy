@@ -49,7 +49,8 @@ def make(model, _quantity=None, make_m2m=True, **attrs):
     else:
         return mommy.make(**attrs)
 
-def prepare(model, **attrs):
+
+def prepare(model, _quantity=None, **attrs):
     """
     Creates a BUT DOESN'T persist an instance from a given model its
     associated models.
@@ -57,7 +58,13 @@ def prepare(model, **attrs):
     which fields you want to define its values by yourself.
     """
     mommy = Mommy(model)
-    return mommy.prepare(**attrs)
+    if _quantity and (not isinstance(_quantity, int) or _quantity < 1):
+        raise InvalidQuantityException
+
+    if _quantity:
+        return [mommy.prepare(**attrs) for i in range(_quantity)]
+    else:
+        return mommy.prepare(**attrs)
 
 
 def make_many(model, quantity=None, **attrs):

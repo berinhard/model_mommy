@@ -79,6 +79,22 @@ class MommyRepeatedCreatesSimpleModel(TestCase):
             InvalidQuantityException, mommy.make, model=Person, _quantity=-1
         )
 
+    def test_prepare_should_create_objects_respecting_quantity_parameter(self):
+        people = mommy.prepare(Person, _quantity=5)
+        self.assertEqual(len(people), 5)
+        self.assertTrue(all(not p.id for p in people))
+
+        people = mommy.prepare(Person, _quantity=5, name="George Washington")
+        self.assertTrue(all(p.name == "George Washington" for p in people))
+
+    def test_prepare_raises_correct_exception_if_invalid_quantity(self):
+        self.assertRaises(
+            InvalidQuantityException, mommy.prepare, model=Person, _quantity="hi"
+        )
+        self.assertRaises(
+            InvalidQuantityException, mommy.prepare, model=Person, _quantity=-1
+        )
+
     def test_make_many_method(self):
         people = mommy.make_many(Person, quantity=5)
         self.assertEqual(Person.objects.count(), 5)
