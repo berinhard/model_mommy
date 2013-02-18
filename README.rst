@@ -39,7 +39,7 @@ To create a persisted instance, just call *Mommy*:
     from model_mommy import mommy
     from family.models import Kid
 
-    kid = mommy.make_one(Kid)
+    kid = mommy.make(Kid)
 
 No need to pass attributes every damn time.
 
@@ -50,10 +50,10 @@ Importing every model over and over again is boring. So let *Mommy* import them 
     from model_mommy import mommy
 
     # 1st form: app_label.model_name
-    kid = mommy.make_one('family.Kid')
+    kid = mommy.make('family.Kid')
 
     # 2nd form: model_name
-    dog = mommy.make_one('Dog')
+    dog = mommy.make('Dog')
 
 
 .. [1] You can only use the 2nd form on unique model names. If you have an app
@@ -79,7 +79,7 @@ when you ask *Mommy*:
 
     from model_mommy import mommy
 
-    rex = mommy.make_one('family.Dog')
+    rex = mommy.make('family.Dog')
 
 She will also create the `Kid`, automagically.
 
@@ -93,7 +93,7 @@ Of course it's possible to explicitly set values for attributes.
 
     from model_mommy import mommy
 
-    another_kid = mommy.make_one('family.Kid', age=3)
+    another_kid = mommy.make('family.Kid', age=3)
 
 Related objects attributes are also reachable:
 
@@ -101,7 +101,7 @@ Related objects attributes are also reachable:
 
     from model_mommy import mommy
 
-    bobs_dog = mommy.make_one('family.Dog', owner__name='Bob')
+    bobs_dog = mommy.make('family.Dog', owner__name='Bob')
 
 
 Non persistent objects
@@ -113,9 +113,9 @@ If don't need a persisted object, *Mommy* can handle this for you as well:
 
     from model_mommy import mommy
 
-    kid = mommy.prepare_one('family.Kid')
+    kid = mommy.prepare('family.Kid')
 
-It works like `make_one`, but it doesn't persist the instance.
+It works like `make`, but it doesn't persist the instance.
 
 
 How mommy behaves?
