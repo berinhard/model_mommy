@@ -169,6 +169,21 @@ class TestExecutingRecipes(TestCase):
         for person in people:
             self.assertEqual(person.name, 'Dennis Ritchie')
             self.assertEqual(person.age, 70)
+
+    def test_prepare_recipe_with_quantity_parameter(self):
+        people = mommy.prepare_recipe('test.generic.person', _quantity=3)
+        self.assertEqual(len(people), 3)
+        for person in people:
+            self.assertIsInstance(person, Person)
+            self.assertEqual(person.id, None)
+
+    def test_prepare_recipe_with_quantity_parameter_respection_model_args(self):
+        people = mommy.prepare_recipe('test.generic.person', _quantity=3, name='Dennis Ritchie', age=70)
+        self.assertEqual(len(people), 3)
+        for person in people:
+            self.assertEqual(person.name, 'Dennis Ritchie')
+            self.assertEqual(person.age, 70)
+
     def test_prepare_recipe(self):
         person = mommy.prepare_recipe('test.generic.person')
         self.assertIsInstance(person, Person)
