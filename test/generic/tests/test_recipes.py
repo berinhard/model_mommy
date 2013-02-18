@@ -4,6 +4,7 @@ from django.test import TestCase
 from model_mommy import mommy
 from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
 from model_mommy.timezone import now
+from model_mommy.exceptions import InvalidQuantityException
 from test.generic.models import Person, DummyNumbersModel, DummyBlankFieldsModel
 
 
@@ -170,6 +171,16 @@ class TestExecutingRecipes(TestCase):
             self.assertEqual(person.name, 'Dennis Ritchie')
             self.assertEqual(person.age, 70)
 
+    def test_make_recipe_raises_correct_exception_if_invalid_quantity(self):
+        self.assertRaises(
+            InvalidQuantityException,
+            mommy.make_recipe, 'test.generic.person', _quantity="hi"
+        )
+        self.assertRaises(
+            InvalidQuantityException,
+            mommy.make_recipe, 'test.generic.person', _quantity=-1
+        )
+
     def test_prepare_recipe_with_quantity_parameter(self):
         people = mommy.prepare_recipe('test.generic.person', _quantity=3)
         self.assertEqual(len(people), 3)
@@ -183,6 +194,16 @@ class TestExecutingRecipes(TestCase):
         for person in people:
             self.assertEqual(person.name, 'Dennis Ritchie')
             self.assertEqual(person.age, 70)
+
+    def test_prepare_recipe_raises_correct_exception_if_invalid_quantity(self):
+        self.assertRaises(
+            InvalidQuantityException,
+            mommy.prepare_recipe, 'test.generic.person', _quantity="hi"
+        )
+        self.assertRaises(
+            InvalidQuantityException,
+            mommy.prepare_recipe, 'test.generic.person', _quantity=-1
+        )
 
     def test_prepare_recipe(self):
         person = mommy.prepare_recipe('test.generic.person')
