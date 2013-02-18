@@ -45,7 +45,7 @@ def make(model, make_m2m=True, **attrs):
     return mommy.make(**attrs)
 
 
-def prepare_one(model, **attrs):
+def prepare(model, **attrs):
     """
     Creates a BUT DOESN'T persist an instance from a given model its
     associated models.
@@ -78,7 +78,7 @@ def make_many_from_recipe(mommy_recipe_name, quantity=None, **new_attrs):
     return [make_recipe(mommy_recipe_name, **new_attrs) for x in range(quantity)]
 
 make.required = foreign_key_required
-prepare_one.required = foreign_key_required
+prepare.required = foreign_key_required
 make_many.required = foreign_key_required
 
 default_mapping = {
@@ -204,7 +204,7 @@ class Mommy(object):
     def prepare(self, **attrs):
         '''Creates, but do not persists, an instance of the model
         associated with Mommy instance.'''
-        self.type_mapping[ForeignKey] = prepare_one
+        self.type_mapping[ForeignKey] = prepare
         return self._make(commit=False, **attrs)
 
     def get_fields(self):

@@ -28,7 +28,7 @@ class Recipe(object):
         return mommy.make(self.model, **self._mapping(attrs))
 
     def prepare(self, **attrs):
-        return mommy.prepare_one(self.model, **self._mapping(attrs))
+        return mommy.prepare(self.model, **self._mapping(attrs))
 
 
 class RecipeForeignKey(object):
