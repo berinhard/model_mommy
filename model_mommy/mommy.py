@@ -32,7 +32,6 @@ mock_file_txt = join(dirname(__file__), 'mock_file.txt')
 #TODO: improve related models handling
 foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
-MAX_SELF_REFERENCE_LOOPS = 2
 MAX_MANY_QUANTITY = 5
 
 def make(model, make_m2m=True, **attrs):
