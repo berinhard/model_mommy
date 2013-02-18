@@ -117,6 +117,26 @@ If don't need a persisted object, *Mommy* can handle this for you as well:
 
 It works like `make`, but it doesn't persist the instance.
 
+More than one instance
+----------------------
+
+If you need to create more than one instance of the model, you can use the `_quantity` parameter for it:
+
+.. code-block:: python
+
+    from model_mommy import mommy
+
+    kids = mommy.make('family.Kid', _quantity=3)
+    assert len(kids) == 3
+
+It also works with `prepare`:
+
+.. code-block:: python
+
+    from model_mommy import mommy
+
+    kids = mommy.prepare('family.Kid', _quantity=3)
+    assert len(kids) == 3
 
 How mommy behaves?
 ==================
@@ -185,6 +205,8 @@ Or if you don't want a persisted instance:
     from model_mommy import mommy
 
     mommy.prepare_recipe('family.person')
+
+You can use the `_quantity` parameter as well if you want to create more than one object from a single recipe.
 
 
 Recipes with foreign keys
