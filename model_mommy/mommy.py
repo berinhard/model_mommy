@@ -88,9 +88,13 @@ def make_many_from_recipe(mommy_recipe_name, quantity=None, **new_attrs):
     quantity = quantity or MAX_MANY_QUANTITY
     return [make_recipe(mommy_recipe_name, **new_attrs) for x in range(quantity)]
 
+
+def __m2m_generator(model, **attrs):
+    return make(model, _quantity=MAX_MANY_QUANTITY, **attrs)
+
 make.required = foreign_key_required
 prepare.required = foreign_key_required
-make_many.required = foreign_key_required
+__m2m_generator.required = foreign_key_required
 
 default_mapping = {
     BooleanField: generators.gen_boolean,
@@ -110,7 +114,7 @@ default_mapping = {
 
     ForeignKey: make,
     OneToOneField: make,
-    ManyToManyField: make_many,
+    ManyToManyField: __m2m_generator,
 
     DateField: generators.gen_date,
     DateTimeField: generators.gen_datetime,
