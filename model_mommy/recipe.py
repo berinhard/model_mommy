@@ -1,10 +1,7 @@
 #coding: utf-8
 import inspect
 import mommy
-
-
-class RecipeNotFound(Exception):
-    pass
+from exceptions import RecipeNotFound
 
 class Recipe(object):
     def __init__(self, model, **attrs):
