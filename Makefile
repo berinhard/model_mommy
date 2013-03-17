@@ -5,3 +5,5 @@ help:
 test:
 	@python runtests.py
 
+.PHONY: test
+
