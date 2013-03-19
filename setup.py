@@ -1,10 +1,12 @@
 import setuptools
 from os.path import join, dirname
 
+import model_mommy
+
 
 setuptools.setup(
     name="model_mommy",
-    version="0.8.1",
+    version=model_mommy.__version__,
     packages=["model_mommy"],
     include_package_data=True,  # declarations in MANIFEST.in
     install_requires=open(join(dirname(__file__), 'requirements.txt')).readlines(),
