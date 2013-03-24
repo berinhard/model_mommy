@@ -1,5 +1,6 @@
 #coding: utf-8
 
+from decimal import Decimal
 from django.test import TestCase
 from model_mommy import mommy
 from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
@@ -300,3 +301,26 @@ class ForeignKeyTestCase(TestCase):
         dog = mommy.prepare_recipe('test.generic.dog', owner__name='James')
         self.assertEqual(Person.objects.count(), 1)
         self.assertEqual(dog.owner.name, 'James')
+
+class TestSequences(TestCase):
+    def test_increment_for_strings(self):
+        person = mommy.make_recipe('test.generic.serial_person')
+        self.assertEqual(person.name, 'joe1')
+        person = mommy.make_recipe('test.generic.serial_person')
+        self.assertEqual(person.name, 'joe2')
+        person = mommy.make_recipe('test.generic.serial_person')
+        self.assertEqual(person.name, 'joe3')
+
+    def test_increment_for_numbers(self):
+        dummy = mommy.make_recipe('test.generic.serial_numbers')
+        self.assertEqual(dummy.default_int_field, 11)
+        self.assertEqual(dummy.default_decimal_field, Decimal('21.1'))
+        self.assertEqual(dummy.default_float_field, 2.23)
+        dummy = mommy.make_recipe('test.generic.serial_numbers')
+        self.assertEqual(dummy.default_int_field, 12)
+        self.assertEqual(dummy.default_decimal_field, Decimal('22.1'))
+        self.assertEqual(dummy.default_float_field, 3.23)
+        dummy = mommy.make_recipe('test.generic.serial_numbers')
+        self.assertEqual(dummy.default_int_field, 13)
+        self.assertEqual(dummy.default_decimal_field, Decimal('23.1'))
+        self.assertEqual(dummy.default_float_field, 4.23)

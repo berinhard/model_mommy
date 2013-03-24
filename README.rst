@@ -261,6 +261,35 @@ It's possible to use *callables* as recipe's attribute value.
 
 When you call `make_recipe`, *Mommy* will set the attribute to the value returned by the callable.
 
+Sequences in recipes
+----------------------
+
+Sometimes, you have a field with an unique value and using `make` can cause random errors. Also, passing an attribute value just to avoid uniqueness validation problems can be tedious. To solve this you can define a sequence with `seq`
+
+.. code-block:: python
+
+
+    from model_mommy.recipe import Recipe, seq
+    from family.models import Person
+
+    person = Recipe(Person,
+        name = seq('Joe'),
+        age = seq(15)
+    )
+
+    p = mommy.make_recipe('myapp.person')
+    p.name
+    >>> 'Joe1'
+    p.age
+    >>> 16
+
+    p = mommy.make_recipe('myapp.person')
+    p.name
+    >>> 'Joe2'
+    p.age
+    >>> 17
+
+This will append a counter to strings to avoid uniqueness problems and it will sum the counter with numerical values.
 
 Overriding recipe definitions
 -----------------------------
