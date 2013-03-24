@@ -238,7 +238,10 @@ class Mommy(object):
                 continue
 
             if isinstance(field, ManyToManyField):
-                self.m2m_dict[field.name] = self.m2m_value(field, model_attrs)
+                if field.name not in model_attrs:
+                    self.m2m_dict[field.name] = self.m2m_value(field)
+                else:
+                    self.m2m_dict[field.name] = model_attrs.pop(field.name)
             elif field_value_not_defined:
                 if field.null:
                     continue
@@ -247,16 +250,11 @@ class Mommy(object):
 
         return self.instance(model_attrs, _commit=commit)
 
-    def m2m_value(self, field, attrs):
-        if field.name not in attrs:
-            if not self.make_m2m or field.null:
-                value =  []
-            else:
-                value = self.generate_value(field)
+    def m2m_value(self, field):
+        if not self.make_m2m or field.null:
+            return []
         else:
-            value = model_attrs.pop(field.name)
-
-        return value
+            return self.generate_value(field)
 
     def instance(self, attrs, _commit):
         instance = self.model(**attrs)
