@@ -153,6 +153,16 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(store.employees.count(), 5)
         self.assertEqual(store.customers.count(), 5)
 
+    def test_regresstion_many_to_many_field_is_accepted_as_kwargs(self):
+        employees = mommy.make(Person, _quantity=3)
+        customers = mommy.make(Person, _quantity=3)
+
+        store = mommy.make(Store, employees=employees, customers=customers)
+
+        self.assertEqual(store.employees.count(), 3)
+        self.assertEqual(store.customers.count(), 3)
+        self.assertEqual(Person.objects.count(), 6)
+
     def test_create_many_to_many_with_set_default_quantity(self):
         store = mommy.make(Store)
         self.assertEqual(store.employees.count(), mommy.MAX_MANY_QUANTITY)
