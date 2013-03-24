@@ -148,8 +148,8 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertTrue(isinstance(lonely_person.only_friend, Person))
         self.assertEquals(Person.objects.all().count(), 1)
 
-    def test_create_many_to_many(self):
-        store = mommy.make(Store)
+    def test_create_many_to_many_if_flagged(self):
+        store = mommy.make(Store, make_m2m=True)
         self.assertEqual(store.employees.count(), 5)
         self.assertEqual(store.customers.count(), 5)
 
@@ -164,11 +164,11 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(Person.objects.count(), 6)
 
     def test_create_many_to_many_with_set_default_quantity(self):
-        store = mommy.make(Store)
+        store = mommy.make(Store, make_m2m=True)
         self.assertEqual(store.employees.count(), mommy.MAX_MANY_QUANTITY)
         self.assertEqual(store.customers.count(), mommy.MAX_MANY_QUANTITY)
 
-    def test_does_not_create_many_to_many_if_flaged(self):
+    def test_does_not_create_many_to_many_as_default(self):
         store = mommy.make(Store, make_m2m=False)
         self.assertEqual(store.employees.count(), 0)
         self.assertEqual(store.customers.count(), 0)

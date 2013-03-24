@@ -36,7 +36,7 @@ foreign_key_required = [lambda field: ('model', field.related.parent_model)]
 
 MAX_MANY_QUANTITY = 5
 
-def make(model, _quantity=None, make_m2m=True, **attrs):
+def make(model, _quantity=None, make_m2m=False, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
     It fill the fields with random values or you can specify
@@ -194,7 +194,7 @@ class Mommy(object):
     # rebuilding the model cache for every make_* or prepare_* call.
     finder = ModelFinder()
 
-    def __init__(self, model, make_m2m=True):
+    def __init__(self, model, make_m2m=False):
         self.make_m2m = make_m2m
         self.m2m_dict = {}
         self.type_mapping = default_mapping.copy()
@@ -352,7 +352,7 @@ def make_many(model, quantity=None, **attrs):
     return [mommy.make(**attrs) for i in range(quantity)]
 
 
-def make_one(model, make_m2m=True, **attrs):
+def make_one(model, make_m2m=False, **attrs):
     msg = "make_one is deprecated. You should use the method make instead."
     warnings.warn(msg, DeprecationWarning)
     mommy = Mommy(model, make_m2m=make_m2m)
