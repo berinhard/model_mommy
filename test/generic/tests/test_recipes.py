@@ -306,7 +306,7 @@ class TestSequences(TestCase):
     def test_increment_for_strings(self):
         person = mommy.make_recipe('test.generic.serial_person')
         self.assertEqual(person.name, 'joe1')
-        person = mommy.make_recipe('test.generic.serial_person')
+        person = mommy.prepare_recipe('test.generic.serial_person')
         self.assertEqual(person.name, 'joe2')
         person = mommy.make_recipe('test.generic.serial_person')
         self.assertEqual(person.name, 'joe3')
@@ -320,7 +320,7 @@ class TestSequences(TestCase):
         self.assertEqual(dummy.default_int_field, 12)
         self.assertEqual(dummy.default_decimal_field, Decimal('22.1'))
         self.assertEqual(dummy.default_float_field, 3.23)
-        dummy = mommy.make_recipe('test.generic.serial_numbers')
+        dummy = mommy.prepare_recipe('test.generic.serial_numbers')
         self.assertEqual(dummy.default_int_field, 13)
         self.assertEqual(dummy.default_decimal_field, Decimal('23.1'))
         self.assertEqual(dummy.default_float_field, 4.23)
