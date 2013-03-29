@@ -6,7 +6,7 @@ from django.test import TestCase
 from model_mommy import mommy
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
-from test.generic.models import Person, Dog, Store, LonelyPerson
+from test.generic.models import Person, Dog, Store, LonelyPerson, School, SchoolEnrollment
 from test.generic.models import User, PaymentBill
 from test.generic.models import UnsupportedModel, DummyGenericRelationModel
 from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
@@ -167,6 +167,13 @@ class MommyCreatesAssociatedModels(TestCase):
         store = mommy.make(Store, make_m2m=True)
         self.assertEqual(store.employees.count(), mommy.MAX_MANY_QUANTITY)
         self.assertEqual(store.customers.count(), mommy.MAX_MANY_QUANTITY)
+
+    def test_create_many_to_many_with_through_option(self):
+        # School student's attr is a m2m relationship with a model through
+        school = mommy.make(School, make_m2m=True)
+        self.assertEqual(School.objects.count(), 1)
+        self.assertEqual(school.students.count(), mommy.MAX_MANY_QUANTITY)
+        self.assertEqual(SchoolEnrollment.objects.count(), mommy.MAX_MANY_QUANTITY)
 
     def test_does_not_create_many_to_many_as_default(self):
         store = mommy.make(Store, make_m2m=False)
