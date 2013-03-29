@@ -174,6 +174,7 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(School.objects.count(), 1)
         self.assertEqual(school.students.count(), mommy.MAX_MANY_QUANTITY)
         self.assertEqual(SchoolEnrollment.objects.count(), mommy.MAX_MANY_QUANTITY)
+        self.assertEqual(Person.objects.count(), mommy.MAX_MANY_QUANTITY)
 
     def test_does_not_create_many_to_many_as_default(self):
         store = mommy.make(Store, make_m2m=False)
