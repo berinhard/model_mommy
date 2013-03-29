@@ -163,7 +163,7 @@ Currently supported fields
 
 * BooleanField, IntegerField, BigIntegerField, SmallIntegerField, PositiveIntegerField, PositiveSmallIntegerField, FloatField, DecimalField
 * CharField, TextField, SlugField, URLField, EmailField
-* ForeignKey, OneToOneField, ManyToManyField
+* ForeignKey, OneToOneField, ManyToManyField (even with through model)
 * DateField, DateTimeField, TimeField
 * FileField, ImageField
 
