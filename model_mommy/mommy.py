@@ -261,29 +261,31 @@ class Mommy(object):
         # m2m only works for persisted instances
         if _commit:
             instance.save()
-            # m2m relation is treated differently
-            for key, values in self.m2m_dict.items():
-                if not values:
-                    continue
-
-                m2m_relation = getattr(instance, key)
-                through_model = m2m_relation.through
-                through_fields = through_model._meta.fields
-
-                instance_key, value_key = '', ''
-                for field in through_fields:
-                    if isinstance(field, ForeignKey):
-                        if isinstance(instance, field.rel.to):
-                            instance_key = field.name
-                        elif isinstance(values[0], field.rel.to):
-                            value_key = field.name
-
-                base_kwargs = {instance_key: instance}
-                for model_instance in values:
-                    base_kwargs[value_key] = model_instance
-                    make(through_model, **base_kwargs)
-
+            self._handle_m2m(instance)
         return instance
+
+    def _handle_m2m(self, instance):
+        for key, values in self.m2m_dict.items():
+            if not values:
+                continue
+
+            m2m_relation = getattr(instance, key)
+            through_model = m2m_relation.through
+            through_fields = through_model._meta.fields
+
+            instance_key, value_key = '', ''
+            for field in through_fields:
+                if isinstance(field, ForeignKey):
+                    if isinstance(instance, field.rel.to):
+                        instance_key = field.name
+                    elif isinstance(values[0], field.rel.to):
+                        value_key = field.name
+
+            base_kwargs = {instance_key: instance}
+            for model_instance in values:
+                base_kwargs[value_key] = model_instance
+                make(through_model, **base_kwargs)
+
 
     def generate_value(self, field, **fk_attrs):
         '''
