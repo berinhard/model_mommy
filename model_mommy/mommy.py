@@ -273,9 +273,9 @@ class Mommy(object):
                 instance_key, value_key = '', ''
                 for field in through_fields:
                     if isinstance(field, ForeignKey):
-                        if field.rel.to is instance.__class__:
+                        if isinstance(instance, field.rel.to):
                             instance_key = field.name
-                        elif field.rel.to is values[0].__class__:
+                        elif isinstance(values[0], field.rel.to):
                             value_key = field.name
 
                 base_kwargs = {instance_key: instance}
