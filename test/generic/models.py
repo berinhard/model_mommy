@@ -159,3 +159,6 @@ class SchoolEnrollment(models.Model):
     start_date = models.DateField(auto_now_add=True)
     school = models.ForeignKey(School)
     student = models.ForeignKey(Person)
+
+class NonAbstractPerson(Person):
+    pass

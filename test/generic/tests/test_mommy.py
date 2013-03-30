@@ -11,7 +11,7 @@ from test.generic.models import User, PaymentBill
 from test.generic.models import UnsupportedModel, DummyGenericRelationModel
 from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
 from test.generic.models import DummyDefaultFieldsModel
-from test.generic.models import DummyGenericForeignKeyModel
+from test.generic.models import DummyGenericForeignKeyModel, NonAbstractPerson
 
 
 class ModelFinderTest(TestCase):
@@ -79,6 +79,12 @@ class MommyCreatesSimpleModel(TestCase):
         self.assertIsInstance(person, Person)
         self.assertEqual(Person.objects.all().count(), 0)
         self.assertEqual(person.id, None)
+
+    def test_non_abstract_model_creation(self):
+        person = mommy.make(NonAbstractPerson, name='bob', happy=False)
+        self.assertIsInstance(person, NonAbstractPerson)
+        self.assertEqual('bob', person.name)
+        self.assertFalse(person.happy)
 
 
 class MommyRepeatedCreatesSimpleModel(TestCase):
