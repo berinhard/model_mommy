@@ -6,7 +6,7 @@ Model Mommy: Smart fixtures for better tests
 With a simple and powerful API you can create many objects with a single line of code.
 
 .. image:: https://travis-ci.org/vandersonmota/model_mommy.png?branch=master
-        :target: https://travis-ci.org/henriquebastos/model_mommy
+        :target: https://travis-ci.org/vandersonmota/model_mommy
 
 Install
 =======
