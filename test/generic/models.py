@@ -63,6 +63,7 @@ class LonelyPerson(models.Model):
 class Store(models.Model):
     customers = models.ManyToManyField(Person, related_name='favorite_stores')
     employees = models.ManyToManyField(Person, related_name='employers')
+    suppliers = models.ManyToManyField(Person, related_name='suppliers', blank=True, null=True)
 
 
 class DummyIntModel(models.Model):
