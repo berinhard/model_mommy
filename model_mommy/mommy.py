@@ -230,12 +230,9 @@ class Mommy(object):
             if isinstance(field, (AutoField, generic.GenericRelation)):
                 continue
 
-            if isinstance(field, ForeignKey) and field.name in self.rel_fields:
-                model_attrs[field.name] = self.generate_value(field)
-                continue
-
-            if not field.name in self.attr_mapping and (field.has_default() or field.blank):
-                continue
+            if field.name not in self.attr_mapping and field.name not in self.rel_fields:
+                if field.has_default() or field.blank:
+                    continue
 
             if isinstance(field, ManyToManyField):
                 if field.name not in model_attrs:
@@ -243,7 +240,7 @@ class Mommy(object):
                 else:
                     self.m2m_dict[field.name] = model_attrs.pop(field.name)
             elif field_value_not_defined:
-                if field.null:
+                if field.name not in self.rel_fields and field.null:
                     continue
                 else:
                     model_attrs[field.name] = self.generate_value(field)
