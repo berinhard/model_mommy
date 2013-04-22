@@ -219,10 +219,10 @@ class Mommy(object):
         return self.model._meta.fields + self.model._meta.many_to_many
 
     def _make(self, commit=True, **attrs):
-        is_fk_field = lambda x: '__' in x
-        model_attrs = dict((k, v) for k, v in attrs.items() if not is_fk_field(k))
-        fk_attrs = dict((k, v) for k, v in attrs.items() if is_fk_field(k))
-        fk_fields = [x.split('__')[0] for x in fk_attrs.keys() if is_fk_field(x)]
+        is_rel_field = lambda x: '__' in x
+        model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
+        rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
+        rel_fields = [x.split('__')[0] for x in rel_attrs.keys() if is_rel_field(x)]
 
         for field in self.get_fields():
             field_value_not_defined = field.name not in model_attrs
@@ -230,8 +230,8 @@ class Mommy(object):
             if isinstance(field, (AutoField, generic.GenericRelation)):
                 continue
 
-            if isinstance(field, ForeignKey) and field.name in fk_fields:
-                model_attrs[field.name] = self.generate_value(field, **fk_attrs)
+            if isinstance(field, ForeignKey) and field.name in rel_fields:
+                model_attrs[field.name] = self.generate_value(field, **rel_attrs)
                 continue
 
             if not field.name in self.attr_mapping and (field.has_default() or field.blank):
@@ -287,7 +287,7 @@ class Mommy(object):
                 make(through_model, **base_kwargs)
 
 
-    def generate_value(self, field, **fk_attrs):
+    def generate_value(self, field, **rel_attrs):
         '''
         Calls the generator associated with a field passing all required args.
 
@@ -317,7 +317,7 @@ class Mommy(object):
         generator_attrs = get_required_values(generator, field)
 
         if isinstance(field, ForeignKey):
-            generator_attrs.update(filter_fk_attrs(field.name, **fk_attrs))
+            generator_attrs.update(filter_rel_attrs(field.name, **rel_attrs))
 
         return generator(**generator_attrs)
 
@@ -347,10 +347,10 @@ def get_required_values(generator, field):
 
     return rt
 
-def filter_fk_attrs(field_name, **fk_attrs):
+def filter_rel_attrs(field_name, **rel_attrs):
     clean_dict = {}
 
-    for k, v in fk_attrs.items():
+    for k, v in rel_attrs.items():
         if k.startswith(field_name + '__'):
             splited_key = k.split('__')
             key = '__'.join(splited_key[1:])
