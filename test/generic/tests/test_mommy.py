@@ -224,6 +224,10 @@ class MommyCreatesAssociatedModels(TestCase):
         bill = mommy.make(PaymentBill, user__profile__email="a@b.com")
         self.assertEqual('a@b.com', bill.user.profile.email)
 
+    def test_field_lookup_for_one_to_one_relationship(self):
+        lonely_person = mommy.make(LonelyPerson, only_friend__name='Bob')
+        self.assertEqual('Bob', lonely_person.only_friend.name)
+
 
 class HandlingUnsupportedModels(TestCase):
     def test_unsupported_model_raises_an_explanatory_exception(self):

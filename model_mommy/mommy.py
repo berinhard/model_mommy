@@ -313,7 +313,7 @@ class Mommy(object):
         # generating the value.
         generator_attrs = get_required_values(generator, field)
 
-        if isinstance(field, ForeignKey):
+        if field.name in self.rel_fields:
             generator_attrs.update(filter_rel_attrs(field.name, **self.rel_attrs))
 
         return generator(**generator_attrs)
