@@ -221,8 +221,8 @@ class Mommy(object):
     def _make(self, commit=True, **attrs):
         is_rel_field = lambda x: '__' in x
         model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
-        rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
-        rel_fields = [x.split('__')[0] for x in rel_attrs.keys() if is_rel_field(x)]
+        self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
+        self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
 
         for field in self.get_fields():
             field_value_not_defined = field.name not in model_attrs
@@ -230,8 +230,8 @@ class Mommy(object):
             if isinstance(field, (AutoField, generic.GenericRelation)):
                 continue
 
-            if isinstance(field, ForeignKey) and field.name in rel_fields:
-                model_attrs[field.name] = self.generate_value(field, **rel_attrs)
+            if isinstance(field, ForeignKey) and field.name in self.rel_fields:
+                model_attrs[field.name] = self.generate_value(field)
                 continue
 
             if not field.name in self.attr_mapping and (field.has_default() or field.blank):
@@ -287,7 +287,7 @@ class Mommy(object):
                 make(through_model, **base_kwargs)
 
 
-    def generate_value(self, field, **rel_attrs):
+    def generate_value(self, field):
         '''
         Calls the generator associated with a field passing all required args.
 
@@ -317,7 +317,7 @@ class Mommy(object):
         generator_attrs = get_required_values(generator, field)
 
         if isinstance(field, ForeignKey):
-            generator_attrs.update(filter_rel_attrs(field.name, **rel_attrs))
+            generator_attrs.update(filter_rel_attrs(field.name, **self.rel_attrs))
 
         return generator(**generator_attrs)
 
