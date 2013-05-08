@@ -324,3 +324,20 @@ class TestSequences(TestCase):
         self.assertEqual(dummy.default_int_field, 13)
         self.assertEqual(dummy.default_decimal_field, Decimal('23.1'))
         self.assertEqual(dummy.default_float_field, 4.23)
+
+    def test_increment_for_numbers_2(self):
+        """
+        This test is a repeated one but it is necessary to ensure Sequences atomicity
+        """
+        dummy = mommy.make_recipe('test.generic.serial_numbers')
+        self.assertEqual(dummy.default_int_field, 11)
+        self.assertEqual(dummy.default_decimal_field, Decimal('21.1'))
+        self.assertEqual(dummy.default_float_field, 2.23)
+        dummy = mommy.make_recipe('test.generic.serial_numbers')
+        self.assertEqual(dummy.default_int_field, 12)
+        self.assertEqual(dummy.default_decimal_field, Decimal('22.1'))
+        self.assertEqual(dummy.default_float_field, 3.23)
+        dummy = mommy.prepare_recipe('test.generic.serial_numbers')
+        self.assertEqual(dummy.default_int_field, 13)
+        self.assertEqual(dummy.default_decimal_field, Decimal('23.1'))
+        self.assertEqual(dummy.default_float_field, 4.23)
