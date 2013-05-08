@@ -173,6 +173,7 @@ Custom fields
 Model-mommy allows you to define generators methods for your custom fields or overrides its default generators. This could be achieved by specifing a dict on settings that its keys are the field paths and the values their generators functions, as the example bellow:
 
 .. code-block:: python
+
     # on your settings.py file:
     def gen_func():
         return 'value'
