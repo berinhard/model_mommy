@@ -167,11 +167,25 @@ Currently supported fields
 * DateField, DateTimeField, TimeField
 * FileField, ImageField
 
+Custom fields
+-------------
+
+Model-mommy allows you to define generators methods for your custom fields or overrides its default generators. This could be achieved by specifing a dict on settings that its keys are the field paths and the values their generators functions, as the example bellow:
+
+.. code-block:: python
+    # on your settings.py file:
+    def gen_func():
+        return 'value'
+
+    MOMMY_CUSTOM_FIELDS_GEN = {
+        'test.generic.fields.CustomField': gen_func,
+    }
+
 
 Recipes
 =======
 
-If you're not confortable with random data, or you have some custom fields, or even you just want to improve the semantics of the generated data, there's hope for you.
+If you're not confortable with random data or even you just want to improve the semantics of the generated data, there's hope for you.
 
 You can define a **recipe**, which is a set of rules to generate data for your models. Create a module called `mommy_recipes.py` at your app's root directory:
 
