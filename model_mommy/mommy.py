@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import warnings
 
+from django.conf import settings
 from django.utils import importlib
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
@@ -197,12 +198,21 @@ class Mommy(object):
     def __init__(self, model, make_m2m=False):
         self.make_m2m = make_m2m
         self.m2m_dict = {}
-        self.type_mapping = default_mapping.copy()
 
         if isinstance(model, ModelBase):
             self.model = model
         else:
             self.model = self.finder.get_model(model)
+
+        self.init_type_mapping()
+
+    def init_type_mapping(self):
+        self.type_mapping = default_mapping.copy()
+        generator_from_settings = getattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', {})
+        for k, v in generator_from_settings.items():
+            path, field_name = k.rsplit('.', 1)
+            field_class = getattr(importlib.import_module(path), field_name)
+            self.type_mapping[field_class] = v
 
     def make(self, **attrs):
         '''Creates and persists an instance of the model

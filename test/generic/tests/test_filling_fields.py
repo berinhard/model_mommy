@@ -2,6 +2,7 @@ from datetime import date, datetime, time
 from decimal import Decimal
 
 from django.test import TestCase
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import CharField, TextField, SlugField
 from django.db.models.fields import DateField, DateTimeField,TimeField, EmailField
@@ -28,13 +29,14 @@ from test.generic.models import DummyDecimalModel, DummyEmailModel
 from test.generic.models import DummyGenericForeignKeyModel
 from test.generic.models import DummyFileFieldModel
 from test.generic.models import DummyImageFieldModel
+from test.generic.models import CustomFieldWithoutGeneratorModel, CustomFieldWithGeneratorModel
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
     'FillingEmailField', 'FillingGenericForeignKeyField','FillingFileField',
-    'TimeFieldsFilling',
+    'TimeFieldsFilling', 'FillingCustomFields',
 ]
 
 
@@ -211,6 +213,7 @@ class FillingGenericForeignKeyField(TestCase):
         dummy = mommy.make(DummyGenericForeignKeyModel)
         self.assertIsInstance(dummy.content_type, ContentType)
 
+
 class FillingFileField(TestCase):
 
     def setUp(self):
@@ -230,6 +233,7 @@ class FillingFileField(TestCase):
 
     def tearDown(self):
         self.dummy.file_field.delete()
+
 
 class FillingImageFileField(TestCase):
 
@@ -252,3 +256,20 @@ class FillingImageFileField(TestCase):
 
     def tearDown(self):
         self.dummy.image_field.delete()
+
+
+class FillingCustomFields(TestCase):
+
+    def setUp(self):
+        generator_dict = {'test.generic.fields.CustomFieldWithGenerator': lambda: "value"}
+        setattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', generator_dict)
+
+    def tearDown(self):
+        delattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN')
+
+    def test_raises_unsupported_field_for_custom_field(self):
+        self.assertRaises(TypeError, mommy.make, CustomFieldWithoutGeneratorModel)
+
+    def test_uses_generator_defined_on_settings_for_custom_field(self):
+        obj = mommy.make(CustomFieldWithGeneratorModel)
+        self.assertEqual("value", obj.custom_value)
