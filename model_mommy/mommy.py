@@ -71,8 +71,7 @@ def prepare(model, _quantity=None, **attrs):
 
 
 def _recipe(name):
-    splited_name = name.split('.')
-    app, recipe_name = '.'.join(splited_name[0:-1]), splited_name[-1]
+    app, recipe_name = name.rsplit('.', 1)
     recipes = importlib.import_module('.'.join([app, 'mommy_recipes']))
     return getattr(recipes, recipe_name)
 
