@@ -12,6 +12,7 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
+from fields import *
 from model_mommy.timezone import smart_datetime as datetime
 
 
@@ -162,3 +163,11 @@ class SchoolEnrollment(models.Model):
 
 class NonAbstractPerson(Person):
     pass
+
+
+class CustomFieldWithGeneratorModel(models.Model):
+    custom_value = CustomFieldWithGenerator()
+
+
+class CustomFieldWithoutGeneratorModel(models.Model):
+    custom_value = CustomFieldWithoutGenerator()
