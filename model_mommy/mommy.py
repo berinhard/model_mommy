@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import warnings
 
+from django.conf import settings
 from django.utils import importlib
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
@@ -70,8 +71,7 @@ def prepare(model, _quantity=None, **attrs):
 
 
 def _recipe(name):
-    splited_name = name.split('.')
-    app, recipe_name = '.'.join(splited_name[0:-1]), splited_name[-1]
+    app, recipe_name = name.rsplit('.', 1)
     recipes = importlib.import_module('.'.join([app, 'mommy_recipes']))
     return getattr(recipes, recipe_name)
 
@@ -197,12 +197,21 @@ class Mommy(object):
     def __init__(self, model, make_m2m=False):
         self.make_m2m = make_m2m
         self.m2m_dict = {}
-        self.type_mapping = default_mapping.copy()
 
         if isinstance(model, ModelBase):
             self.model = model
         else:
             self.model = self.finder.get_model(model)
+
+        self.init_type_mapping()
+
+    def init_type_mapping(self):
+        self.type_mapping = default_mapping.copy()
+        generator_from_settings = getattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', {})
+        for k, v in generator_from_settings.items():
+            path, field_name = k.rsplit('.', 1)
+            field_class = getattr(importlib.import_module(path), field_name)
+            self.type_mapping[field_class] = v
 
     def make(self, **attrs):
         '''Creates and persists an instance of the model
