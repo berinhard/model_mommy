@@ -219,10 +219,10 @@ class Mommy(object):
         return self.model._meta.fields + self.model._meta.many_to_many
 
     def _make(self, commit=True, **attrs):
-        is_fk_field = lambda x: '__' in x
-        model_attrs = dict((k, v) for k, v in attrs.items() if not is_fk_field(k))
-        fk_attrs = dict((k, v) for k, v in attrs.items() if is_fk_field(k))
-        fk_fields = [x.split('__')[0] for x in fk_attrs.keys() if is_fk_field(x)]
+        is_rel_field = lambda x: '__' in x
+        model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
+        self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
+        self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
 
         for field in self.get_fields():
             field_value_not_defined = field.name not in model_attrs
@@ -230,12 +230,9 @@ class Mommy(object):
             if isinstance(field, (AutoField, generic.GenericRelation)):
                 continue
 
-            if isinstance(field, ForeignKey) and field.name in fk_fields:
-                model_attrs[field.name] = self.generate_value(field, **fk_attrs)
-                continue
-
-            if not field.name in self.attr_mapping and (field.has_default() or field.blank):
-                continue
+            if field.name not in self.attr_mapping and field.name not in self.rel_fields:
+                if field.has_default() or field.blank:
+                    continue
 
             if isinstance(field, ManyToManyField):
                 if field.name not in model_attrs:
@@ -243,7 +240,7 @@ class Mommy(object):
                 else:
                     self.m2m_dict[field.name] = model_attrs.pop(field.name)
             elif field_value_not_defined:
-                if field.null:
+                if field.name not in self.rel_fields and field.null:
                     continue
                 else:
                     model_attrs[field.name] = self.generate_value(field)
@@ -251,7 +248,7 @@ class Mommy(object):
         return self.instance(model_attrs, _commit=commit)
 
     def m2m_value(self, field):
-        if not self.make_m2m or field.null:
+        if not (self.make_m2m or field.null) and field.name not in self.rel_fields:
             return []
         else:
             return self.generate_value(field)
@@ -287,7 +284,7 @@ class Mommy(object):
                 make(through_model, **base_kwargs)
 
 
-    def generate_value(self, field, **fk_attrs):
+    def generate_value(self, field):
         '''
         Calls the generator associated with a field passing all required args.
 
@@ -316,8 +313,8 @@ class Mommy(object):
         # generating the value.
         generator_attrs = get_required_values(generator, field)
 
-        if isinstance(field, ForeignKey):
-            generator_attrs.update(filter_fk_attrs(field.name, **fk_attrs))
+        if field.name in self.rel_fields:
+            generator_attrs.update(filter_rel_attrs(field.name, **self.rel_attrs))
 
         return generator(**generator_attrs)
 
@@ -347,10 +344,10 @@ def get_required_values(generator, field):
 
     return rt
 
-def filter_fk_attrs(field_name, **fk_attrs):
+def filter_rel_attrs(field_name, **rel_attrs):
     clean_dict = {}
 
-    for k, v in fk_attrs.items():
+    for k, v in rel_attrs.items():
         if k.startswith(field_name + '__'):
             splited_key = k.split('__')
             key = '__'.join(splited_key[1:])
