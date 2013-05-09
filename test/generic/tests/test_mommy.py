@@ -2,11 +2,15 @@
 from decimal import Decimal
 
 from django.test import TestCase
+from django.db.models.options import Options
+from django.db.models import Manager
+
+from mock import patch, Mock
 
 from model_mommy import mommy
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
-from test.generic.models import Person, Dog, Store, LonelyPerson, School, SchoolEnrollment
+from test.generic.models import Person, Dog, Store, LonelyPerson, School, SchoolEnrollment, ModelWithImpostorField
 from test.generic.models import User, PaymentBill
 from test.generic.models import UnsupportedModel, DummyGenericRelationModel
 from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
@@ -44,6 +48,17 @@ class ModelFinderTest(TestCase):
 
 
 class MommyCreatesSimpleModel(TestCase):
+
+    def test_consider_real_django_fields_only(self):
+        id_ = ModelWithImpostorField._meta.get_field('id')
+        with patch.object(mommy.Mommy, 'get_fields') as mock:
+            f = Manager()
+            f.name = 'foo'
+            mock.return_value = [id_, f]
+            try:
+                mommy.make(ModelWithImpostorField)
+            except TypeError:
+                self.fail('TypeError raised')
 
     def test_make_should_create_one_object(self):
         person = mommy.make(Person)

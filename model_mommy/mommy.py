@@ -13,7 +13,7 @@ from django.db.models import (\
     AutoField, IntegerField, SmallIntegerField,
     PositiveIntegerField, PositiveSmallIntegerField,
     BooleanField, DecimalField, FloatField,
-    FileField, ImageField,
+    FileField, ImageField, Field,
     ForeignKey, ManyToManyField, OneToOneField)
 
 try:
@@ -240,7 +240,7 @@ class Mommy(object):
                 continue
 
             if field.name not in self.attr_mapping and field.name not in self.rel_fields:
-                if field.has_default() or field.blank:
+                if not issubclass(field.__class__, Field) or field.has_default() or field.blank:
                     continue
 
             if isinstance(field, ManyToManyField):

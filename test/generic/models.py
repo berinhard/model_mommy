@@ -11,17 +11,17 @@ from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-
 from fields import *
 from model_mommy.timezone import smart_datetime as datetime
-
 
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
 
+class ModelWithImpostorField(models.Model):
+    pass
+
 class Profile(models.Model):
     email = models.EmailField()
-
 
 class User(models.Model):
     profile = models.ForeignKey(Profile, blank=True, null=True)
