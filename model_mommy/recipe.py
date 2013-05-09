@@ -19,7 +19,7 @@ class Recipe(object):
             if callable(v):
                 mapping[k] = v()
             elif isinstance(v, Sequence):
-                mapping[k] = v.gen()
+                mapping[k] = v.gen(self.model)
             elif isinstance(v, RecipeForeignKey):
                 recipe_attrs = mommy.filter_fk_attrs(k, **fk_fields_attrs)
                 mapping[k] = v.recipe.make(**recipe_attrs)
@@ -58,18 +58,21 @@ def foreign_key(recipe):
     return RecipeForeignKey(recipe)
 
 class Sequence(object):
+
     def __init__(self, value):
         self.value = value
         self.counter = 1
 
-    @property
-    def i(self):
+    def get_inc(self, model):
+        if not model.objects.count():
+            self.counter = 1
         i = self.counter
         self.counter += 1
         return i
 
-    def gen(self):
-        return self.value + type(self.value)(self.i)
+    def gen(self, model):
+        inc = self.get_inc(model)
+        return self.value + type(self.value)(inc)
 
 def seq(value):
     return Sequence(value)
