@@ -172,3 +172,7 @@ class CustomFieldWithGeneratorModel(models.Model):
 
 class CustomFieldWithoutGeneratorModel(models.Model):
     custom_value = CustomFieldWithoutGenerator()
+
+
+class DummyUniqueIntegerFieldModel(models.Model):
+    value = models.IntegerField(unique=True)
