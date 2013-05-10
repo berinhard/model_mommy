@@ -341,3 +341,14 @@ class TestSequences(TestCase):
         self.assertEqual(dummy.default_int_field, 13)
         self.assertEqual(dummy.default_decimal_field, Decimal('23.1'))
         self.assertEqual(dummy.default_float_field, 4.23)
+
+    def test_creates_unique_field_recipe_using_for_iterator(self):
+        for i in range(1, 4):
+            dummy = mommy.make_recipe('test.generic.dummy_unique_field')
+            self.assertEqual(dummy.value, 10 + i)
+
+    def test_creates_unique_field_recipe_using_quantity_argument(self):
+        dummies= mommy.make_recipe('test.generic.dummy_unique_field', _quantity=3)
+        self.assertEqual(11, dummies[0].value)
+        self.assertEqual(12, dummies[1].value)
+        self.assertEqual(13, dummies[2].value)

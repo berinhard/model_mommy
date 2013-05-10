@@ -18,8 +18,6 @@ class Recipe(object):
                 continue
             if callable(v):
                 mapping[k] = v()
-            elif isinstance(v, Sequence):
-                mapping[k] = v.gen(self.model)
             elif isinstance(v, RecipeForeignKey):
                 recipe_attrs = mommy.filter_rel_attrs(k, **rel_fields_attrs)
                 mapping[k] = v.recipe.make(**recipe_attrs)

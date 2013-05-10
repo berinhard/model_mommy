@@ -4,7 +4,7 @@
 from decimal import Decimal
 from model_mommy.recipe import Recipe, foreign_key, seq
 from model_mommy.timezone import now
-from test.generic.models import Person, Dog, DummyDefaultFieldsModel
+from test.generic.models import Person, Dog, DummyDefaultFieldsModel, DummyUniqueIntegerFieldModel
 
 
 person = Recipe(Person,
@@ -39,3 +39,6 @@ other_dog = Recipe(Dog,
     owner = foreign_key('person')
 )
 
+dummy_unique_field = Recipe(DummyUniqueIntegerFieldModel,
+    value = seq(10),
+)

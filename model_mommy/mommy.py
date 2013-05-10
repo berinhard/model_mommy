@@ -257,7 +257,7 @@ class Mommy(object):
             if isinstance(field, (AutoField, generic.GenericRelation)):
                 continue
 
-            if field.name not in self.attr_mapping and field.name not in self.rel_fields:
+            if all([field.name not in model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
                 if not issubclass(field.__class__, Field) or field.has_default() or field.blank:
                     continue
 
@@ -271,6 +271,8 @@ class Mommy(object):
                     continue
                 else:
                     model_attrs[field.name] = self.generate_value(field)
+            elif isinstance(model_attrs[field.name], Sequence):
+                model_attrs[field.name] = model_attrs[field.name].gen(self.model)
 
         return self.instance(model_attrs, _commit=commit)
 
@@ -309,7 +311,6 @@ class Mommy(object):
             for model_instance in values:
                 base_kwargs[value_key] = model_instance
                 make(through_model, **base_kwargs)
-
 
     def generate_value(self, field):
         '''
