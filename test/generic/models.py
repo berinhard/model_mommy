@@ -123,7 +123,6 @@ class DummyBlankFieldsModel(models.Model):
     blank_char_field = models.CharField(max_length=50, blank=True)
     blank_text_field = models.TextField(blank=True)
 
-
 class DummyDefaultFieldsModel(models.Model):
     default_char_field = models.CharField(max_length=50, default='default')
     default_text_field = models.TextField(default='default')
@@ -147,6 +146,8 @@ class DummyImageFieldModel(models.Model):
     fs = FileSystemStorage(location='/tmp/')
     image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)
 
+class DummyMultipleInheritanceModel(DummyDefaultFieldsModel, Person):
+    my_dummy_field = models.IntegerField()
 
 class Ambiguous(models.Model):
     name = models.CharField(max_length=20)
@@ -163,7 +164,7 @@ class SchoolEnrollment(models.Model):
     student = models.ForeignKey(Person)
 
 class NonAbstractPerson(Person):
-    pass
+    dummy_count = models.IntegerField()
 
 
 class CustomFieldWithGeneratorModel(models.Model):

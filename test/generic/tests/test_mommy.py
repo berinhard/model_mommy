@@ -14,7 +14,7 @@ from test.generic.models import Person, Dog, Store, LonelyPerson, School, School
 from test.generic.models import User, PaymentBill
 from test.generic.models import UnsupportedModel, DummyGenericRelationModel
 from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
-from test.generic.models import DummyDefaultFieldsModel
+from test.generic.models import DummyDefaultFieldsModel, DummyMultipleInheritanceModel
 from test.generic.models import DummyGenericForeignKeyModel, NonAbstractPerson
 
 
@@ -100,6 +100,12 @@ class MommyCreatesSimpleModel(TestCase):
         self.assertIsInstance(person, NonAbstractPerson)
         self.assertEqual('bob', person.name)
         self.assertFalse(person.happy)
+
+    def test_multiple_inheritance_creation(self):
+        multiple = mommy.make(DummyMultipleInheritanceModel)
+        self.assertIsInstance(multiple, DummyMultipleInheritanceModel)
+        self.assertTrue(Person.objects.filter(id=multiple.id))
+        self.assertTrue(DummyDefaultFieldsModel.objects.filter(id=multiple.id))
 
 
 class MommyRepeatedCreatesSimpleModel(TestCase):
