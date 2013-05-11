@@ -56,4 +56,23 @@ def foreign_key(recipe):
     return RecipeForeignKey(recipe)
 
 def seq(value):
-    return mommy.Sequence(value)
+    return Sequence(value)
+
+class Sequence(object):
+
+    def __init__(self, value):
+        self.value = value
+        self.counter = 1
+
+    def get_inc(self, model):
+        if not model.objects.count():
+            self.counter = 1
+        i = self.counter
+        self.counter += 1
+        return i
+
+    def gen(self, model):
+        inc = self.get_inc(model)
+        return self.value + type(self.value)(inc)
+
+

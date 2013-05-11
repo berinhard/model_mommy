@@ -23,6 +23,7 @@ except ImportError:
 
 import generators
 from exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
+from recipe import Sequence
 
 recipes = None
 
@@ -184,24 +185,6 @@ class ModelFinder(object):
 
         self._ambiguous_models = ambiguous_models
         self._unique_models = unique_models
-
-
-class Sequence(object):
-
-    def __init__(self, value):
-        self.value = value
-        self.counter = 1
-
-    def get_inc(self, model):
-        if not model.objects.count():
-            self.counter = 1
-        i = self.counter
-        self.counter += 1
-        return i
-
-    def gen(self, model):
-        inc = self.get_inc(model)
-        return self.value + type(self.value)(inc)
 
 
 class Mommy(object):
