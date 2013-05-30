@@ -231,7 +231,6 @@ You can define `foreign_key` relations:
 
 .. code-block:: python
 
-    from model_mommy import mommy
     from model_mommy.recipe import Recipe, foreign_key
     from family.models import Person, Dog
 
