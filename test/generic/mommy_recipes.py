@@ -29,6 +29,12 @@ serial_numbers = Recipe(DummyDefaultFieldsModel,
     default_float_field = seq(1.23)
 )
 
+serial_numbers_by = Recipe(DummyDefaultFieldsModel,
+    default_decimal_field = seq(Decimal('20.1'), increment_by=Decimal('2.4')),
+    default_int_field = seq(10, increment_by=3),
+    default_float_field = seq(1.23, increment_by=1.8)
+)
+
 dog = Recipe(Dog,
     breed = 'Pug',
     owner = foreign_key(person)

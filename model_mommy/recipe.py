@@ -55,20 +55,21 @@ def foreign_key(recipe):
     """
     return RecipeForeignKey(recipe)
 
-def seq(value):
-    return Sequence(value)
+def seq(value, increment_by=1):
+    return Sequence(value, increment_by=increment_by)
 
 class Sequence(object):
 
-    def __init__(self, value):
+    def __init__(self, value, increment_by=1):
         self.value = value
         self.counter = 1
+        self.increment_by = increment_by
 
     def get_inc(self, model):
         if not model.objects.count():
-            self.counter = 1
+            self.counter = self.increment_by
         i = self.counter
-        self.counter += 1
+        self.counter += self.increment_by
         return i
 
     def gen(self, model):

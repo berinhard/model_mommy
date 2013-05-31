@@ -352,3 +352,18 @@ class TestSequences(TestCase):
         self.assertEqual(11, dummies[0].value)
         self.assertEqual(12, dummies[1].value)
         self.assertEqual(13, dummies[2].value)
+
+    def test_increment_by_3(self):
+        dummy = mommy.make_recipe('test.generic.serial_numbers_by')
+        self.assertEqual(dummy.default_int_field, 13)
+        self.assertEqual(dummy.default_decimal_field, Decimal('22.5'))
+        self.assertAlmostEqual(dummy.default_float_field, 3.030000)
+        dummy = mommy.make_recipe('test.generic.serial_numbers_by')
+        self.assertEqual(dummy.default_int_field, 16)
+        self.assertEqual(dummy.default_decimal_field, Decimal('24.9'))
+        self.assertAlmostEqual(dummy.default_float_field, 4.83)
+        dummy = mommy.prepare_recipe('test.generic.serial_numbers_by')
+        self.assertEqual(dummy.default_int_field, 19)
+        self.assertEqual(dummy.default_decimal_field, Decimal('27.3'))
+        self.assertAlmostEqual(dummy.default_float_field, 6.63)
+
