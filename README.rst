@@ -224,6 +224,30 @@ Or if you don't want a persisted instance:
 You can use the `_quantity` parameter as well if you want to create more than one object from a single recipe.
 
 
+You can define recipes locally to your module or test case as well.
+
+.. code-block:: python
+
+    company_recipe = Recipe(Company, name='WidgetCo')
+
+    class EmployeeTest(TestCase):
+        def setUp(self):
+            self.employee_recipe = Recipe(
+                Employee, name=seq('Employee '),
+                company=company_recipe.make())
+
+        def test_employee_list(self):
+            self.employee_recipe.make(_quantity=3)
+            # test stuff....
+
+        def test_employee_tasks(self):
+            employee1 = self.employee_recipe.make()
+            task_recipe = Recipe(Task, employee=employee1)
+            task_recipe.make(status='done')
+            task_recipe.make(due_date=datetime(2014, 1, 1))
+            # test stuff....
+
+
 Recipes with foreign keys
 -------------------------
 
