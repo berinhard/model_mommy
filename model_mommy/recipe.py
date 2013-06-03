@@ -62,7 +62,7 @@ class Sequence(object):
 
     def __init__(self, value, increment_by=1):
         self.value = value
-        self.counter = 1
+        self.counter = increment_by
         self.increment_by = increment_by
 
     def get_inc(self, model):
