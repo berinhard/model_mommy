@@ -224,7 +224,7 @@ Or if you don't want a persisted instance:
 You can use the `_quantity` parameter as well if you want to create more than one object from a single recipe.
 
 
-You can define recipes locally to your module or test case as well.
+You can define recipes locally to your module or test case as well. This can be useful for cases where a particular set of values may be unique to a particular test case, but used repeatedly there.
 
 .. code-block:: python
 
