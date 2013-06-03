@@ -306,6 +306,30 @@ Sometimes, you have a field with an unique value and using `make` can cause rand
 
 This will append a counter to strings to avoid uniqueness problems and it will sum the counter with numerical values.
 
+
+You can also provide an optional `increment_by` argument which will modify incrementing behaviour. This can be an integer, float or Decimal.
+
+.. code-block:: python
+
+
+    person = Recipe(Person,
+        age = seq(15, increment_by=3)
+        height_ft = seq(5.5, increment_by=.25)
+    )
+
+    p = mommy.make_recipe('myapp.person')
+    p.age
+    >>> 18
+    p.height_ft
+    >>> 5.75
+
+    p = mommy.make_recipe('myapp.person')
+    p.age
+    >>> 21
+    p.height_ft
+    >>> 6.0
+
+
 Overriding recipe definitions
 -----------------------------
 
