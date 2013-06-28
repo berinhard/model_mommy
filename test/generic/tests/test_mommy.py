@@ -256,6 +256,15 @@ class MommyCreatesAssociatedModels(TestCase):
         lonely_person = mommy.make(LonelyPerson, only_friend__name='Bob')
         self.assertEqual('Bob', lonely_person.only_friend.name)
 
+    def test_allow_create_fkey_related_model(self):
+        try:
+            person = mommy.make(Person, dog_set=[lambda p: mommy.make(Dog, owner=p)])
+        except TypeError:
+            self.fail('type error raised')
+
+        self.assertEqual(person.dog_set.count(), 1)
+
+
 
 class HandlingUnsupportedModels(TestCase):
     def test_unsupported_model_raises_an_explanatory_exception(self):
