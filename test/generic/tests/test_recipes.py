@@ -312,6 +312,10 @@ class ForeignKeyTestCase(TestCase):
         self.assertEqual(Person.objects.count(), 1)
         self.assertEqual(dog.owner.name, 'James')
 
+        dog = dog_recipe.prepare(owner__name='Zezin')
+        self.assertEqual(Person.objects.count(), 1)
+        self.assertEqual(dog.owner.name, 'Zezin')
+
 class TestSequences(TestCase):
     def test_increment_for_strings(self):
         person = mommy.make_recipe('test.generic.serial_person')
