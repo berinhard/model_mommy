@@ -6,7 +6,7 @@ from model_mommy import mommy
 from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
 from model_mommy.timezone import now
 from model_mommy.exceptions import InvalidQuantityException
-from test.generic.models import Person, DummyNumbersModel, DummyBlankFieldsModel
+from test.generic.models import Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
 
 
 class TestDefiningRecipes(TestCase):
@@ -299,6 +299,16 @@ class ForeignKeyTestCase(TestCase):
           using query lookup syntax
         """
         dog = mommy.prepare_recipe('test.generic.dog', owner__name='James')
+        self.assertEqual(Person.objects.count(), 1)
+        self.assertEqual(dog.owner.name, 'James')
+
+    def test_do_query_lookup_empty_recipes(self):
+        """
+          It should not attempt to create other object when
+          using query lookup syntax
+        """
+        dog_recipe = Recipe(Dog)
+        dog = dog_recipe.make(owner__name='James')
         self.assertEqual(Person.objects.count(), 1)
         self.assertEqual(dog.owner.name, 'James')
 

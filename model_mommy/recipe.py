@@ -19,9 +19,14 @@ class Recipe(object):
             if callable(v):
                 mapping[k] = v()
             elif isinstance(v, RecipeForeignKey):
-                recipe_attrs = mommy.filter_rel_attrs(k, **rel_fields_attrs)
+                a={}
+                for key, value in rel_fields_attrs.items():
+                    if key.startswith('%s__' % k):
+                        a[key] = rel_fields_attrs.pop(key)
+                recipe_attrs = mommy.filter_rel_attrs(k, **a)
                 mapping[k] = v.recipe.make(**recipe_attrs)
         mapping.update(new_attrs)
+        mapping.update(rel_fields_attrs)
         return mapping
 
     def make(self, **attrs):
