@@ -21,6 +21,8 @@ except ImportError:
     pass
     #BigIntegerField = IntegerField
 
+from six import text_type
+
 from model_mommy import mommy
 from test.generic.models import Person
 from test.generic.models import DummyIntModel, DummyPositiveIntModel
@@ -67,14 +69,14 @@ class StringFieldsFilling(FieldFillingTestCase):
         person_name_field = Person._meta.get_field('name')
         self.assertIsInstance(person_name_field, CharField)
 
-        self.assertIsInstance(self.person.name, str)
+        self.assertIsInstance(self.person.name, text_type)
         self.assertEqual(len(self.person.name), person_name_field.max_length)
 
     def test_fill_SlugField_with_a_random_str(self):
         person_nickname_field = Person._meta.get_field('nickname')
         self.assertIsInstance(person_nickname_field, SlugField)
 
-        self.assertIsInstance(self.person.nickname, str)
+        self.assertIsInstance(self.person.nickname, text_type)
         self.assertEqual(len(self.person.nickname),
                          person_nickname_field.max_length)
 
@@ -82,7 +84,7 @@ class StringFieldsFilling(FieldFillingTestCase):
         person_bio_field = Person._meta.get_field('bio')
         self.assertIsInstance(person_bio_field, TextField)
 
-        self.assertIsInstance(self.person.bio, str)
+        self.assertIsInstance(self.person.bio, text_type)
 
 
 class BooleanFieldsFilling(FieldFillingTestCase):
@@ -195,7 +197,7 @@ class URLFieldsFilling(FieldFillingTestCase):
         blog_field = Person._meta.get_field('blog')
         self.assertIsInstance(blog_field, URLField)
 
-        self.assertIsInstance(self.person.blog, str)
+        self.assertIsInstance(self.person.blog, text_type)
 
 
 class FillingEmailField(TestCase):
