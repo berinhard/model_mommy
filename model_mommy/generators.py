@@ -34,13 +34,13 @@ def get_content_file(content, name):
         return ContentFile(content, name=name)
 
 def gen_file_field():
-    name = 'mock_file.txt'
+    name = u'mock_file.txt'
     file_path = abspath(join(dirname(__file__), name))
     with open(file_path, 'rb') as f:
         return get_content_file(f.read(), name=name)
 
 def gen_image_field():
-    name = 'mock-img.jpeg'
+    name = u'mock-img.jpeg'
     file_path = abspath(join(dirname(__file__), name))
     with open(file_path, 'rb') as f:
         return get_content_file(f.read(), name=name)
@@ -91,13 +91,13 @@ def gen_time():
 
 
 def gen_string(max_length):
-    return ''.join(choice(string.ascii_letters) for i in range(max_length))
+    return u''.join(choice(string.ascii_letters) for i in range(max_length))
 gen_string.required = ['max_length']
 
 
 def gen_slug(max_length=50):
     valid_chars = string.letters + string.digits + '_-'
-    return ''.join(choice(valid_chars) for i in range(max_length))
+    return u''.join(choice(valid_chars) for i in range(max_length))
 
 
 def gen_text():
@@ -109,11 +109,11 @@ def gen_boolean():
 
 
 def gen_url():
-    return 'http://www.%s.com' % gen_string(30)
+    return u'http://www.%s.com' % gen_string(30)
 
 
 def gen_email():
-    return "%s@example.com" % gen_string(10)
+    return u"%s@example.com" % gen_string(10)
 
 
 def gen_content_type():
