@@ -23,7 +23,7 @@ except ImportError:
 
 import generators
 from exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
-from recipe import Sequence
+from model_mommy.recipe import Sequence
 
 recipes = None
 
