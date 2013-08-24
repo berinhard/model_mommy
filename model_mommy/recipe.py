@@ -63,8 +63,4 @@ def foreign_key(recipe):
 def seq(value, increment_by=1):
     return mommy.Sequence(value, increment_by=increment_by)
 
-    def gen(self, model):
-        inc = self.get_inc(model)
-        return self.value + type(self.value)(inc)
-
 
