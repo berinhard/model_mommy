@@ -5,6 +5,7 @@
 # DO NOT ADD THE APP TO INSTALLED_APPS#
 #######################################
 from decimal import Decimal
+from tempfile import gettempdir
 
 from django.db import models
 from django.core.files.storage import FileSystemStorage
@@ -138,12 +139,12 @@ class DummyDefaultFieldsModel(models.Model):
 
 
 class DummyFileFieldModel(models.Model):
-    fs = FileSystemStorage(location='/tmp/')
+    fs = FileSystemStorage(location=gettempdir())
     file_field = models.FileField(upload_to="%Y/%m/%d", storage=fs)
 
 
 class DummyImageFieldModel(models.Model):
-    fs = FileSystemStorage(location='/tmp/')
+    fs = FileSystemStorage(location=gettempdir())
     image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)
 
 class DummyMultipleInheritanceModel(DummyDefaultFieldsModel, Person):

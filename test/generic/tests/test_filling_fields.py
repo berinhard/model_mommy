@@ -1,5 +1,7 @@
 from datetime import date, datetime, time
 from decimal import Decimal
+from os.path import abspath
+from tempfile import gettempdir
 
 from django.test import TestCase
 from django.conf import settings
@@ -227,11 +229,11 @@ class FillingFileField(TestCase):
         field = DummyFileFieldModel._meta.get_field('file_field')
         self.assertIsInstance(field, FileField)
         import time
-        path = "/tmp/%s/mock_file.txt" % time.strftime('%Y/%m/%d')
+        path = "%s/%s/mock_file.txt" % (gettempdir(), time.strftime('%Y/%m/%d'))
 
         from django import VERSION
         if VERSION[1] >= 4:
-            self.assertEqual(self.dummy.file_field.path, path)
+            self.assertEqual(abspath(self.dummy.file_field.path), abspath(path))
 
     def tearDown(self):
         self.dummy.file_field.delete()
@@ -248,11 +250,11 @@ class FillingImageFileField(TestCase):
         field = DummyImageFieldModel._meta.get_field('image_field')
         self.assertIsInstance(field, ImageField)
         import time
-        path = "/tmp/%s/mock-img.jpeg" % time.strftime('%Y/%m/%d')
+        path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
 
         from django import VERSION
         if VERSION[1] >= 4:
-            self.assertEqual(self.dummy.image_field.path, path)
+            self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
         self.assertTrue(self.dummy.image_field.width)
         self.assertTrue(self.dummy.image_field.height)
 
