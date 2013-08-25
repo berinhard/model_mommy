@@ -41,8 +41,8 @@ __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
-    'FillingEmailField', 'FillingGenericForeignKeyField','FillingFileField',
-    'TimeFieldsFilling', 'FillingCustomFields',
+    'FillingEmailField', 'FillingGenericForeignKeyField', 'FillingFileField',
+    'FillingImageFileField', 'TimeFieldsFilling', 'FillingCustomFields',
 ]
 
 
