@@ -16,6 +16,7 @@ from django.db.models.fields import BooleanField, URLField
 from django.db.models import FileField, ImageField
 from django.core.files import File
 from django.core.files.images import ImageFile
+from django.utils.unittest import skipUnless
 
 try:
     from django.db.models.fields import BigIntegerField
@@ -26,6 +27,7 @@ except ImportError:
 from six import text_type
 
 from model_mommy import mommy
+from test.generic.models import has_pil
 from test.generic.models import Person
 from test.generic.models import DummyIntModel, DummyPositiveIntModel
 from test.generic.models import DummyNumbersModel
@@ -238,7 +240,7 @@ class FillingFileField(TestCase):
     def tearDown(self):
         self.dummy.file_field.delete()
 
-
+@skipUnless(has_pil, "PIL is required to test ImageField")
 class FillingImageFileField(TestCase):
 
     def setUp(self):
