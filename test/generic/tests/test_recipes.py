@@ -153,6 +153,17 @@ class TestExecutingRecipes(TestCase):
         self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
+    def test_model_with_foreign_key_as_unicode(self):
+        dog = mommy.make_recipe('test.generic.other_dog_unicode')
+        self.assertEqual(dog.breed, 'Basset')
+        self.assertIsInstance(dog.owner, Person)
+        self.assertNotEqual(dog.owner.id, None)
+
+        dog = mommy.prepare_recipe('test.generic.other_dog_unicode')
+        self.assertEqual(dog.breed, 'Basset')
+        self.assertIsInstance(dog.owner, Person)
+        self.assertNotEqual(dog.owner.id, None)
+
     def test_make_recipe(self):
         person = mommy.make_recipe('test.generic.person')
         self.assertIsInstance(person, Person)
