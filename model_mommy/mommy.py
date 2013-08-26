@@ -24,6 +24,9 @@ except ImportError:
 import generators
 from exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 
+from six import string_types
+
+
 class Sequence(object):
 
     def __init__(self, value, increment_by=1):
@@ -364,7 +367,7 @@ def get_required_values(generator, field):
                 key, value = item(field)
                 rt[key] = value
 
-            elif isinstance(item, basestring):
+            elif isinstance(item, string_types):
                 rt[item] = getattr(field, item)
 
             else:
