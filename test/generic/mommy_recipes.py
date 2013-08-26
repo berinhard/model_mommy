@@ -6,6 +6,8 @@ from model_mommy.recipe import Recipe, foreign_key, seq
 from model_mommy.timezone import now
 from test.generic.models import Person, Dog, DummyDefaultFieldsModel, DummyUniqueIntegerFieldModel
 
+from six import u
+
 
 person = Recipe(Person,
     name = 'John Doe',
@@ -43,6 +45,11 @@ dog = Recipe(Dog,
 other_dog = Recipe(Dog,
     breed = 'Basset',
     owner = foreign_key('person')
+)
+
+other_dog_unicode = Recipe(Dog,
+    breed = 'Basset',
+    owner = foreign_key(u('person'))
 )
 
 dummy_unique_field = Recipe(DummyUniqueIntegerFieldModel,

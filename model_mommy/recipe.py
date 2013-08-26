@@ -3,6 +3,8 @@ import inspect
 import mommy
 from exceptions import RecipeNotFound
 
+from six import string_types
+
 class Recipe(object):
     def __init__(self, model, **attrs):
         self.attr_mapping = attrs
@@ -41,7 +43,7 @@ class RecipeForeignKey(object):
     def __init__(self, recipe):
         if isinstance(recipe, Recipe):
             self.recipe = recipe
-        elif isinstance(recipe, str):
+        elif isinstance(recipe, string_types):
             frame = inspect.stack()[2]
             caller_module = inspect.getmodule(frame[0])
             recipe = getattr(caller_module, recipe)
