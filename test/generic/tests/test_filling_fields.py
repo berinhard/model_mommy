@@ -16,7 +16,6 @@ from django.db.models.fields import BooleanField, URLField
 from django.db.models import FileField, ImageField
 from django.core.files import File
 from django.core.files.images import ImageFile
-from django.utils.unittest import skipUnless
 
 try:
     from django.db.models.fields import BigIntegerField
@@ -240,25 +239,27 @@ class FillingFileField(TestCase):
     def tearDown(self):
         self.dummy.file_field.delete()
 
-@skipUnless(has_pil, "PIL is required to test ImageField")
+# skipUnless not available in Django 1.2
+# @skipUnless(has_pil, "PIL is required to test ImageField")
 class FillingImageFileField(TestCase):
 
     def setUp(self):
         path = mommy.mock_file_jpeg
         self.fixture_img_file = ImageFile(open(path))
 
-    def test_filling_image_file_field(self):
-        self.dummy = mommy.make(DummyImageFieldModel)
-        field = DummyImageFieldModel._meta.get_field('image_field')
-        self.assertIsInstance(field, ImageField)
-        import time
-        path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
-
-        from django import VERSION
-        if VERSION[1] >= 4:
-            self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
-        self.assertTrue(self.dummy.image_field.width)
-        self.assertTrue(self.dummy.image_field.height)
+    if has_pil:
+        def test_filling_image_file_field(self):
+            self.dummy = mommy.make(DummyImageFieldModel)
+            field = DummyImageFieldModel._meta.get_field('image_field')
+            self.assertIsInstance(field, ImageField)
+            import time
+            path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
+    
+            from django import VERSION
+            if VERSION[1] >= 4:
+                self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
+            self.assertTrue(self.dummy.image_field.width)
+            self.assertTrue(self.dummy.image_field.height)
 
     def tearDown(self):
         self.dummy.image_field.delete()
