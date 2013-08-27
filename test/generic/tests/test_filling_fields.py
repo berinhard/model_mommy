@@ -257,9 +257,10 @@ class FillingImageFileField(TestCase):
     
             from django import VERSION
             if VERSION[1] >= 4:
+                # These require the file to exist in earlier versions of Django
                 self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
-            self.assertTrue(self.dummy.image_field.width)
-            self.assertTrue(self.dummy.image_field.height)
+                self.assertTrue(self.dummy.image_field.width)
+                self.assertTrue(self.dummy.image_field.height)
 
     def tearDown(self):
         self.dummy.image_field.delete()
