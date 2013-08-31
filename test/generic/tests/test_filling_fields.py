@@ -26,6 +26,7 @@ except ImportError:
 from six import text_type
 
 from model_mommy import mommy
+from test.generic.models import has_pil
 from test.generic.models import Person
 from test.generic.models import DummyIntModel, DummyPositiveIntModel
 from test.generic.models import DummyNumbersModel
@@ -39,8 +40,8 @@ __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
-    'FillingEmailField', 'FillingGenericForeignKeyField','FillingFileField',
-    'TimeFieldsFilling', 'FillingCustomFields',
+    'FillingEmailField', 'FillingGenericForeignKeyField', 'FillingFileField',
+    'FillingImageFileField', 'TimeFieldsFilling', 'FillingCustomFields',
 ]
 
 
@@ -238,25 +239,28 @@ class FillingFileField(TestCase):
     def tearDown(self):
         self.dummy.file_field.delete()
 
-
+# skipUnless not available in Django 1.2
+# @skipUnless(has_pil, "PIL is required to test ImageField")
 class FillingImageFileField(TestCase):
 
     def setUp(self):
         path = mommy.mock_file_jpeg
         self.fixture_img_file = ImageFile(open(path))
 
-    def test_filling_image_file_field(self):
-        self.dummy = mommy.make(DummyImageFieldModel)
-        field = DummyImageFieldModel._meta.get_field('image_field')
-        self.assertIsInstance(field, ImageField)
-        import time
-        path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
-
-        from django import VERSION
-        if VERSION[1] >= 4:
-            self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
-        self.assertTrue(self.dummy.image_field.width)
-        self.assertTrue(self.dummy.image_field.height)
+    if has_pil:
+        def test_filling_image_file_field(self):
+            self.dummy = mommy.make(DummyImageFieldModel)
+            field = DummyImageFieldModel._meta.get_field('image_field')
+            self.assertIsInstance(field, ImageField)
+            import time
+            path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
+    
+            from django import VERSION
+            if VERSION[1] >= 4:
+                # These require the file to exist in earlier versions of Django
+                self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
+                self.assertTrue(self.dummy.image_field.width)
+                self.assertTrue(self.dummy.image_field.height)
 
     def tearDown(self):
         self.dummy.image_field.delete()

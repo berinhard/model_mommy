@@ -15,6 +15,14 @@ from django.contrib.contenttypes import generic
 from fields import *
 from model_mommy.timezone import smart_datetime as datetime
 
+# check whether or not PIL is installed
+try:
+    from PIL import ImageFile as PilImageFile
+except ImportError:
+    has_pil = False
+else:
+    has_pil = True
+
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
 
@@ -143,9 +151,15 @@ class DummyFileFieldModel(models.Model):
     file_field = models.FileField(upload_to="%Y/%m/%d", storage=fs)
 
 
-class DummyImageFieldModel(models.Model):
-    fs = FileSystemStorage(location=gettempdir())
-    image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)
+if has_pil:
+    class DummyImageFieldModel(models.Model):
+        fs = FileSystemStorage(location=gettempdir())
+        image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)
+else:
+    # doesn't matter, won't be using
+    class DummyImageFieldModel(models.Model):
+        pass
+
 
 class DummyMultipleInheritanceModel(DummyDefaultFieldsModel, Person):
     my_dummy_field = models.IntegerField()
