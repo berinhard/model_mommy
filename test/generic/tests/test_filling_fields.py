@@ -23,7 +23,7 @@ except ImportError:
     pass
     #BigIntegerField = IntegerField
 
-from six import text_type
+from six import text_type, string_types
 
 from model_mommy import mommy
 from test.generic.models import has_pil
@@ -35,13 +35,6 @@ from test.generic.models import DummyGenericForeignKeyModel
 from test.generic.models import DummyFileFieldModel
 from test.generic.models import DummyImageFieldModel
 from test.generic.models import CustomFieldWithoutGeneratorModel, CustomFieldWithGeneratorModel
-
-try:
-    unicode
-except NameError:
-    # Python 3
-    basestring = unicode = str
-
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
@@ -216,7 +209,7 @@ class FillingEmailField(TestCase):
         obj = mommy.make(DummyEmailModel)
         field = DummyEmailModel._meta.get_field('email_field')
         self.assertIsInstance(field, EmailField)
-        self.assertIsInstance(obj.email_field, basestring)
+        self.assertIsInstance(obj.email_field, string_types)
 
 
 class FillingGenericForeignKeyField(TestCase):
