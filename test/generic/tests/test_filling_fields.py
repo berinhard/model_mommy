@@ -36,6 +36,13 @@ from test.generic.models import DummyFileFieldModel
 from test.generic.models import DummyImageFieldModel
 from test.generic.models import CustomFieldWithoutGeneratorModel, CustomFieldWithGeneratorModel
 
+try:
+    unicode
+except NameError:
+    # Python 3
+    basestring = unicode = str
+
+
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
@@ -254,7 +261,7 @@ class FillingImageFileField(TestCase):
             self.assertIsInstance(field, ImageField)
             import time
             path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
-    
+
             from django import VERSION
             if VERSION[1] >= 4:
                 # These require the file to exist in earlier versions of Django

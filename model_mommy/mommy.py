@@ -21,8 +21,8 @@ try:
 except ImportError:
     BigIntegerField = IntegerField
 
-import generators
-from exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
+from . import generators
+from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 
 from six import string_types
 

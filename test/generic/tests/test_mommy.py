@@ -171,9 +171,9 @@ class MommyCreatesAssociatedModels(TestCase):
     def test_create_one_to_one(self):
         lonely_person = mommy.make(LonelyPerson)
 
-        self.assertEquals(LonelyPerson.objects.all().count(), 1)
+        self.assertEqual(LonelyPerson.objects.all().count(), 1)
         self.assertTrue(isinstance(lonely_person.only_friend, Person))
-        self.assertEquals(Person.objects.all().count(), 1)
+        self.assertEqual(Person.objects.all().count(), 1)
 
     def test_create_many_to_many_if_flagged(self):
         store = mommy.make(Store, make_m2m=True)
@@ -262,7 +262,7 @@ class HandlingUnsupportedModels(TestCase):
         try:
             mommy.make(UnsupportedModel)
             self.fail("Should have raised a TypeError")
-        except TypeError, e:
+        except TypeError as e:
             self.assertTrue('not supported' in repr(e))
 
 

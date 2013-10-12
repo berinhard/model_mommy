@@ -281,7 +281,7 @@ class ForeignKeyTestCase(TestCase):
         with self.assertRaises(TypeError) as c:
             foreign_key(2)
         exception = c.exception
-        self.assertEqual(exception.message, 'Not a recipe')
+        self.assertEqual(str(exception), 'Not a recipe')
 
     def test_do_not_create_related_model(self):
         """
@@ -391,4 +391,3 @@ class TestSequences(TestCase):
         self.assertEqual(dummy.default_int_field, 19)
         self.assertEqual(dummy.default_decimal_field, Decimal('27.3'))
         self.assertAlmostEqual(dummy.default_float_field, 6.63)
-

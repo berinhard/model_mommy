@@ -12,7 +12,7 @@ from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from fields import *
+from .fields import *
 from model_mommy.timezone import smart_datetime as datetime
 
 # check whether or not PIL is installed
@@ -138,7 +138,7 @@ class DummyDefaultFieldsModel(models.Model):
     default_int_field = models.IntegerField(default=123)
     default_float_field = models.FloatField(default=123.0)
     default_date_field = models.DateField(default='2012-01-01')
-    default_date_time_field = models.DateTimeField(default=datetime(2012, 01, 01))
+    default_date_time_field = models.DateTimeField(default=datetime(2012, 1, 1))
     default_time_field = models.TimeField(default='00:00:00')
     default_decimal_field = models.DecimalField(max_digits=5, decimal_places=2,
                                                 default=Decimal('0'))
