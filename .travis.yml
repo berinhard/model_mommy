@@ -14,7 +14,7 @@ matrix:
     - python: 3.3
       env: DJANGO_VERSION=1.5.1
 before_install:
-  - sudo apt-get build-dep python-imaging
+  - sudo apt-get update && sudo apt-get build-dep python-imaging
 install:
    # Install whatever version of Django that's listed above
    # Travis is currently working on
