@@ -23,7 +23,7 @@ except ImportError:
     pass
     #BigIntegerField = IntegerField
 
-from six import text_type
+from six import text_type, string_types
 
 from model_mommy import mommy
 from test.generic.models import has_pil
@@ -209,7 +209,7 @@ class FillingEmailField(TestCase):
         obj = mommy.make(DummyEmailModel)
         field = DummyEmailModel._meta.get_field('email_field')
         self.assertIsInstance(field, EmailField)
-        self.assertIsInstance(obj.email_field, basestring)
+        self.assertIsInstance(obj.email_field, string_types)
 
 
 class FillingGenericForeignKeyField(TestCase):
@@ -254,7 +254,7 @@ class FillingImageFileField(TestCase):
             self.assertIsInstance(field, ImageField)
             import time
             path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
-    
+
             from django import VERSION
             if VERSION[1] >= 4:
                 # These require the file to exist in earlier versions of Django

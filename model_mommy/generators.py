@@ -53,7 +53,7 @@ def gen_from_list(L):
     class KidMommy(Mommy):
       attr_mapping = {'some_field':gen_from_list([A, B, C])}
     '''
-    return lambda: choice(L)
+    return lambda: choice(list(L))
 
 # -- DEFAULT GENERATORS --
 
@@ -96,7 +96,7 @@ gen_string.required = ['max_length']
 
 
 def gen_slug(max_length=50):
-    valid_chars = string.letters + string.digits + '_-'
+    valid_chars = string.ascii_letters + string.digits + '_-'
     return u''.join(choice(valid_chars) for i in range(max_length))
 
 

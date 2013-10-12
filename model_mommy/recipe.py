@@ -1,7 +1,7 @@
 #coding: utf-8
 import inspect
-import mommy
-from exceptions import RecipeNotFound
+from . import mommy
+from .exceptions import RecipeNotFound
 
 from six import string_types
 
@@ -22,7 +22,7 @@ class Recipe(object):
                 mapping[k] = v()
             elif isinstance(v, RecipeForeignKey):
                 a={}
-                for key, value in rel_fields_attrs.items():
+                for key, value in list(rel_fields_attrs.items()):
                     if key.startswith('%s__' % k):
                         a[key] = rel_fields_attrs.pop(key)
                 recipe_attrs = mommy.filter_rel_attrs(k, **a)
@@ -64,5 +64,3 @@ def foreign_key(recipe):
 
 def seq(value, increment_by=1):
     return mommy.Sequence(value, increment_by=increment_by)
-
-
