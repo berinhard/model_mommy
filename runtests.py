@@ -31,6 +31,7 @@ def configure_settings(options):
                 'test.ambiguous',
             ),
             SITE_ID=1,
+            TEST_RUNNER='django.test.simple.DjangoTestSuiteRunner',
             TEST_ROOT=join(dirname(__file__), 'test', 'generic', 'tests'),
         )
 
