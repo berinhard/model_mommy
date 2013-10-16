@@ -1,5 +1,7 @@
 #coding: utf-8
 
+from random import choice
+from mock import patch
 from decimal import Decimal
 from django.test import TestCase
 from model_mommy import mommy
@@ -61,6 +63,16 @@ class TestDefiningRecipes(TestCase):
         )
         value = r.make().blank_char_field
         self.assertEqual(value, 'callable!!')
+
+    def test_always_calls_when_creating(self):
+        with patch('test.generic.tests.test_recipes.choice') as choice_mock:
+            l = ['foo', 'bar', 'spam', 'eggs']
+            r = Recipe(DummyBlankFieldsModel,
+                blank_char_field = lambda: choice(l)
+            )
+            r.make().blank_char_field
+            r.make().blank_char_field
+            self.assertEqual(choice_mock.call_count, 2)
 
     def test_make_recipes_with_args(self):
         """
