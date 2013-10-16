@@ -29,6 +29,7 @@ def configure_settings(options):
                 'django.contrib.contenttypes',
                 'test.generic',
                 'test.ambiguous',
+                'test.ambiguous2',
             ),
             SITE_ID=1,
             TEST_RUNNER='django.test.simple.DjangoTestSuiteRunner',

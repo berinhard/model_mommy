@@ -202,7 +202,7 @@ class ModelFinder(object):
                     ambiguous_models.append(name)
 
         for name in ambiguous_models:
-            unique_models.pop(name)
+            unique_models.pop(name, None)
 
         self._ambiguous_models = ambiguous_models
         self._unique_models = unique_models
