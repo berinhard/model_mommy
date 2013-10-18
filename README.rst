@@ -390,6 +390,13 @@ Model-mommy identifies django-taggit's `TaggableManager` as a normal Django fiel
 
 The fix for this is to set ``blank=True`` on your ``TaggableManager``.
 
+Extensions
+==========
+
+GeoDjango
+---------
+Works with it? This project has some custom generators for it:
+https://github.com/sigma-consultoria/mommy_spatial_generators
 
 
 Contributing
