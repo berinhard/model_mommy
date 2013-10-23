@@ -10,7 +10,7 @@ from mock import patch, Mock
 from model_mommy import mommy
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
-from test.generic.models import Person, Dog, Store, LonelyPerson, School, SchoolEnrollment, ModelWithImpostorField
+from test.generic.models import Person, Dog, Store, LonelyPerson, School, SchoolEnrollment, ModelWithImpostorField, Classroom
 from test.generic.models import User, PaymentBill
 from test.generic.models import UnsupportedModel, DummyGenericRelationModel
 from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
@@ -207,6 +207,14 @@ class MommyCreatesAssociatedModels(TestCase):
         store = mommy.make(Store, make_m2m=False)
         self.assertEqual(store.employees.count(), 0)
         self.assertEqual(store.customers.count(), 0)
+
+    def test_does_not_create_nullable_many_to_many_for_relations(self):
+        classroom = mommy.make(Classroom, make_m2m=False)
+        self.assertEqual(classroom.students.count(), 0)
+
+    def test_nullable_many_to_many_for_relations_if_flagged(self):
+        classroom = mommy.make(Classroom, make_m2m=True)
+        self.assertEqual(classroom.students.count(), 5)
 
     def test_simple_creating_person_with_parameters(self):
         kid = mommy.make(Person, happy=True, age=10, name='Mike')

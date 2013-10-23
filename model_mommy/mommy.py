@@ -281,10 +281,11 @@ class Mommy(object):
         return self.instance(model_attrs, _commit=commit)
 
     def m2m_value(self, field):
-        if not (self.make_m2m or field.null) and field.name not in self.rel_fields:
-            return []
-        else:
+        if field.name in self.rel_fields:
             return self.generate_value(field)
+        if not self.make_m2m:
+            return []
+        return self.generate_value(field)
 
     def instance(self, attrs, _commit):
         instance = self.model(**attrs)
