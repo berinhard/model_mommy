@@ -70,6 +70,10 @@ class LonelyPerson(models.Model):
     only_friend = models.OneToOneField(Person)
 
 
+class Classroom(models.Model):
+    students = models.ManyToManyField(Person, null=True)
+
+
 class Store(models.Model):
     customers = models.ManyToManyField(Person, related_name='favorite_stores')
     employees = models.ManyToManyField(Person, related_name='employers')
