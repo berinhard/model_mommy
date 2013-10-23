@@ -212,9 +212,9 @@ class MommyCreatesAssociatedModels(TestCase):
         classroom = mommy.make(Classroom, make_m2m=False)
         self.assertEqual(classroom.students.count(), 0)
 
-    def test_nullable_many_to_many_for_relations_if_flagged(self):
+    def test_nullable_many_to_many_is_not_created_even_if_flagged(self):
         classroom = mommy.make(Classroom, make_m2m=True)
-        self.assertEqual(classroom.students.count(), 5)
+        self.assertEqual(classroom.students.count(), 0)
 
     def test_simple_creating_person_with_parameters(self):
         kid = mommy.make(Person, happy=True, age=10, name='Mike')
