@@ -18,8 +18,6 @@ class Recipe(object):
             # do not generate values if field value is provided
             if new_attrs.get(k):
                 continue
-            if callable(v):
-                mapping[k] = v()
             elif isinstance(v, RecipeForeignKey):
                 a={}
                 for key, value in list(rel_fields_attrs.items()):

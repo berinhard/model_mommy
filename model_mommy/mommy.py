@@ -277,6 +277,8 @@ class Mommy(object):
                     model_attrs[field.name] = self.generate_value(field)
             elif isinstance(model_attrs[field.name], Sequence):
                 model_attrs[field.name] = model_attrs[field.name].gen(self.model)
+            elif callable(model_attrs[field.name]):
+                model_attrs[field.name] = model_attrs[field.name]()
 
         return self.instance(model_attrs, _commit=commit)
 
