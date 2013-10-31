@@ -168,6 +168,15 @@ class MommyCreatesAssociatedModels(TestCase):
         dog = mommy.make(GuardDog)
         self.assertEqual(Person.objects.count(), person_count+1)
 
+    def test_attrs_on_related_model_through_parent(self):
+        '''
+        Foreign key on parent gets created twice. Once for
+        parent oject and another time for child object
+        '''
+        dog = mommy.make(GuardDog, owner__name='john')
+        for person in Person.objects.all():
+            self.assertEqual(person.name, 'john')
+
     def test_prepare_should_not_create_one_object(self):
         dog = mommy.prepare(Dog)
         self.assertIsInstance(dog, Dog)
