@@ -65,6 +65,8 @@ class Dog(models.Model):
     owner = models.ForeignKey('Person')
     breed = models.CharField(max_length=50)
 
+class GuardDog(Dog):
+    pass
 
 class LonelyPerson(models.Model):
     only_friend = models.OneToOneField(Person)
