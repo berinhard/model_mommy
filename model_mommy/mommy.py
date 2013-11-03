@@ -256,6 +256,11 @@ class Mommy(object):
         self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
 
         for field in self.get_fields():
+
+            # Skip links to parent so parent is not created twice.
+            if isinstance(field, OneToOneField) and field.rel.parent_link:
+                continue
+
             field_value_not_defined = field.name not in model_attrs
 
             if isinstance(field, (AutoField, generic.GenericRelation)):
