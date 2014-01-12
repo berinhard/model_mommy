@@ -5,14 +5,23 @@
 # DO NOT ADD THE APP TO INSTALLED_APPS#
 #######################################
 from decimal import Decimal
+from tempfile import gettempdir
 
 from django.db import models
 from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
-from fields import *
+from .fields import *
 from model_mommy.timezone import smart_datetime as datetime
+
+# check whether or not PIL is installed
+try:
+    from PIL import ImageFile as PilImageFile
+except ImportError:
+    has_pil = False
+else:
+    has_pil = True
 
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
@@ -55,10 +64,17 @@ class Person(models.Model):
 class Dog(models.Model):
     owner = models.ForeignKey('Person')
     breed = models.CharField(max_length=50)
+    created = models.DateTimeField(auto_now_add=True)
 
+class GuardDog(Dog):
+    pass
 
 class LonelyPerson(models.Model):
     only_friend = models.OneToOneField(Person)
+
+
+class Classroom(models.Model):
+    students = models.ManyToManyField(Person, null=True)
 
 
 class Store(models.Model):
@@ -129,7 +145,7 @@ class DummyDefaultFieldsModel(models.Model):
     default_int_field = models.IntegerField(default=123)
     default_float_field = models.FloatField(default=123.0)
     default_date_field = models.DateField(default='2012-01-01')
-    default_date_time_field = models.DateTimeField(default=datetime(2012, 01, 01))
+    default_date_time_field = models.DateTimeField(default=datetime(2012, 1, 1))
     default_time_field = models.TimeField(default='00:00:00')
     default_decimal_field = models.DecimalField(max_digits=5, decimal_places=2,
                                                 default=Decimal('0'))
@@ -138,13 +154,19 @@ class DummyDefaultFieldsModel(models.Model):
 
 
 class DummyFileFieldModel(models.Model):
-    fs = FileSystemStorage(location='/tmp/')
+    fs = FileSystemStorage(location=gettempdir())
     file_field = models.FileField(upload_to="%Y/%m/%d", storage=fs)
 
 
-class DummyImageFieldModel(models.Model):
-    fs = FileSystemStorage(location='/tmp/')
-    image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)
+if has_pil:
+    class DummyImageFieldModel(models.Model):
+        fs = FileSystemStorage(location=gettempdir())
+        image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)
+else:
+    # doesn't matter, won't be using
+    class DummyImageFieldModel(models.Model):
+        pass
+
 
 class DummyMultipleInheritanceModel(DummyDefaultFieldsModel, Person):
     my_dummy_field = models.IntegerField()

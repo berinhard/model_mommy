@@ -22,9 +22,30 @@ try:
 except ImportError:
     BigIntegerField = IntegerField
 
-import generators
-from exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
-from recipe import Sequence
+from . import generators
+from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
+
+from six import string_types
+
+
+class Sequence(object):
+
+    def __init__(self, value, increment_by=1):
+        self.value = value
+        self.counter = increment_by
+        self.increment_by = increment_by
+
+    def get_inc(self, model):
+        if not model.objects.count():
+            self.counter = self.increment_by
+        i = self.counter
+        self.counter += self.increment_by
+        return i
+
+    def gen(self, model):
+        inc = self.get_inc(model)
+        return self.value + type(self.value)(inc)
+
 
 recipes = None
 
@@ -182,7 +203,7 @@ class ModelFinder(object):
                     ambiguous_models.append(name)
 
         for name in ambiguous_models:
-            unique_models.pop(name)
+            unique_models.pop(name, None)
 
         self._ambiguous_models = ambiguous_models
         self._unique_models = unique_models
@@ -236,6 +257,11 @@ class Mommy(object):
         self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
 
         for field in self.get_fields():
+
+            # Skip links to parent so parent is not created twice.
+            if isinstance(field, OneToOneField) and field.rel.parent_link:
+                continue
+
             field_value_not_defined = field.name not in model_attrs
 
             if isinstance(field, (AutoField, generic.GenericRelation)):
@@ -257,14 +283,17 @@ class Mommy(object):
                     model_attrs[field.name] = self.generate_value(field)
             elif isinstance(model_attrs[field.name], Sequence):
                 model_attrs[field.name] = model_attrs[field.name].gen(self.model)
+            elif callable(model_attrs[field.name]):
+                model_attrs[field.name] = model_attrs[field.name]()
 
         return self.instance(model_attrs, _commit=commit)
 
     def m2m_value(self, field):
-        if not (self.make_m2m or field.null) and field.name not in self.rel_fields:
-            return []
-        else:
+        if field.name in self.rel_fields:
             return self.generate_value(field)
+        if not self.make_m2m or field.null:
+            return []
+        return self.generate_value(field)
 
     def instance(self, attrs, _commit):
         one_to_many_keys = {}
@@ -358,7 +387,7 @@ def get_required_values(generator, field):
                 key, value = item(field)
                 rt[key] = value
 
-            elif isinstance(item, basestring):
+            elif isinstance(item, string_types):
                 rt[item] = getattr(field, item)
 
             else:

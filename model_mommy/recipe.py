@@ -1,7 +1,9 @@
 #coding: utf-8
 import inspect
-import mommy
-from exceptions import RecipeNotFound
+from . import mommy
+from .exceptions import RecipeNotFound
+
+from six import string_types
 
 class Recipe(object):
     def __init__(self, model, **attrs):
@@ -16,12 +18,15 @@ class Recipe(object):
             # do not generate values if field value is provided
             if new_attrs.get(k):
                 continue
-            if callable(v):
-                mapping[k] = v()
             elif isinstance(v, RecipeForeignKey):
-                recipe_attrs = mommy.filter_rel_attrs(k, **rel_fields_attrs)
+                a={}
+                for key, value in list(rel_fields_attrs.items()):
+                    if key.startswith('%s__' % k):
+                        a[key] = rel_fields_attrs.pop(key)
+                recipe_attrs = mommy.filter_rel_attrs(k, **a)
                 mapping[k] = v.recipe.make(**recipe_attrs)
         mapping.update(new_attrs)
+        mapping.update(rel_fields_attrs)
         return mapping
 
     def make(self, **attrs):
@@ -36,7 +41,7 @@ class RecipeForeignKey(object):
     def __init__(self, recipe):
         if isinstance(recipe, Recipe):
             self.recipe = recipe
-        elif isinstance(recipe, str):
+        elif isinstance(recipe, string_types):
             frame = inspect.stack()[2]
             caller_module = inspect.getmodule(frame[0])
             recipe = getattr(caller_module, recipe)
@@ -56,24 +61,4 @@ def foreign_key(recipe):
     return RecipeForeignKey(recipe)
 
 def seq(value, increment_by=1):
-    return Sequence(value, increment_by=increment_by)
-
-class Sequence(object):
-
-    def __init__(self, value, increment_by=1):
-        self.value = value
-        self.counter = increment_by
-        self.increment_by = increment_by
-
-    def get_inc(self, model):
-        if not model.objects.count():
-            self.counter = self.increment_by
-        i = self.counter
-        self.counter += self.increment_by
-        return i
-
-    def gen(self, model):
-        inc = self.get_inc(model)
-        return self.value + type(self.value)(inc)
-
-
+    return mommy.Sequence(value, increment_by=increment_by)

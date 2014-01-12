@@ -1,12 +1,14 @@
 #coding: utf-8
 
+from random import choice
+from mock import patch
 from decimal import Decimal
 from django.test import TestCase
 from model_mommy import mommy
 from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
 from model_mommy.timezone import now
 from model_mommy.exceptions import InvalidQuantityException
-from test.generic.models import Person, DummyNumbersModel, DummyBlankFieldsModel
+from test.generic.models import Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
 
 
 class TestDefiningRecipes(TestCase):
@@ -61,6 +63,25 @@ class TestDefiningRecipes(TestCase):
         )
         value = r.make().blank_char_field
         self.assertEqual(value, 'callable!!')
+
+    def test_always_calls_when_creating(self):
+        with patch('test.generic.tests.test_recipes.choice') as choice_mock:
+            l = ['foo', 'bar', 'spam', 'eggs']
+            r = Recipe(DummyBlankFieldsModel,
+                blank_char_field = lambda: choice(l)
+            )
+            r.make().blank_char_field
+            r.make().blank_char_field
+            self.assertEqual(choice_mock.call_count, 2)
+
+    def test_always_calls_with_quantity(self):
+        with patch('test.generic.tests.test_recipes.choice') as choice_mock:
+            l = ['foo', 'bar', 'spam', 'eggs']
+            r = Recipe(DummyBlankFieldsModel,
+                blank_char_field = lambda: choice(l)
+            )
+            r.make(_quantity=3)
+            self.assertEqual(choice_mock.call_count, 3)
 
     def test_make_recipes_with_args(self):
         """
@@ -149,6 +170,17 @@ class TestExecutingRecipes(TestCase):
         self.assertNotEqual(dog.owner.id, None)
 
         dog = mommy.prepare_recipe('test.generic.other_dog')
+        self.assertEqual(dog.breed, 'Basset')
+        self.assertIsInstance(dog.owner, Person)
+        self.assertNotEqual(dog.owner.id, None)
+
+    def test_model_with_foreign_key_as_unicode(self):
+        dog = mommy.make_recipe('test.generic.other_dog_unicode')
+        self.assertEqual(dog.breed, 'Basset')
+        self.assertIsInstance(dog.owner, Person)
+        self.assertNotEqual(dog.owner.id, None)
+
+        dog = mommy.prepare_recipe('test.generic.other_dog_unicode')
         self.assertEqual(dog.breed, 'Basset')
         self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
@@ -270,7 +302,7 @@ class ForeignKeyTestCase(TestCase):
         with self.assertRaises(TypeError) as c:
             foreign_key(2)
         exception = c.exception
-        self.assertEqual(exception.message, 'Not a recipe')
+        self.assertEqual(str(exception), 'Not a recipe')
 
     def test_do_not_create_related_model(self):
         """
@@ -301,6 +333,20 @@ class ForeignKeyTestCase(TestCase):
         dog = mommy.prepare_recipe('test.generic.dog', owner__name='James')
         self.assertEqual(Person.objects.count(), 1)
         self.assertEqual(dog.owner.name, 'James')
+
+    def test_do_query_lookup_empty_recipes(self):
+        """
+          It should not attempt to create other object when
+          using query lookup syntax
+        """
+        dog_recipe = Recipe(Dog)
+        dog = dog_recipe.make(owner__name='James')
+        self.assertEqual(Person.objects.count(), 1)
+        self.assertEqual(dog.owner.name, 'James')
+
+        dog = dog_recipe.prepare(owner__name='Zezin')
+        self.assertEqual(Person.objects.count(), 1)
+        self.assertEqual(dog.owner.name, 'Zezin')
 
 class TestSequences(TestCase):
     def test_increment_for_strings(self):
@@ -366,4 +412,3 @@ class TestSequences(TestCase):
         self.assertEqual(dummy.default_int_field, 19)
         self.assertEqual(dummy.default_decimal_field, Decimal('27.3'))
         self.assertAlmostEqual(dummy.default_float_field, 6.63)
-

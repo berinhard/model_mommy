@@ -10,7 +10,7 @@ from mock import patch, Mock
 from model_mommy import mommy
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
-from test.generic.models import Person, Dog, Store, LonelyPerson, School, SchoolEnrollment, ModelWithImpostorField
+from test.generic.models import Person, Dog, Store, LonelyPerson, School, SchoolEnrollment, ModelWithImpostorField, Classroom, GuardDog
 from test.generic.models import User, PaymentBill
 from test.generic.models import UnsupportedModel, DummyGenericRelationModel
 from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
@@ -159,6 +159,33 @@ class MommyCreatesAssociatedModels(TestCase):
         dog = mommy.make(Dog)
         self.assertIsInstance(dog.owner, Person)
 
+    def test_foreign_key_on_parent_should_create_one_object(self):
+        '''
+        Foreign key on parent gets created twice. Once for
+        parent oject and another time for child object
+        '''
+        person_count = Person.objects.count()
+        dog = mommy.make(GuardDog)
+        self.assertEqual(Person.objects.count(), person_count+1)
+
+    def test_auto_now_add_on_parent_should_work(self):
+        '''
+        Foreign key on parent gets created twice. Once for
+        parent oject and another time for child object
+        '''
+        person_count = Person.objects.count()
+        dog = mommy.make(GuardDog)
+        self.assertNotEqual(dog.created, None)
+
+    def test_attrs_on_related_model_through_parent(self):
+        '''
+        Foreign key on parent gets created twice. Once for
+        parent oject and another time for child object
+        '''
+        dog = mommy.make(GuardDog, owner__name='john')
+        for person in Person.objects.all():
+            self.assertEqual(person.name, 'john')
+
     def test_prepare_should_not_create_one_object(self):
         dog = mommy.prepare(Dog)
         self.assertIsInstance(dog, Dog)
@@ -171,9 +198,9 @@ class MommyCreatesAssociatedModels(TestCase):
     def test_create_one_to_one(self):
         lonely_person = mommy.make(LonelyPerson)
 
-        self.assertEquals(LonelyPerson.objects.all().count(), 1)
+        self.assertEqual(LonelyPerson.objects.all().count(), 1)
         self.assertTrue(isinstance(lonely_person.only_friend, Person))
-        self.assertEquals(Person.objects.all().count(), 1)
+        self.assertEqual(Person.objects.all().count(), 1)
 
     def test_create_many_to_many_if_flagged(self):
         store = mommy.make(Store, make_m2m=True)
@@ -207,6 +234,14 @@ class MommyCreatesAssociatedModels(TestCase):
         store = mommy.make(Store, make_m2m=False)
         self.assertEqual(store.employees.count(), 0)
         self.assertEqual(store.customers.count(), 0)
+
+    def test_does_not_create_nullable_many_to_many_for_relations(self):
+        classroom = mommy.make(Classroom, make_m2m=False)
+        self.assertEqual(classroom.students.count(), 0)
+
+    def test_nullable_many_to_many_is_not_created_even_if_flagged(self):
+        classroom = mommy.make(Classroom, make_m2m=True)
+        self.assertEqual(classroom.students.count(), 0)
 
     def test_simple_creating_person_with_parameters(self):
         kid = mommy.make(Person, happy=True, age=10, name='Mike')
@@ -271,7 +306,7 @@ class HandlingUnsupportedModels(TestCase):
         try:
             mommy.make(UnsupportedModel)
             self.fail("Should have raised a TypeError")
-        except TypeError, e:
+        except TypeError as e:
             self.assertTrue('not supported' in repr(e))
 
 

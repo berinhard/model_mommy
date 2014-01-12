@@ -1,5 +1,7 @@
 from datetime import date, datetime, time
 from decimal import Decimal
+from os.path import abspath
+from tempfile import gettempdir
 
 from django.test import TestCase
 from django.conf import settings
@@ -21,7 +23,10 @@ except ImportError:
     pass
     #BigIntegerField = IntegerField
 
+from six import text_type, string_types
+
 from model_mommy import mommy
+from test.generic.models import has_pil
 from test.generic.models import Person
 from test.generic.models import DummyIntModel, DummyPositiveIntModel
 from test.generic.models import DummyNumbersModel
@@ -35,8 +40,8 @@ __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
-    'FillingEmailField', 'FillingGenericForeignKeyField','FillingFileField',
-    'TimeFieldsFilling', 'FillingCustomFields',
+    'FillingEmailField', 'FillingGenericForeignKeyField', 'FillingFileField',
+    'FillingImageFileField', 'TimeFieldsFilling', 'FillingCustomFields',
 ]
 
 
@@ -67,14 +72,14 @@ class StringFieldsFilling(FieldFillingTestCase):
         person_name_field = Person._meta.get_field('name')
         self.assertIsInstance(person_name_field, CharField)
 
-        self.assertIsInstance(self.person.name, str)
+        self.assertIsInstance(self.person.name, text_type)
         self.assertEqual(len(self.person.name), person_name_field.max_length)
 
     def test_fill_SlugField_with_a_random_str(self):
         person_nickname_field = Person._meta.get_field('nickname')
         self.assertIsInstance(person_nickname_field, SlugField)
 
-        self.assertIsInstance(self.person.nickname, str)
+        self.assertIsInstance(self.person.nickname, text_type)
         self.assertEqual(len(self.person.nickname),
                          person_nickname_field.max_length)
 
@@ -82,7 +87,7 @@ class StringFieldsFilling(FieldFillingTestCase):
         person_bio_field = Person._meta.get_field('bio')
         self.assertIsInstance(person_bio_field, TextField)
 
-        self.assertIsInstance(self.person.bio, str)
+        self.assertIsInstance(self.person.bio, text_type)
 
 
 class BooleanFieldsFilling(FieldFillingTestCase):
@@ -195,7 +200,7 @@ class URLFieldsFilling(FieldFillingTestCase):
         blog_field = Person._meta.get_field('blog')
         self.assertIsInstance(blog_field, URLField)
 
-        self.assertIsInstance(self.person.blog, str)
+        self.assertIsInstance(self.person.blog, text_type)
 
 
 class FillingEmailField(TestCase):
@@ -204,7 +209,7 @@ class FillingEmailField(TestCase):
         obj = mommy.make(DummyEmailModel)
         field = DummyEmailModel._meta.get_field('email_field')
         self.assertIsInstance(field, EmailField)
-        self.assertIsInstance(obj.email_field, basestring)
+        self.assertIsInstance(obj.email_field, string_types)
 
 
 class FillingGenericForeignKeyField(TestCase):
@@ -225,34 +230,37 @@ class FillingFileField(TestCase):
         field = DummyFileFieldModel._meta.get_field('file_field')
         self.assertIsInstance(field, FileField)
         import time
-        path = "/tmp/%s/mock_file.txt" % time.strftime('%Y/%m/%d')
+        path = "%s/%s/mock_file.txt" % (gettempdir(), time.strftime('%Y/%m/%d'))
 
         from django import VERSION
         if VERSION[1] >= 4:
-            self.assertEqual(self.dummy.file_field.path, path)
+            self.assertEqual(abspath(self.dummy.file_field.path), abspath(path))
 
     def tearDown(self):
         self.dummy.file_field.delete()
 
-
+# skipUnless not available in Django 1.2
+# @skipUnless(has_pil, "PIL is required to test ImageField")
 class FillingImageFileField(TestCase):
 
     def setUp(self):
         path = mommy.mock_file_jpeg
         self.fixture_img_file = ImageFile(open(path))
 
-    def test_filling_image_file_field(self):
-        self.dummy = mommy.make(DummyImageFieldModel)
-        field = DummyImageFieldModel._meta.get_field('image_field')
-        self.assertIsInstance(field, ImageField)
-        import time
-        path = "/tmp/%s/mock-img.jpeg" % time.strftime('%Y/%m/%d')
+    if has_pil:
+        def test_filling_image_file_field(self):
+            self.dummy = mommy.make(DummyImageFieldModel)
+            field = DummyImageFieldModel._meta.get_field('image_field')
+            self.assertIsInstance(field, ImageField)
+            import time
+            path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
 
-        from django import VERSION
-        if VERSION[1] >= 4:
-            self.assertEqual(self.dummy.image_field.path, path)
-        self.assertTrue(self.dummy.image_field.width)
-        self.assertTrue(self.dummy.image_field.height)
+            from django import VERSION
+            if VERSION[1] >= 4:
+                # These require the file to exist in earlier versions of Django
+                self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
+                self.assertTrue(self.dummy.image_field.width)
+                self.assertTrue(self.dummy.image_field.height)
 
     def tearDown(self):
         self.dummy.image_field.delete()
