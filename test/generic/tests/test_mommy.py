@@ -8,6 +8,7 @@ from django.db.models import Manager
 from mock import patch, Mock
 
 from model_mommy import mommy
+from model_mommy.mommy import related
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
 from test.generic.models import Person, Dog, Store, LonelyPerson, School, SchoolEnrollment, ModelWithImpostorField, Classroom, GuardDog
@@ -293,13 +294,11 @@ class MommyCreatesAssociatedModels(TestCase):
 
     def test_allow_create_fkey_related_model(self):
         try:
-            person = mommy.make(Person, dog_set=[lambda p: mommy.make(Dog, owner=p)])
+            person = mommy.make(Person, dog_set=related(Dog, Dog))
         except TypeError:
             self.fail('type error raised')
 
-        self.assertEqual(person.dog_set.count(), 1)
-
-
+        self.assertEqual(person.dog_set.count(), 2)
 
 class HandlingUnsupportedModels(TestCase):
     def test_unsupported_model_raises_an_explanatory_exception(self):

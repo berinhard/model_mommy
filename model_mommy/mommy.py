@@ -28,6 +28,13 @@ from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityExcept
 from six import string_types
 
 
+class related(object):
+    def __init__(self, *args):
+        self.related = args
+
+    def make(self):
+        return [make(m) for m in self.related]
+
 class Sequence(object):
 
     def __init__(self, value, increment_by=1):
@@ -298,8 +305,7 @@ class Mommy(object):
     def instance(self, attrs, _commit):
         one_to_many_keys = {}
         for k in attrs.keys():
-            field = getattr(self.model, k, None)
-            if isinstance(field, ForeignRelatedObjectsDescriptor):
+            if isinstance(attrs[k], related):
                 one_to_many_keys[k] = attrs.pop(k)
         instance = self.model(**attrs)
         # m2m only works for persisted instances
@@ -310,9 +316,9 @@ class Mommy(object):
         return instance
 
     def _handle_one_to_many(self, instance, attrs):
-        for k, v in attrs.iteritems():
-            for element in v:
-                element(instance)
+        for k, v in attrs.items():
+            setattr(instance, k, v.make())
+            instance.save()
 
     def _handle_m2m(self, instance):
         for key, values in self.m2m_dict.items():
