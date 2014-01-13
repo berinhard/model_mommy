@@ -115,6 +115,14 @@ def gen_url():
 def gen_email():
     return u"%s@example.com" % gen_string(10)
 
+    
+def gen_ipv6():
+    return ":".join(format(randint(1, 65535), 'x') for i in range(8))
+
+
+def gen_ipv4():
+    return ".".join(str(randint(1, 255)) for i in range(4))
+
 
 def gen_content_type():
     return ContentType.objects.get_for_model(choice(get_models()))
