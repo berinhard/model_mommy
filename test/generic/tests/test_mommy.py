@@ -8,6 +8,7 @@ from django.db.models import Manager
 from mock import patch, Mock
 
 from model_mommy import mommy
+from model_mommy import generators
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
 from test.generic.models import Person, Dog, Store, LonelyPerson, School, SchoolEnrollment, ModelWithImpostorField, Classroom, GuardDog
@@ -16,6 +17,7 @@ from test.generic.models import UnsupportedModel, DummyGenericRelationModel
 from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
 from test.generic.models import DummyDefaultFieldsModel, DummyMultipleInheritanceModel
 from test.generic.models import DummyGenericForeignKeyModel, NonAbstractPerson
+from test.generic.forms import DummyIPAddressesFieldForm
 
 
 class ModelFinderTest(TestCase):
@@ -340,3 +342,17 @@ class SkipDefaultsTestCase(TestCase):
         self.assertEqual(dummy.default_decimal_field, Decimal('0'))
         self.assertEqual(dummy.default_email_field, 'foo@bar.org')
         self.assertEqual(dummy.default_slug_field, 'a-slug')
+
+
+class MommyGeneratesIPAdresses(TestCase):
+    def test_create_model_with_valid_ipv4(self):
+        form_data = {
+            'ip': generators.gen_ipv4(),
+        }
+        self.assertTrue(DummyIPAddressesFieldForm(form_data).is_valid())
+
+    def test_create_model_with_valid_ipv6(self):
+        form_data = {
+            'ip': generators.gen_ipv6(),
+        }
+        self.assertTrue(DummyIPAddressesFieldForm(form_data).is_valid())

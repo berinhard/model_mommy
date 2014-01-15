@@ -199,3 +199,7 @@ class CustomFieldWithoutGeneratorModel(models.Model):
 
 class DummyUniqueIntegerFieldModel(models.Model):
     value = models.IntegerField(unique=True)
+
+
+class DummyIPAddressesFieldModel(models.Model):
+    ip = models.GenericIPAddressField()
