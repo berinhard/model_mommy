@@ -7,6 +7,7 @@
 from decimal import Decimal
 from tempfile import gettempdir
 
+from django import VERSION
 from django.db import models
 from django.core.files.storage import FileSystemStorage
 
@@ -201,5 +202,10 @@ class DummyUniqueIntegerFieldModel(models.Model):
     value = models.IntegerField(unique=True)
 
 
-class DummyIPAddressesFieldModel(models.Model):
-    ip = models.GenericIPAddressField()
+if VERSION < (1, 4):
+    class DummyIPAddressFieldModel(models.Model):
+        ip = models.IPAddressField()  # Deprecated in Django 1.7
+else:
+    class DummyGenericIPAddressFieldModel(models.Model):
+        ip = models.GenericIPAddressField()  # New in Django 1.4
+    

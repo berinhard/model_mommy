@@ -2,6 +2,7 @@
 from decimal import Decimal
 
 from django.test import TestCase
+from django import VERSION
 from django.db.models.options import Options
 from django.db.models import Manager
 
@@ -17,7 +18,6 @@ from test.generic.models import UnsupportedModel, DummyGenericRelationModel
 from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
 from test.generic.models import DummyDefaultFieldsModel, DummyMultipleInheritanceModel
 from test.generic.models import DummyGenericForeignKeyModel, NonAbstractPerson
-from test.generic.forms import DummyIPAddressesFieldForm
 
 
 class ModelFinderTest(TestCase):
@@ -344,15 +344,27 @@ class SkipDefaultsTestCase(TestCase):
         self.assertEqual(dummy.default_slug_field, 'a-slug')
 
 
-class MommyGeneratesIPAdresses(TestCase):
-    def test_create_model_with_valid_ipv4(self):
-        form_data = {
-            'ip': generators.gen_ipv4(),
-        }
-        self.assertTrue(DummyIPAddressesFieldForm(form_data).is_valid())
+if VERSION < (1, 4):
+    from test.generic.forms import DummyIPAddressFieldForm
 
-    def test_create_model_with_valid_ipv6(self):
-        form_data = {
-            'ip': generators.gen_ipv6(),
-        }
-        self.assertTrue(DummyIPAddressesFieldForm(form_data).is_valid())
+    class MommyGeneratesIPAdresses(TestCase):
+        def test_create_model_with_valid_ipv4(self):
+            form_data = {
+                'ip': generators.gen_ipv4(),
+            }
+            self.assertTrue(DummyIPAddressFieldForm(form_data).is_valid())
+else:
+    from test.generic.forms import DummyGenericIPAddressFieldForm
+
+    class MommyGeneratesIPAdresses(TestCase):
+        def test_create_model_with_valid_ipv4(self):
+            form_data = {
+                'ip': generators.gen_ipv4(),
+            }
+            self.assertTrue(DummyGenericIPAddressFieldForm(form_data).is_valid())
+        
+        def test_create_model_with_valid_ipv6(self):
+            form_data = {
+                'ip': generators.gen_ipv6(),
+            }
+            self.assertTrue(DummyGenericIPAddressFieldForm(form_data).is_valid())
