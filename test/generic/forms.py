@@ -3,14 +3,14 @@ from django.forms import ModelForm
 
 
 if VERSION < (1, 4):
-	from test.generic.models import DummyIPAddressFieldModel
+    from test.generic.models import DummyIPAddressFieldModel
 
-	class DummyIPAddressFieldForm(ModelForm):
-	    class Meta:
-	        model = DummyIPAddressFieldModel
+    class DummyIPAddressFieldForm(ModelForm):
+        class Meta:
+            model = DummyIPAddressFieldModel
 else:
-	from test.generic.models import DummyGenericIPAddressFieldModel
+    from test.generic.models import DummyGenericIPAddressFieldModel
 
-	class DummyGenericIPAddressFieldForm(ModelForm):
-	    class Meta:
-	        model = DummyGenericIPAddressFieldModel
+    class DummyGenericIPAddressFieldForm(ModelForm):
+        class Meta:
+            model = DummyGenericIPAddressFieldModel
