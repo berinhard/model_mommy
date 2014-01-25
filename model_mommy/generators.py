@@ -15,9 +15,7 @@ from decimal import Decimal
 from os.path import abspath, join, dirname
 from random import randint, choice, random
 from django import VERSION
-from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
-from django.db.models import get_models
 
 from model_mommy.timezone import now
 
@@ -125,4 +123,7 @@ def gen_ipv4():
 
 
 def gen_content_type():
+    from django.contrib.contenttypes.models import ContentType
+    from django.db.models import get_models
+
     return ContentType.objects.get_for_model(choice(get_models()))
