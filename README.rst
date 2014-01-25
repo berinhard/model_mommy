@@ -280,6 +280,20 @@ Using the `foreign_key` is important for 2 reasons:
 * Semantics. You'll know that attribute is a foreign key when you're reading;
 * The associated instance will be created only when you call `make_recipe` and not during recipe definition;
 
+You can also use `related`, when you want two or more models to share the same parent:
+
+.. code-block:: python
+    from model_mommy.recipe import related, Recipe
+
+    dog = Recipe(Dog,
+        breed = 'Pug',
+    )
+    other_dog = Recipe(Dog,
+        breed = 'Boxer',
+    )
+    person_with_three_dogs = Recipe(Person,
+        dog_set = related('dog', 'other_dog')
+    )
 
 Recipes with callables
 ----------------------
