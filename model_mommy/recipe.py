@@ -25,6 +25,8 @@ class Recipe(object):
                         a[key] = rel_fields_attrs.pop(key)
                 recipe_attrs = mommy.filter_rel_attrs(k, **a)
                 mapping[k] = v.recipe.make(**recipe_attrs)
+            elif isinstance(v, related):
+                mapping[k] = v.prepare()
         mapping.update(new_attrs)
         mapping.update(rel_fields_attrs)
         return mapping
@@ -62,3 +64,28 @@ def foreign_key(recipe):
 
 def seq(value, increment_by=1):
     return mommy.Sequence(value, increment_by=increment_by)
+
+class related(object):
+    def __init__(self, *args):
+        self.related = []
+        for recipe in args:
+            if isinstance(recipe, Recipe):
+                self.related.append(recipe)
+            elif isinstance(recipe, string_types):
+                frame = inspect.stack()[1]
+                caller_module = inspect.getmodule(frame[0])
+                recipe = getattr(caller_module, recipe)
+                if recipe:
+                    self.related.append(recipe)
+                else:
+                    raise RecipeNotFound
+            else:
+                raise TypeError('Not a recipe')
+
+    def prepare(self):
+        """
+            Django related manager saves related set.
+            No need to persist at first
+        """
+        return [m.prepare() for m in self.related]
+

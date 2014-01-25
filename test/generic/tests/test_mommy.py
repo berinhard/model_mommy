@@ -2,13 +2,9 @@
 from decimal import Decimal
 
 from django.test import TestCase
-from django.db.models.options import Options
 from django.db.models import Manager
-
-from mock import patch, Mock
-
+from mock import patch
 from model_mommy import mommy
-from model_mommy.mommy import related
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
 from test.generic.models import Person, Dog, Store, LonelyPerson, School, SchoolEnrollment, ModelWithImpostorField, Classroom, GuardDog

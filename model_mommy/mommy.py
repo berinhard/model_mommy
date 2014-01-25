@@ -23,16 +23,7 @@ except ImportError:
 
 from . import generators
 from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
-
 from six import string_types
-
-
-class related(object):
-    def __init__(self, *args):
-        self.related = args
-
-    def make(self):
-        return [make(m) for m in self.related]
 
 class Sequence(object):
 
