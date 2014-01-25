@@ -15,7 +15,6 @@ from django.db.models import (\
     BooleanField, DecimalField, FloatField,
     FileField, ImageField, Field,
     ForeignKey, ManyToManyField, OneToOneField)
-from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
 
 try:
     from django.db.models import BigIntegerField
