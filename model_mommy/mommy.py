@@ -15,7 +15,7 @@ from django.db.models import (\
     BooleanField, DecimalField, FloatField,
     FileField, ImageField, Field,
     ForeignKey, ManyToManyField, OneToOneField)
-
+from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
 try:
     from django.db.models import BigIntegerField
 except ImportError:
@@ -303,8 +303,9 @@ class Mommy(object):
 
     def instance(self, attrs, _commit):
         one_to_many_keys = {}
-        for k in attrs.keys():
-            if isinstance(attrs[k], related):
+        for k, v in attrs.items():
+            field = getattr(self.model, k, None)
+            if isinstance(field, ForeignRelatedObjectsDescriptor):
                 one_to_many_keys[k] = attrs.pop(k)
         instance = self.model(**attrs)
         # m2m only works for persisted instances
@@ -316,7 +317,7 @@ class Mommy(object):
 
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
-            setattr(instance, k, v.make())
+            setattr(instance, k, v)
 
     def _handle_m2m(self, instance):
         for key, values in self.m2m_dict.items():
