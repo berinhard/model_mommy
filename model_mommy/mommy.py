@@ -294,7 +294,7 @@ class Mommy(object):
 
     def instance(self, attrs, _commit):
         one_to_many_keys = {}
-        for k, v in attrs.items():
+        for k in tuple(attrs.keys()):
             field = getattr(self.model, k, None)
             if isinstance(field, ForeignRelatedObjectsDescriptor):
                 one_to_many_keys[k] = attrs.pop(k)
