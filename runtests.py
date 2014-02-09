@@ -4,6 +4,7 @@ from os.path import dirname, join
 import sys
 from optparse import OptionParser
 import warnings
+import django
 
 
 def parse_args():
@@ -55,6 +56,12 @@ def get_runner(settings):
     '''
     from django.test.utils import get_runner
     TestRunner = get_runner(settings)
+    if django.VERSION >= (1, 7):
+        #  I suspect this will not be necessary in next release after 1.7.0a1:
+        #  See https://code.djangoproject.com/ticket/21831
+        setattr(settings, 'INSTALLED_APPS',
+                ['django.contrib.auth']
+                + list(getattr(settings, 'INSTALLED_APPS')))
     return TestRunner(verbosity=1, interactive=True, failfast=False)
 
 
@@ -64,6 +71,8 @@ def runtests(options=None, labels=None):
 
     settings = configure_settings(options)
     runner = get_runner(settings)
+    if django.VERSION >= (1, 7):
+        django.setup()
     sys.exit(runner.run_tests(labels))
 
 

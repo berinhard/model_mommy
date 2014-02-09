@@ -5,9 +5,14 @@ from django.conf import settings
 from django.utils import importlib
 from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.loading import cache, get_model
+import django
+from django.db.models.loading import get_model
+if django.VERSION >= (1, 7):
+    from django.apps import apps
+else:
+    from django.db.models.loading import cache
 from django.db.models.base import ModelBase
-from django.db.models import (\
+from django.db.models import (
     CharField, EmailField, SlugField, TextField, URLField,
     DateField, DateTimeField, TimeField,
     AutoField, IntegerField, SmallIntegerField,
@@ -158,11 +163,15 @@ class ModelFinder(object):
         :param name String on the form 'applabel.modelname' or 'modelname'.
         :return a model class.
         '''
-        if '.' in name:
-            app_label, model_name = name.split('.')
-            model =  get_model(app_label, model_name)
-        else:
-            model = self.get_model_by_name(name)
+        try:
+            if '.' in name:
+                app_label, model_name = name.split('.')
+                model = get_model(app_label, model_name)
+            else:
+                model = self.get_model_by_name(name)
+        except LookupError:  # Django 1.7.0a1 throws an exception
+            # Lower djangos just fail silently
+            model = None
 
         if not model:
             raise ModelNotFound("Could not find model '%s'." % name.title())
@@ -194,7 +203,12 @@ class ModelFinder(object):
         unique_models = {}
         ambiguous_models = []
 
-        for app_model in cache.app_models.values():
+        if django.VERSION >= (1, 7):
+            all_models = apps.all_models
+        else:
+            all_models = cache.app_models
+
+        for app_model in all_models.values():
             for name, model in app_model.items():
                 if name not in unique_models:
                     unique_models[name] = model
