@@ -27,7 +27,7 @@ except ImportError:
     BigIntegerField = IntegerField
 
 from . import generators
-from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
+from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty
 
 from six import string_types
 
@@ -265,6 +265,7 @@ class Mommy(object):
 
     def _make(self, commit=True, **attrs):
         is_rel_field = lambda x: '__' in x
+        iterator_attrs = dict((k, v) for k, v in attrs.items() if hasattr(v, 'next'))
         model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
         self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
         self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
@@ -298,6 +299,11 @@ class Mommy(object):
                 model_attrs[field.name] = model_attrs[field.name].gen(self.model)
             elif callable(model_attrs[field.name]):
                 model_attrs[field.name] = model_attrs[field.name]()
+            elif field.name in iterator_attrs:
+                try:
+                    model_attrs[field.name] = iterator_attrs[field.name].next()
+                except StopIteration:
+                    raise RecipeIteratorEmpty('{} iterator is empty.'.format(field.name))
 
         return self.instance(model_attrs, _commit=commit)
 

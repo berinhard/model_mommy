@@ -1,6 +1,11 @@
 #coding:utf-8
 
+
 class RecipeNotFound(Exception):
+    pass
+
+
+class RecipeIteratorEmpty(Exception):
     pass
 
 

@@ -185,7 +185,7 @@ Model-mommy allows you to define generators methods for your custom fields or ov
 Recipes
 =======
 
-If you're not confortable with random data or even you just want to improve the semantics of the generated data, there's hope for you.
+If you're not comfortable with random data or even you just want to improve the semantics of the generated data, there's hope for you.
 
 You can define a **recipe**, which is a set of rules to generate data for your models. Create a module called `mommy_recipes.py` at your app's root directory:
 
@@ -298,8 +298,25 @@ It's possible to use *callables* as recipe's attribute value.
 
 When you call `make_recipe`, *Mommy* will set the attribute to the value returned by the callable.
 
-Sequences in recipes
+
+Recipes with iterators
 ----------------------
+
+You can also use *iterators* (including *generators*) to provide multiple values to a recipe.
+
+.. code-block:: python
+
+    from itertools import cycle
+
+    colors = ['red', 'green', 'blue', 'yellow']
+    person = Recipe(Person,
+        favorite_color = cycle(colors)
+    )
+
+*Mommy* will use the next value in *iterator* every time you create a model from the recipe.
+
+Sequences in recipes
+--------------------
 
 Sometimes, you have a field with an unique value and using `make` can cause random errors. Also, passing an attribute value just to avoid uniqueness validation problems can be tedious. To solve this you can define a sequence with `seq`
 
