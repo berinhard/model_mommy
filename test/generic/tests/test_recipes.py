@@ -437,3 +437,18 @@ class TestIterators(TestCase):
         self.assertEqual('a', r.make().blank_char_field)
         self.assertEqual('b', r.make().blank_char_field)
         self.assertRaises(RecipeIteratorEmpty, r.make)
+
+    def test_only_iterators_not_iteratables_are_iterated(self):
+        """Ensure we only iterate explicit iterators.
+
+        Consider "iterable" vs "iterator":
+
+        Something like a string is "iterable", but not an "iterator". We don't
+        want to iterate "iterables", only explicit "iterators".
+
+        """
+        r = Recipe(DummyBlankFieldsModel,
+                   blank_text_field="not an iterator, so don't iterate!")
+        self.assertEqual(
+            r.make().blank_text_field,
+            "not an iterator, so don't iterate!")
