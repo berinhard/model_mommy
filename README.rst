@@ -313,7 +313,7 @@ You can also use *iterators* (including *generators*) to provide multiple values
         favorite_color = cycle(colors)
     )
 
-*Mommy* will use the next value in *iterator* every time you create a model from the recipe.
+*Mommy* will use the next value in the *iterator* every time you create a model from the recipe.
 
 Sequences in recipes
 --------------------
