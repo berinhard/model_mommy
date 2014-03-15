@@ -258,6 +258,7 @@ class Mommy(object):
         '''Creates, but do not persists, an instance of the model
         associated with Mommy instance.'''
         self.type_mapping[ForeignKey] = prepare
+        self.type_mapping[OneToOneField] = prepare
         return self._make(commit=False, **attrs)
 
     def get_fields(self):

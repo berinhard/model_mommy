@@ -197,6 +197,14 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(Person.objects.all().count(), 0)
         self.assertEqual(Dog.objects.all().count(), 0)
 
+    def test_prepare_one_to_one_should_not_persist_one_object(self):
+        lonely_person = mommy.prepare(LonelyPerson)
+
+        # makes sure database is clean
+        self.assertEqual(LonelyPerson.objects.all().count(), 0)
+        self.assertTrue(isinstance(lonely_person.only_friend, Person))
+        self.assertEqual(Person.objects.all().count(), 0)
+
     def test_create_one_to_one(self):
         lonely_person = mommy.make(LonelyPerson)
 
