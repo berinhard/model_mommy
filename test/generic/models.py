@@ -47,7 +47,7 @@ class Person(models.Model):
     happy = models.BooleanField(default=True)
     unhappy = models.BooleanField(default=False)
     name = models.CharField(max_length=30)
-    nickname = models.SlugField()
+    nickname = models.SlugField(max_length=36)
     age = models.IntegerField()
     bio = models.TextField()
     birthday = models.DateField()
@@ -208,4 +208,4 @@ if VERSION < (1, 4):
 else:
     class DummyGenericIPAddressFieldModel(models.Model):
         ip = models.GenericIPAddressField()  # New in Django 1.4
-    
+

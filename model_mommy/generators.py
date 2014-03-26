@@ -93,9 +93,10 @@ def gen_string(max_length):
 gen_string.required = ['max_length']
 
 
-def gen_slug(max_length=50):
+def gen_slug(max_length):
     valid_chars = string.ascii_letters + string.digits + '_-'
     return u''.join(choice(valid_chars) for i in range(max_length))
+gen_slug.required = ['max_length']
 
 
 def gen_text():
@@ -113,7 +114,7 @@ def gen_url():
 def gen_email():
     return u"%s@example.com" % gen_string(10)
 
-    
+
 def gen_ipv6():
     return ":".join(format(randint(1, 65535), 'x') for i in range(8))
 
