@@ -185,7 +185,7 @@ Model-mommy allows you to define generators methods for your custom fields or ov
 Recipes
 =======
 
-If you're not confortable with random data or even you just want to improve the semantics of the generated data, there's hope for you.
+If you're not comfortable with random data or even you just want to improve the semantics of the generated data, there's hope for you.
 
 You can define a **recipe**, which is a set of rules to generate data for your models. Create a module called `mommy_recipes.py` at your app's root directory:
 
