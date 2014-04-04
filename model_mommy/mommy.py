@@ -29,6 +29,7 @@ except ImportError:
 from . import generators
 from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty
 
+import six
 from six import string_types, advance_iterator
 
 
@@ -204,7 +205,10 @@ class ModelFinder(object):
 
 
 def is_iterator(value):
-    return hasattr(value, '__iter__') and not isinstance(value, string_types)
+    if six.PY3:
+        return hasattr(value, '__next__')
+    else:
+        return hasattr(value, 'next')
 
 
 class Mommy(object):
