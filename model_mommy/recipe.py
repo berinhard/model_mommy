@@ -22,7 +22,7 @@ class Recipe(object):
             # do not generate values if field value is provided
             if new_attrs.get(k):
                 continue
-            elif hasattr(v, 'next') and callable(v.next):
+            elif mommy.is_iterator(v):
                 if self.model.objects.count() == 0:
                     self._iterator_backups[k] = itertools.tee(self._iterator_backups.get(k, [v])[0])
                 mapping[k] = self._iterator_backups[k][1]
