@@ -1,5 +1,6 @@
 #coding: utf-8
 
+import itertools
 from random import choice
 from mock import patch
 from decimal import Decimal
@@ -7,7 +8,7 @@ from django.test import TestCase
 from model_mommy import mommy
 from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
 from model_mommy.timezone import now
-from model_mommy.exceptions import InvalidQuantityException
+from model_mommy.exceptions import InvalidQuantityException, RecipeIteratorEmpty
 from test.generic.models import Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
 
 
@@ -412,3 +413,42 @@ class TestSequences(TestCase):
         self.assertEqual(dummy.default_int_field, 19)
         self.assertEqual(dummy.default_decimal_field, Decimal('27.3'))
         self.assertAlmostEqual(dummy.default_float_field, 6.63)
+
+
+class TestIterators(TestCase):
+
+    def test_accepts_generators(self):
+        r = Recipe(DummyBlankFieldsModel,
+                   blank_char_field=itertools.cycle(['a', 'b']))
+        self.assertEqual('a', r.make().blank_char_field)
+        self.assertEqual('b', r.make().blank_char_field)
+        self.assertEqual('a', r.make().blank_char_field)
+
+    def test_accepts_iterators(self):
+        r = Recipe(DummyBlankFieldsModel,
+                   blank_char_field=iter(['a', 'b', 'c']))
+        self.assertEqual('a', r.make().blank_char_field)
+        self.assertEqual('b', r.make().blank_char_field)
+        self.assertEqual('c', r.make().blank_char_field)
+
+    def test_empty_iterator_exception(self):
+        r = Recipe(DummyBlankFieldsModel,
+                   blank_char_field=iter(['a', 'b']))
+        self.assertEqual('a', r.make().blank_char_field)
+        self.assertEqual('b', r.make().blank_char_field)
+        self.assertRaises(RecipeIteratorEmpty, r.make)
+
+    def test_only_iterators_not_iteratables_are_iterated(self):
+        """Ensure we only iterate explicit iterators.
+
+        Consider "iterable" vs "iterator":
+
+        Something like a string is "iterable", but not an "iterator". We don't
+        want to iterate "iterables", only explicit "iterators".
+
+        """
+        r = Recipe(DummyBlankFieldsModel,
+                   blank_text_field="not an iterator, so don't iterate!")
+        self.assertEqual(
+            r.make().blank_text_field,
+            "not an iterator, so don't iterate!")

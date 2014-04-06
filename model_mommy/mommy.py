@@ -27,28 +27,9 @@ except ImportError:
     BigIntegerField = IntegerField
 
 from . import generators
-from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
+from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty
 
-from six import string_types
-
-
-class Sequence(object):
-
-    def __init__(self, value, increment_by=1):
-        self.value = value
-        self.counter = increment_by
-        self.increment_by = increment_by
-
-    def get_inc(self, model):
-        if not model.objects.count():
-            self.counter = self.increment_by
-        i = self.counter
-        self.counter += self.increment_by
-        return i
-
-    def gen(self, model):
-        inc = self.get_inc(model)
-        return self.value + type(self.value)(inc)
+from six import string_types, advance_iterator, PY3
 
 
 recipes = None
@@ -222,6 +203,13 @@ class ModelFinder(object):
         self._unique_models = unique_models
 
 
+def is_iterator(value):
+    if PY3:
+        return hasattr(value, '__next__')
+    else:
+        return hasattr(value, 'next')
+
+
 class Mommy(object):
     attr_mapping = {}
     type_mapping = None
@@ -266,6 +254,7 @@ class Mommy(object):
 
     def _make(self, commit=True, **attrs):
         is_rel_field = lambda x: '__' in x
+        iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
         model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
         self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
         self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
@@ -295,10 +284,13 @@ class Mommy(object):
                     continue
                 else:
                     model_attrs[field.name] = self.generate_value(field)
-            elif isinstance(model_attrs[field.name], Sequence):
-                model_attrs[field.name] = model_attrs[field.name].gen(self.model)
             elif callable(model_attrs[field.name]):
                 model_attrs[field.name] = model_attrs[field.name]()
+            elif field.name in iterator_attrs:
+                try:
+                    model_attrs[field.name] = advance_iterator(iterator_attrs[field.name])
+                except StopIteration:
+                    raise RecipeIteratorEmpty('{} iterator is empty.'.format(field.name))
 
         return self.instance(model_attrs, _commit=commit)
 
