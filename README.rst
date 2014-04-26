@@ -295,6 +295,8 @@ You can also use `related`, when you want two or more models to share the same p
         dog_set = related('dog', 'other_dog')
     )
 
+Note this will only work when calling `make_recipe` because the related manager requires the objects in the related_set to be persisted. That said, calling `prepare_recipe` the related_set will be empty.
+
 Recipes with callables
 ----------------------
 
