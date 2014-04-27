@@ -283,6 +283,8 @@ Using the `foreign_key` is important for 2 reasons:
 You can also use `related`, when you want two or more models to share the same parent:
 
 .. code-block:: python
+
+
     from model_mommy.recipe import related, Recipe
 
     dog = Recipe(Dog,
