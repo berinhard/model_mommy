@@ -20,7 +20,7 @@ from django.db.models import (
     BooleanField, DecimalField, FloatField,
     FileField, ImageField, Field,
     ForeignKey, ManyToManyField, OneToOneField)
-
+from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
 try:
     from django.db.models import BigIntegerField
 except ImportError:
@@ -30,7 +30,6 @@ from . import generators
 from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty
 
 from six import string_types, advance_iterator, PY3
-
 
 recipes = None
 
@@ -302,12 +301,22 @@ class Mommy(object):
         return self.generate_value(field)
 
     def instance(self, attrs, _commit):
+        one_to_many_keys = {}
+        for k in tuple(attrs.keys()):
+            field = getattr(self.model, k, None)
+            if isinstance(field, ForeignRelatedObjectsDescriptor):
+                one_to_many_keys[k] = attrs.pop(k)
         instance = self.model(**attrs)
         # m2m only works for persisted instances
         if _commit:
             instance.save()
+            self._handle_one_to_many(instance, one_to_many_keys)
             self._handle_m2m(instance)
         return instance
+
+    def _handle_one_to_many(self, instance, attrs):
+        for k, v in attrs.items():
+            setattr(instance, k, v)
 
     def _handle_m2m(self, instance):
         for key, values in self.m2m_dict.items():

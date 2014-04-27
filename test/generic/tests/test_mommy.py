@@ -5,9 +5,7 @@ from django.test import TestCase
 from django import VERSION
 from django.db.models.options import Options
 from django.db.models import Manager
-
-from mock import patch, Mock
-
+from mock import patch
 from model_mommy import mommy
 from model_mommy import generators
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
@@ -301,6 +299,13 @@ class MommyCreatesAssociatedModels(TestCase):
         lonely_person = mommy.make(LonelyPerson, only_friend__name='Bob')
         self.assertEqual('Bob', lonely_person.only_friend.name)
 
+    def test_allow_create_fkey_related_model(self):
+        try:
+            person = mommy.make(Person, dog_set=[mommy.prepare(Dog), mommy.prepare(Dog)])
+        except TypeError:
+            self.fail('type error raised')
+
+        self.assertEqual(person.dog_set.count(), 2)
 
 class HandlingUnsupportedModels(TestCase):
     def test_unsupported_model_raises_an_explanatory_exception(self):
@@ -370,7 +375,7 @@ else:
                 'ip': generators.gen_ipv4(),
             }
             self.assertTrue(DummyGenericIPAddressFieldForm(form_data).is_valid())
-        
+
         def test_create_model_with_valid_ipv6(self):
             form_data = {
                 'ip': generators.gen_ipv6(),

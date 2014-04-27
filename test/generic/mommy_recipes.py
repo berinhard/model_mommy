@@ -3,6 +3,7 @@
 #ATTENTION: Recipes defined for testing purposes only
 from decimal import Decimal
 from model_mommy.recipe import Recipe, foreign_key, seq
+from model_mommy.recipe import related
 from model_mommy.timezone import now
 from test.generic.models import Person, Dog, DummyDefaultFieldsModel, DummyUniqueIntegerFieldModel
 
@@ -54,4 +55,8 @@ other_dog_unicode = Recipe(Dog,
 
 dummy_unique_field = Recipe(DummyUniqueIntegerFieldModel,
     value = seq(10),
+)
+
+dog_lady = Recipe(Person,
+    dog_set = related('dog', other_dog)
 )
