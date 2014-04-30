@@ -259,8 +259,6 @@ class Mommy(object):
         self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
         self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
 
-
-
         for field in self.get_fields():
 
             # Skip links to parent so parent is not created twice.
