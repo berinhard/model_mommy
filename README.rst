@@ -143,8 +143,7 @@ How mommy behaves?
 
 By default, *model-mommy* skips fields with `null=True` or `blank=True`. Also if a field has a *default* value, it will be used.
 
-You can override this behavior by explicitly defining values.
-
+You can override this behavior by explicitly defining values, or you can pass a special argument `_fill_blanks=True` which will tell *model-mommy* to fill in these fields with random data.
 
 When shouldn't you let mommy generate things for you?
 -----------------------------------------------------
