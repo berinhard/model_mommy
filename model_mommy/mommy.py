@@ -252,11 +252,14 @@ class Mommy(object):
         return self.model._meta.fields + self.model._meta.many_to_many
 
     def _make(self, commit=True, **attrs):
+        fill_in_blanks = attrs.pop('_fill_blanks', False)
         is_rel_field = lambda x: '__' in x
         iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
         model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
         self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
         self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
+
+
 
         for field in self.get_fields():
 
@@ -270,7 +273,7 @@ class Mommy(object):
                 continue
 
             if all([field.name not in model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
-                if not issubclass(field.__class__, Field) or field.has_default() or field.blank:
+                if not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not fill_in_blanks):
                     continue
 
             if isinstance(field, ManyToManyField):
@@ -279,7 +282,7 @@ class Mommy(object):
                 else:
                     self.m2m_dict[field.name] = model_attrs.pop(field.name)
             elif field_value_not_defined:
-                if field.name not in self.rel_fields and field.null:
+                if field.name not in self.rel_fields and (field.null and not fill_in_blanks):
                     continue
                 else:
                     model_attrs[field.name] = self.generate_value(field)

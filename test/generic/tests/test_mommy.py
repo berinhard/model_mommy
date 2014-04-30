@@ -342,6 +342,12 @@ class SkipBlanksTestCase(TestCase):
         self.assertEqual(dummy.blank_text_field, '')
 
 
+class FillBlanksTestCase(TestCase):
+    def test_fill_blanks(self):
+        dummy = mommy.make(DummyBlankFieldsModel, _fill_blanks=True)
+        self.assertEqual(len(dummy.blank_char_field), 50)
+
+
 class SkipDefaultsTestCase(TestCase):
     def test_skip_fields_with_default(self):
         dummy = mommy.make(DummyDefaultFieldsModel)
