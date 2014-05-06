@@ -134,4 +134,152 @@ File: test_model.py ::
 Recipes with foreign keys
 -------------------------
 
+You can define `foreign_key` relations:
 
+.. code-block:: python
+
+    from model_mommy.recipe import Recipe, foreign_key
+    from family.models import Person, Dog
+
+
+    person = Recipe(Person,
+        name = 'John Doe',
+        nickname = 'joe',
+        age = 18,
+        birthday = date.today(),
+        appointment = datetime.now()
+    )
+
+    dog = Recipe(Dog,
+        breed = 'Pug',
+        owner = foreign_key(person)
+    )
+
+Notice that `person` is a *recipe*.
+
+You may be thinking: "I can put the Person model instance directly in the owner field". That's not recommended.
+
+Using the `foreign_key` is important for 2 reasons:
+
+* Semantics. You'll know that attribute is a foreign key when you're reading;
+* The associated instance will be created only when you call `make_recipe` and not during recipe definition;
+
+You can also use `related`, when you want two or more models to share the same parent:
+
+.. code-block:: python
+
+
+    from model_mommy.recipe import related, Recipe
+
+    dog = Recipe(Dog,
+        breed = 'Pug',
+    )
+    other_dog = Recipe(Dog,
+        breed = 'Boxer',
+    )
+    person_with_three_dogs = Recipe(Person,
+        dog_set = related('dog', 'other_dog')
+    )
+
+Note this will only work when calling `make_recipe` because the related manager requires the objects in the related_set to be persisted. That said, calling `prepare_recipe` the related_set will be empty.
+
+Recipes with callables
+----------------------
+
+It's possible to use *callables* as recipe's attribute value.
+
+.. code-block:: python
+
+    from datetime import date
+    from model_mommy.recipe import Recipe
+    from family.models import Person
+
+    person = Recipe(Person,
+        birthday = date.today,
+    )
+
+When you call `make_recipe`, *Mommy* will set the attribute to the value returned by the callable.
+
+
+Recipes with iterators
+----------------------
+
+You can also use *iterators* (including *generators*) to provide multiple values to a recipe.
+
+.. code-block:: python
+
+    from itertools import cycle
+
+    colors = ['red', 'green', 'blue', 'yellow']
+    person = Recipe(Person,
+        favorite_color = cycle(colors)
+    )
+
+*Mommy* will use the next value in the *iterator* every time you create a model from the recipe.
+
+Sequences in recipes
+--------------------
+
+Sometimes, you have a field with an unique value and using `make` can cause random errors. Also, passing an attribute value just to avoid uniqueness validation problems can be tedious. To solve this you can define a sequence with `seq`
+
+.. code-block:: python
+
+
+    from model_mommy.recipe import Recipe, seq
+    from family.models import Person
+
+    person = Recipe(Person,
+        name = seq('Joe'),
+        age = seq(15)
+    )
+
+    p = mommy.make_recipe('myapp.person')
+    p.name
+    >>> 'Joe1'
+    p.age
+    >>> 16
+
+    p = mommy.make_recipe('myapp.person')
+    p.name
+    >>> 'Joe2'
+    p.age
+    >>> 17
+
+This will append a counter to strings to avoid uniqueness problems and it will sum the counter with numerical values.
+
+
+You can also provide an optional `increment_by` argument which will modify incrementing behaviour. This can be an integer, float or Decimal.
+
+.. code-block:: python
+
+
+    person = Recipe(Person,
+        age = seq(15, increment_by=3)
+        height_ft = seq(5.5, increment_by=.25)
+    )
+
+    p = mommy.make_recipe('myapp.person')
+    p.age
+    >>> 18
+    p.height_ft
+    >>> 5.75
+
+    p = mommy.make_recipe('myapp.person')
+    p.age
+    >>> 21
+    p.height_ft
+    >>> 6.0
+
+
+Overriding recipe definitions
+-----------------------------
+
+Passing values when calling `make_recipe` or `prepare_recipe` will override the recipe rule.
+
+.. code-block:: python
+
+    from model_mommy import mommy
+
+    mommy.make_recipe('model_mommy.person', name='Peter Parker')
+
+This is useful when you have to create multiple objects and you have some unique field, for instance.
