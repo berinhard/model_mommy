@@ -24,6 +24,41 @@ Run the command above ::
 
     pip install model_mommy
 
+Contributing
+============
+
+1. Prepare a virtual environment.
+
+.. code-block:: console
+
+    pip install virtualenvwrapper
+    mkvirtualenv --no-site-packages --distribute
+
+2. Install the requirements.
+
+.. code-block:: console
+
+    pip install -r requirements.txt
+
+3. Run the tests.
+
+.. code-block:: console
+
+    make test
+
+Inspiration
+===========
+
+*Model-mommy* was inspired by many great open source software like ruby's ObjectDaddy and FactoryGirl.
+
+
+Doubts? Loved it? Hated it? Suggestions?
+========================================
+
+Join our mailing list for support, development and ideas!
+
+*  https://groups.google.com/group/model-mommy
+
 
 Contents:
 
@@ -31,9 +66,12 @@ Contents:
    :maxdepth: 4
 
    basic_usage
-   model_relationships
-   define_some_attributes.rst
-   recipes.rst
+   how_mommy_behaves
+   recipes
+   deprecation_warnings
+   know_issues
+   extensions
+
 
 
 
