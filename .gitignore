@@ -10,4 +10,4 @@ share/
 *.egg-info/
 .idea
 .tox
-
+build/
