@@ -26,6 +26,14 @@ else:
 
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
+OCCUPATION_CHOCIES = (
+    ('Service Industry', (
+        ('waitress', 'Waitress'),
+        ('bartender', 'Bartender'))),
+    ('Education', (
+        ('teacher', 'Teacher'),
+        ('principal', 'Principal'))))
+
 
 class ModelWithImpostorField(models.Model):
     pass
@@ -54,6 +62,7 @@ class Person(models.Model):
     birth_time = models.TimeField()
     appointment = models.DateTimeField()
     blog = models.URLField()
+    occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOCIES)
 
     #backward compatibilty with Django 1.1
     try:

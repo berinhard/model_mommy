@@ -65,6 +65,11 @@ class FillingFromChoice(FieldFillingTestCase):
         from test.generic.models import GENDER_CH
         self.assertTrue(self.person.gender in map(lambda x: x[0], GENDER_CH))
 
+    def test_if_oppucation_populated_from_choices(self):
+        from test.generic.models import OCCUPATION_CHOCIES
+        occupations = [item[0] for list in OCCUPATION_CHOCIES for item in list[1]]
+        self.assertTrue(self.person.occupation in occupations)
+
 
 class StringFieldsFilling(FieldFillingTestCase):
 

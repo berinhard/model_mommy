@@ -57,7 +57,13 @@ def gen_from_list(L):
 
 
 def gen_from_choices(C):
-    choice_list = map(lambda x: x[0], C)
+    choice_list = []
+    for value, label in C:
+        if isinstance(label, (list, tuple)):
+            for val, lbl in label:
+                choice_list.append(val)
+        else:
+            choice_list.append(value)
     return gen_from_list(choice_list)
 
 
