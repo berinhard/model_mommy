@@ -270,7 +270,8 @@ class Mommy(object):
                 continue
 
             if all([field.name not in model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
-                if not issubclass(field.__class__, Field) or field.has_default() or field.blank:
+                # Django is quirky in that BooleanFields are always "blank", but have no default default.
+                if not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not isinstance(field, BooleanField)):
                     continue
 
             if isinstance(field, ManyToManyField):
