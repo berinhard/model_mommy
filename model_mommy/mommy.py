@@ -18,7 +18,7 @@ from django.db.models import (
     AutoField, IntegerField, SmallIntegerField,
     PositiveIntegerField, PositiveSmallIntegerField,
     BooleanField, DecimalField, FloatField,
-    FileField, ImageField, Field,
+    FileField, ImageField, Field, IPAddressField, GenericIPAddressField
     ForeignKey, ManyToManyField, OneToOneField)
 from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
 try:
@@ -122,6 +122,7 @@ default_mapping = {
 
     URLField: generators.gen_url,
     EmailField: generators.gen_email,
+    IPAddressField: generators.gen_ipv4,
     FileField: generators.gen_file_field,
     ImageField: generators.gen_image_field,
 
@@ -363,6 +364,14 @@ class Mommy(object):
             generator = self.type_mapping[ContentType]
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
+        elif isinstance(field, GenericIPAddressField):
+            protocol = field.protocol.lower()
+            if protocol == 'ipv4':
+                generator = generators.gen_ipv4
+            elif protocol == 'ipv6':
+                generator = generators.gen_ipv6
+            else:
+                generator = generators.gen_ipv46
         else:
             raise TypeError('%s is not supported by mommy.' % field.__class__)
 

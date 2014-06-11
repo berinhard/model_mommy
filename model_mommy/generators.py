@@ -129,6 +129,11 @@ def gen_ipv4():
     return ".".join(str(randint(1, 255)) for i in range(4))
 
 
+def gen_ipv46():
+    ip_gen = choice([gen_ipv4, gen_ipv6])
+    return ip_gen()
+
+
 def gen_content_type():
     from django.contrib.contenttypes.models import ContentType
     from django.db.models import get_models
