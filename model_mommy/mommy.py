@@ -18,7 +18,7 @@ from django.db.models import (
     AutoField, IntegerField, SmallIntegerField,
     PositiveIntegerField, PositiveSmallIntegerField,
     BooleanField, DecimalField, FloatField,
-    FileField, ImageField, Field, IPAddressField, GenericIPAddressField
+    FileField, ImageField, Field, IPAddressField, GenericIPAddressField,
     ForeignKey, ManyToManyField, OneToOneField)
 from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
 try:
