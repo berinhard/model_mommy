@@ -18,7 +18,7 @@ from django.db.models import (
     AutoField, IntegerField, SmallIntegerField,
     PositiveIntegerField, PositiveSmallIntegerField,
     BooleanField, DecimalField, FloatField,
-    FileField, ImageField, Field, IPAddressField, GenericIPAddressField,
+    FileField, ImageField, Field, IPAddressField,
     ForeignKey, ManyToManyField, OneToOneField)
 from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
 try:
@@ -26,9 +26,19 @@ try:
 except ImportError:
     BigIntegerField = IntegerField
 
+try:
+    from django.db.models import GenericIPAddressField
+except ImportError:
+    GenericIPAddressField = IPAddressField
+
 from django.core.exceptions import ValidationError
-from django.core.validators import (validate_ipv4_address,
-    validate_ipv6_address, validate_ipv46_address)
+from django.core.validators import validate_ipv4_address
+try:
+    from django.core.validators import validate_ipv6_address, validate_ipv46_address
+except ImportError:
+    def validate_ipv6_address(v):
+        raise ValidationError()
+    validate_ipv46_address = validate_ipv6_address
 
 from . import generators
 from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty

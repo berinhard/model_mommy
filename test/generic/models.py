@@ -116,13 +116,6 @@ class DummyDecimalModel(models.Model):
     decimal_field = models.DecimalField(max_digits=5, decimal_places=2)
 
 
-class DummyIPAddressFieldsModel(models.Model):
-    ipv4_field = models.GenericIPAddressField('ipv4', protocol='IPv4')
-    ipv6_field = models.GenericIPAddressField('ipv6', protocol='IPv6')
-    ipv46_field = models.GenericIPAddressField('ipv46', protocol='both')
-    old_ipv4_field = models.IPAddressField('old_ipv4')
-
-
 class UnsupportedField(models.Field):
     description = "I'm bad company, mommy doesn't know me"
 
@@ -221,8 +214,9 @@ class DummyUniqueIntegerFieldModel(models.Model):
 
 if VERSION < (1, 4):
     class DummyIPAddressFieldModel(models.Model):
-        ip = models.IPAddressField()  # Deprecated in Django 1.7
+        ipv4_field = models.IPAddressField()  # Deprecated in Django 1.7
 else:
     class DummyGenericIPAddressFieldModel(models.Model):
-        ip = models.GenericIPAddressField()  # New in Django 1.4
-
+        ipv4_field = models.GenericIPAddressField('ipv4', protocol='IPv4')
+        ipv6_field = models.GenericIPAddressField('ipv6', protocol='IPv6')
+        ipv46_field = models.GenericIPAddressField('ipv46', protocol='both')
