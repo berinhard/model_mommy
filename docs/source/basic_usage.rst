@@ -84,14 +84,14 @@ File: model.py ::
         wanted_games_qtd = models.BigIntegerField()
         birthday = models.DateField()
         appointment = models.DateTimeField()
-        
+
         class Meta:
             verbose_name = _(u'Kid')
             verbose_name_plural = _(u'Kids')
 
         def __unicode__(self):
             """
-            Retorn the name of kid 
+            Retorn the name of kid
             """
             return u'%s' % (self.name)
 
@@ -157,7 +157,7 @@ File: test_model.py ::
             """
             Set up all the tests
             """
-            self.rex = mommy.make('family.Dog', M2M=True)
+            self.rex = mommy.make('family.Dog', make_m2m=True)
 
 Defining some attributes
 ------------------------
