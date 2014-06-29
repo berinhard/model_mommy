@@ -153,7 +153,10 @@ class TestDefiningRecipes(TestCase):
         p = Recipe('generic.Person',
             name=seq('foo')
         )
-        p.make(_quantity=5)
+        try:
+            p.make(_quantity=5)
+        except AttributeError, e:
+            self.fail('%s' %e)
 
 class TestExecutingRecipes(TestCase):
     """
