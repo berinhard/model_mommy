@@ -8,6 +8,11 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import CharField, TextField, SlugField
 from django.db.models.fields import DateField, DateTimeField,TimeField, EmailField
+from django.db.models.fields import IPAddressField
+try:
+    from django.db.models.fields import GenericIPAddressField
+except ImportError:
+    GenericIPAddressField = IPAddressField
 from django.db.models.fields import IntegerField, SmallIntegerField
 from django.db.models.fields import PositiveSmallIntegerField
 from django.db.models.fields import PositiveIntegerField
@@ -36,11 +41,20 @@ from test.generic.models import DummyFileFieldModel
 from test.generic.models import DummyImageFieldModel
 from test.generic.models import CustomFieldWithoutGeneratorModel, CustomFieldWithGeneratorModel
 
+from django.core.validators import validate_ipv4_address
+try:
+    from django.core.validators import validate_ipv6_address, validate_ipv46_address
+except ImportError:
+    def validate_ipv6_address(v):
+        raise ValidationError()
+    validate_ipv46_address = validate_ipv6_address
+
+
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
     'DateFieldsFilling', 'FillingIntFields', 'FillingPositiveIntFields',
     'FillingOthersNumericFields', 'FillingFromChoice', 'URLFieldsFilling',
-    'FillingEmailField', 'FillingGenericForeignKeyField', 'FillingFileField',
+    'FillingEmailField', 'FillingIPAddressField', 'FillingGenericForeignKeyField', 'FillingFileField',
     'FillingImageFileField', 'TimeFieldsFilling', 'FillingCustomFields',
 ]
 
@@ -215,6 +229,29 @@ class FillingEmailField(TestCase):
         field = DummyEmailModel._meta.get_field('email_field')
         self.assertIsInstance(field, EmailField)
         self.assertIsInstance(obj.email_field, string_types)
+
+
+class FillingIPAddressField(TestCase):
+
+    def test_filling_IPAddressField(self):
+        try:
+            from test.generic.models import DummyGenericIPAddressFieldModel as IPModel
+        except ImportError:
+            from test.generic.models import DummyIPAddressFieldModel as IPModel
+
+        obj = mommy.make(IPModel)
+        field = IPModel._meta.get_field('ipv4_field')
+        self.assertIsInstance(field, GenericIPAddressField)
+        self.assertIsInstance(obj.ipv4_field, string_types)
+
+        validate_ipv4_address(obj.ipv4_field)
+
+        if hasattr(obj, 'ipv6_field'):
+            self.assertIsInstance(obj.ipv6_field, string_types)
+            self.assertIsInstance(obj.ipv46_field, string_types)
+
+            validate_ipv6_address(obj.ipv6_field)
+            validate_ipv46_address(obj.ipv46_field)
 
 
 class FillingGenericForeignKeyField(TestCase):
