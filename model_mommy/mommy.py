@@ -76,7 +76,7 @@ def make(model, _quantity=None, make_m2m=False, **attrs):
 
 def prepare(model, _quantity=None, **attrs):
     """
-    Creates a BUT DOESN'T persist an instance from a given model its
+    Creates BUT DOESN'T persist an instance from a given model its
     associated models.
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
@@ -257,7 +257,7 @@ class Mommy(object):
         return self._make(commit=True, **attrs)
 
     def prepare(self, **attrs):
-        '''Creates, but do not persists, an instance of the model
+        '''Creates, but does not persist, an instance of the model
         associated with Mommy instance.'''
         self.type_mapping[ForeignKey] = prepare
         self.type_mapping[OneToOneField] = prepare
@@ -393,7 +393,7 @@ class Mommy(object):
         -- default_mapping - mapping from pre-defined type associated
            generators
 
-        `attr_mapping` and `type_mapping` can be defined easely overwriting the
+        `attr_mapping` and `type_mapping` can be defined easily overwriting the
         model.
         '''
         if field.name in self.attr_mapping:
@@ -409,7 +409,7 @@ class Mommy(object):
         else:
             raise TypeError('%s is not supported by mommy.' % field.__class__)
 
-        # attributes like max_length, decimal_places are take in account when
+        # attributes like max_length, decimal_places are taken into account when
         # generating the value.
         generator_attrs = get_required_values(generator, field)
 
@@ -422,9 +422,9 @@ class Mommy(object):
 def get_required_values(generator, field):
     '''
     Gets required values for a generator from the field.
-    If required value is a function, call's it with field as argument.
+    If required value is a function, calls it with field as argument.
     If required value is a string, simply fetch the value from the field
-    and returns.
+    and return.
     '''
     #FIXME: avoid abreviations
     rt = {}
@@ -458,7 +458,7 @@ def filter_rel_attrs(field_name, **rel_attrs):
     return clean_dict
 
 
-### DEPRECATED METHODS (should be removed on the future)
+### DEPRECATED METHODS (should be removed in the future)
 def make_many(model, quantity=None, **attrs):
     msg = "make_many is deprecated. You should use make with _quantity parameter."
     warnings.warn(msg, DeprecationWarning)
