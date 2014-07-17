@@ -298,7 +298,7 @@ class Mommy(object):
                 else:
                     self.m2m_dict[field.name] = model_attrs.pop(field.name)
             elif field_value_not_defined:
-                if field.name not in self.rel_fields and (field.null and not fill_in_blanks):
+                if field.name not in self.rel_fields and (field.null and not field.fill_blanks):
                     continue
                 else:
                     model_attrs[field.name] = self.generate_value(field)
