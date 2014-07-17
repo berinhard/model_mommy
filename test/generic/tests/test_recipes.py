@@ -148,6 +148,15 @@ class TestDefiningRecipes(TestCase):
         self.assertTrue(person.wanted_games_qtd)
         self.assertFalse(person.id)
 
+    def test_defining_recipes_str(self):
+        from model_mommy.recipe import seq
+        p = Recipe('generic.Person',
+            name=seq('foo')
+        )
+        try:
+            p.make(_quantity=5)
+        except AttributeError, e:
+            self.fail('%s' %e)
 
 class TestExecutingRecipes(TestCase):
     """

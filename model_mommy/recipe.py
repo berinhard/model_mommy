@@ -6,6 +6,7 @@ from .exceptions import RecipeNotFound, RecipeIteratorEmpty
 
 from six import string_types
 
+finder = mommy.ModelFinder()
 
 class Recipe(object):
     def __init__(self, model, **attrs):
@@ -23,7 +24,11 @@ class Recipe(object):
             if new_attrs.get(k):
                 continue
             elif mommy.is_iterator(v):
-                if self.model.objects.count() == 0:
+                if isinstance(self.model, string_types):
+                    m = finder.get_model(self.model)
+                else:
+                    m = self.model
+                if m.objects.count() == 0:
                     self._iterator_backups[k] = itertools.tee(self._iterator_backups.get(k, [v])[0])
                 mapping[k] = self._iterator_backups[k][1]
             elif isinstance(v, RecipeForeignKey):

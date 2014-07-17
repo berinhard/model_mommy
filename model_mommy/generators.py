@@ -57,7 +57,13 @@ def gen_from_list(L):
 
 
 def gen_from_choices(C):
-    choice_list = map(lambda x: x[0], C)
+    choice_list = []
+    for value, label in C:
+        if isinstance(label, (list, tuple)):
+            for val, lbl in label:
+                choice_list.append(val)
+        else:
+            choice_list.append(value)
     return gen_from_list(choice_list)
 
 
@@ -121,6 +127,11 @@ def gen_ipv6():
 
 def gen_ipv4():
     return ".".join(str(randint(1, 255)) for i in range(4))
+
+
+def gen_ipv46():
+    ip_gen = choice([gen_ipv4, gen_ipv6])
+    return ip_gen()
 
 
 def gen_content_type():

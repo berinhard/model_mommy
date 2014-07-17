@@ -16,10 +16,10 @@ Install
     pip install model_mommy
 
 
-Basic usage
-===========
+Usage and Info
+==============
 
-Let's say you have an app **family** with a model like this:
+*     http://model-mommy.readthedocs.org/
 
 .. code-block:: python
 
@@ -468,3 +468,4 @@ Doubts? Loved it? Hated it? Suggestions?
 Join our mailing list for support, development and ideas!
 
 *  https://groups.google.com/group/model-mommy
+=======

@@ -18,13 +18,27 @@ from django.db.models import (
     AutoField, IntegerField, SmallIntegerField,
     PositiveIntegerField, PositiveSmallIntegerField,
     BooleanField, DecimalField, FloatField,
-    FileField, ImageField, Field,
+    FileField, ImageField, Field, IPAddressField,
     ForeignKey, ManyToManyField, OneToOneField)
 from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
 try:
     from django.db.models import BigIntegerField
 except ImportError:
     BigIntegerField = IntegerField
+
+try:
+    from django.db.models import GenericIPAddressField
+except ImportError:
+    GenericIPAddressField = IPAddressField
+
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_ipv4_address
+try:
+    from django.core.validators import validate_ipv6_address, validate_ipv46_address
+except ImportError:
+    def validate_ipv6_address(v):
+        raise ValidationError()
+    validate_ipv46_address = validate_ipv6_address
 
 from . import generators
 from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty
@@ -62,7 +76,7 @@ def make(model, _quantity=None, make_m2m=False, **attrs):
 
 def prepare(model, _quantity=None, **attrs):
     """
-    Creates a BUT DOESN'T persist an instance from a given model its
+    Creates BUT DOESN'T persist an instance from a given model its
     associated models.
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
@@ -122,6 +136,7 @@ default_mapping = {
 
     URLField: generators.gen_url,
     EmailField: generators.gen_email,
+    IPAddressField: generators.gen_ipv4,
     FileField: generators.gen_file_field,
     ImageField: generators.gen_image_field,
 
@@ -242,7 +257,7 @@ class Mommy(object):
         return self._make(commit=True, **attrs)
 
     def prepare(self, **attrs):
-        '''Creates, but do not persists, an instance of the model
+        '''Creates, but does not persist, an instance of the model
         associated with Mommy instance.'''
         self.type_mapping[ForeignKey] = prepare
         self.type_mapping[OneToOneField] = prepare
@@ -271,7 +286,10 @@ class Mommy(object):
                 continue
 
             if all([field.name not in model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
-                if not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not fill_in_blanks):
+                #TODO: Merge fill_blanks logic with BooleanField update
+                # if not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not fill_in_blanks):
+                # Django is quirky in that BooleanFields are always "blank", but have no default default.
+                if not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not isinstance(field, BooleanField)):
                     continue
 
             if isinstance(field, ManyToManyField):
@@ -341,6 +359,32 @@ class Mommy(object):
                 base_kwargs[value_key] = model_instance
                 make(through_model, **base_kwargs)
 
+    def _ip_generator(self, field):
+        protocol = getattr(field, 'protocol', '').lower()
+
+        if not protocol:
+            field_validator = field.default_validators[0]
+            dummy_ipv4 = '1.1.1.1'
+            dummy_ipv6 = 'FE80::0202:B3FF:FE1E:8329'
+            try:
+                field_validator(dummy_ipv4)
+                field_validator(dummy_ipv6)
+                generator = generators.gen_ipv46
+            except ValidationError:
+                try:
+                    field_validator(dummy_ipv4)
+                    generator = generators.gen_ipv4
+                except ValidationError:
+                    generator = generators.gen_ipv6
+        elif protocol == 'ipv4':
+            generator = generators.gen_ipv4
+        elif protocol == 'ipv6':
+            generator = generators.gen_ipv6
+        else:
+            generator = generators.gen_ipv46
+
+        return generator
+
     def generate_value(self, field):
         '''
         Calls the generator associated with a field passing all required args.
@@ -352,7 +396,7 @@ class Mommy(object):
         -- default_mapping - mapping from pre-defined type associated
            generators
 
-        `attr_mapping` and `type_mapping` can be defined easely overwriting the
+        `attr_mapping` and `type_mapping` can be defined easily overwriting the
         model.
         '''
         if field.name in self.attr_mapping:
@@ -363,10 +407,12 @@ class Mommy(object):
             generator = self.type_mapping[ContentType]
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
+        elif isinstance(field, GenericIPAddressField):
+            generator = self._ip_generator(field)
         else:
             raise TypeError('%s is not supported by mommy.' % field.__class__)
 
-        # attributes like max_length, decimal_places are take in account when
+        # attributes like max_length, decimal_places are taken into account when
         # generating the value.
         generator_attrs = get_required_values(generator, field)
 
@@ -379,9 +425,9 @@ class Mommy(object):
 def get_required_values(generator, field):
     '''
     Gets required values for a generator from the field.
-    If required value is a function, call's it with field as argument.
+    If required value is a function, calls it with field as argument.
     If required value is a string, simply fetch the value from the field
-    and returns.
+    and return.
     '''
     #FIXME: avoid abreviations
     rt = {}
@@ -415,7 +461,7 @@ def filter_rel_attrs(field_name, **rel_attrs):
     return clean_dict
 
 
-### DEPRECATED METHODS (should be removed on the future)
+### DEPRECATED METHODS (should be removed in the future)
 def make_many(model, quantity=None, **attrs):
     msg = "make_many is deprecated. You should use make with _quantity parameter."
     warnings.warn(msg, DeprecationWarning)

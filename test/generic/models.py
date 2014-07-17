@@ -26,6 +26,14 @@ else:
 
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
+OCCUPATION_CHOCIES = (
+    ('Service Industry', (
+        ('waitress', 'Waitress'),
+        ('bartender', 'Bartender'))),
+    ('Education', (
+        ('teacher', 'Teacher'),
+        ('principal', 'Principal'))))
+
 
 class ModelWithImpostorField(models.Model):
     pass
@@ -46,6 +54,7 @@ class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CH)
     happy = models.BooleanField(default=True)
     unhappy = models.BooleanField(default=False)
+    bipolar = models.BooleanField()
     name = models.CharField(max_length=30)
     nickname = models.SlugField(max_length=36)
     age = models.IntegerField()
@@ -54,6 +63,7 @@ class Person(models.Model):
     birth_time = models.TimeField()
     appointment = models.DateTimeField()
     blog = models.URLField()
+    occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOCIES)
 
     #backward compatibilty with Django 1.1
     try:
@@ -204,8 +214,9 @@ class DummyUniqueIntegerFieldModel(models.Model):
 
 if VERSION < (1, 4):
     class DummyIPAddressFieldModel(models.Model):
-        ip = models.IPAddressField()  # Deprecated in Django 1.7
+        ipv4_field = models.IPAddressField()  # Deprecated in Django 1.7
 else:
     class DummyGenericIPAddressFieldModel(models.Model):
-        ip = models.GenericIPAddressField()  # New in Django 1.4
-
+        ipv4_field = models.GenericIPAddressField('ipv4', protocol='IPv4')
+        ipv6_field = models.GenericIPAddressField('ipv6', protocol='IPv6')
+        ipv46_field = models.GenericIPAddressField('ipv46', protocol='both')
