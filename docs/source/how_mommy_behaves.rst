@@ -3,7 +3,30 @@ How mommy behaves?
 
 By default, *model-mommy* skips fields with `null=True` or `blank=True`. Also if a field has a *default* value, it will be used.
 
-You can override this behavior by explicitly defining values.
+You can override this behavior by:
+
+1. Explicitly defining values
+
+.. code-block:: python
+
+    # from "Basic Usage" page, assume all fields either null=True or blank=True
+    from .models import Kid  
+    from model_mommy import mommy
+
+    kid = mommy.make(Kid, happy=True, bio='Happy kid')
+    
+2. Passing `_fill_optional` with a list of fields to fill with random data
+
+.. code-block:: python
+
+    kid = mommy.make(Kid, _fill_optional=['happy', 'bio'])
+
+3. Passing `_fill_optional=True` to fill all fields with random data
+
+.. code-block:: python
+
+    kid = mommy.make(Kid, _fill_optional=True)
+
 
 
 When shouldn't you let mommy generate things for you?
