@@ -148,7 +148,7 @@ class DummyNullFieldsModel(models.Model):
 
 class DummyBlankFieldsModel(models.Model):
     blank_char_field = models.CharField(max_length=50, blank=True)
-    blank_text_field = models.TextField(blank=True)
+    blank_text_field = models.TextField(max_length=300, blank=True)
 
 class DummyDefaultFieldsModel(models.Model):
     default_char_field = models.CharField(max_length=50, default='default')

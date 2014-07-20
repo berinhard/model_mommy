@@ -267,7 +267,7 @@ class Mommy(object):
         return self.model._meta.fields + self.model._meta.many_to_many
 
     def _make(self, commit=True, **attrs):
-        fill_in_blanks = attrs.pop('_fill_blanks', list())
+        fill_in_blanks = attrs.pop('_fill_blanks', False)
         is_rel_field = lambda x: '__' in x
         iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
         model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
@@ -276,7 +276,10 @@ class Mommy(object):
 
         for field in self.get_fields():
             # check for fill blanks argument
-            field.fill_blanks = field.name in fill_in_blanks
+            if isinstance(fill_in_blanks, bool):
+                field.fill_blanks = fill_in_blanks
+            else:
+                field.fill_blanks = field.name in fill_in_blanks
 
             # Skip links to parent so parent is not created twice.
             if isinstance(field, OneToOneField) and field.rel.parent_link:
