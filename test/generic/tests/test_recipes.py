@@ -5,11 +5,12 @@ from random import choice
 from mock import patch
 from decimal import Decimal
 from django.test import TestCase
+from datetime import timedelta
 from model_mommy import mommy
 from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
 from model_mommy.timezone import now
 from model_mommy.exceptions import InvalidQuantityException, RecipeIteratorEmpty
-from test.generic.models import Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
+from test.generic.models import TEST_TIME, Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
 
 
 class TestDefiningRecipes(TestCase):
@@ -429,6 +430,21 @@ class TestSequences(TestCase):
         self.assertEqual(dummy.default_decimal_field, Decimal('27.3'))
         self.assertAlmostEqual(dummy.default_float_field, 6.63)
 
+    def test_increment_by_timedelta(self):
+        dummy = mommy.make_recipe('test.generic.serial_datetime')
+        self.assertEqual(dummy.default_date_field, TEST_TIME.date() + timedelta(days=1))
+        self.assertEqual(dummy.default_date_time_field, TEST_TIME + timedelta(hours=3))
+        self.assertEqual(dummy.default_time_field, (TEST_TIME + timedelta(seconds=15)).time())
+        dummy = mommy.make_recipe('test.generic.serial_datetime')
+        self.assertEqual(dummy.default_date_field, TEST_TIME.date() + timedelta(days=2))
+        self.assertEqual(dummy.default_date_time_field, TEST_TIME + timedelta(hours=6))
+        self.assertEqual(dummy.default_time_field, (TEST_TIME + timedelta(seconds=30)).time())
+
+    def test_creates_unique_timedelta_recipe_using_quantity_argument(self):
+        dummies = mommy.make_recipe('test.generic.serial_datetime', _quantity=3)
+        self.assertEqual(dummies[0].default_date_field, TEST_TIME.date() + timedelta(days=1))
+        self.assertEqual(dummies[1].default_date_field, TEST_TIME.date() + timedelta(days=2))
+        self.assertEqual(dummies[2].default_date_field, TEST_TIME.date() + timedelta(days=3))
 
 class TestIterators(TestCase):
 
