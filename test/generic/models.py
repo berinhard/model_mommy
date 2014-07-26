@@ -217,6 +217,6 @@ if VERSION < (1, 4):
         ipv4_field = models.IPAddressField()  # Deprecated in Django 1.7
 else:
     class DummyGenericIPAddressFieldModel(models.Model):
-        ipv4_field = models.GenericIPAddressField('ipv4', protocol='IPv4')
-        ipv6_field = models.GenericIPAddressField('ipv6', protocol='IPv6')
-        ipv46_field = models.GenericIPAddressField('ipv46', protocol='both')
+        ipv4_field = models.GenericIPAddressField(protocol='IPv4')
+        ipv6_field = models.GenericIPAddressField(protocol='IPv6')
+        ipv46_field = models.GenericIPAddressField(protocol='both')
