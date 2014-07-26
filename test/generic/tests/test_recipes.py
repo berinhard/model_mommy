@@ -155,7 +155,7 @@ class TestDefiningRecipes(TestCase):
         )
         try:
             p.make(_quantity=5)
-        except AttributeError, e:
+        except AttributeError as e:
             self.fail('%s' %e)
 
 class TestExecutingRecipes(TestCase):
