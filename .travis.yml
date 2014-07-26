@@ -10,9 +10,6 @@ matrix:
   include:
     - python: 3.3
       env: DJANGO_VERSION=1.6
-  allow_failures:
-    - python: 3.3
-      env: DJANGO_VERSION=1.6
 before_install:
   - sudo apt-get update && sudo apt-get build-dep python-imaging
 install:
