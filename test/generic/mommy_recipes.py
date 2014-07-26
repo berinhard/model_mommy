@@ -5,9 +5,10 @@ from decimal import Decimal
 from model_mommy.recipe import Recipe, foreign_key, seq
 from model_mommy.recipe import related
 from model_mommy.timezone import now
-from test.generic.models import Person, Dog, DummyDefaultFieldsModel, DummyUniqueIntegerFieldModel
+from test.generic.models import TEST_TIME, Person, Dog, DummyDefaultFieldsModel, DummyUniqueIntegerFieldModel
 
 from six import u
+from datetime import timedelta
 
 
 person = Recipe(Person,
@@ -36,6 +37,12 @@ serial_numbers_by = Recipe(DummyDefaultFieldsModel,
     default_decimal_field = seq(Decimal('20.1'), increment_by=Decimal('2.4')),
     default_int_field = seq(10, increment_by=3),
     default_float_field = seq(1.23, increment_by=1.8)
+)
+
+serial_datetime = Recipe(DummyDefaultFieldsModel,
+    default_date_field = seq(TEST_TIME.date(), timedelta(days=1)),
+    default_date_time_field = seq(TEST_TIME, timedelta(hours=3)),
+    default_time_field = seq(TEST_TIME.time(), timedelta(seconds=15))
 )
 
 dog = Recipe(Dog,

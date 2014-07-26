@@ -248,14 +248,21 @@ Sometimes, you have a field with an unique value and using `make` can cause rand
 This will append a counter to strings to avoid uniqueness problems and it will sum the counter with numerical values.
 
 
-You can also provide an optional `increment_by` argument which will modify incrementing behaviour. This can be an integer, float or Decimal.
+You can also provide an optional `increment_by` argument which will modify incrementing behaviour. This can be an integer, float, Decimal or timedelta.
 
 .. code-block:: python
+
+
+    from datetime import datetime, timedelta
+    from model_mommy.recipe import Recipe, seq
+    from family.models import Person
 
 
     person = Recipe(Person,
         age = seq(15, increment_by=3)
         height_ft = seq(5.5, increment_by=.25)
+        # assume today's date is 21/07/2014
+        appointment = seq(datetime.date(2014, 7, 21), timedelta(days=1))
     )
 
     p = mommy.make_recipe('myapp.person')
@@ -263,12 +270,16 @@ You can also provide an optional `increment_by` argument which will modify incre
     >>> 18
     p.height_ft
     >>> 5.75
+    p.appointment
+    >>> datetime.date(2014, 7, 22)
 
     p = mommy.make_recipe('myapp.person')
     p.age
     >>> 21
     p.height_ft
     >>> 6.0
+    p.appointment
+    >>> datetime.date(2014, 7, 23)
 
 
 Overriding recipe definitions

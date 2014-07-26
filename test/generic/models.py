@@ -15,6 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 from .fields import *
 from model_mommy.timezone import smart_datetime as datetime
+import datetime as base_datetime
 
 # check whether or not PIL is installed
 try:
@@ -33,6 +34,8 @@ OCCUPATION_CHOCIES = (
     ('Education', (
         ('teacher', 'Teacher'),
         ('principal', 'Principal'))))
+
+TEST_TIME = base_datetime.datetime(2014, 7, 21, 15, 39, 58, 457698)
 
 
 class ModelWithImpostorField(models.Model):
