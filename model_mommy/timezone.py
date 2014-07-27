@@ -16,8 +16,11 @@ except ImportError:
 
 def smart_datetime(*args):
     value = datetime(*args)
+    return tz_aware(value)
 
+def tz_aware(d):
+    value = d
     if VERSION >= (1, 4) and settings.USE_TZ:
-        value = value.replace(tzinfo=utc)
+        value = d.replace(tzinfo=utc)
 
     return value

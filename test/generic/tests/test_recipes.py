@@ -8,7 +8,7 @@ from django.test import TestCase
 from datetime import timedelta
 from model_mommy import mommy
 from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
-from model_mommy.timezone import now
+from model_mommy.timezone import now, tz_aware
 from model_mommy.exceptions import InvalidQuantityException, RecipeIteratorEmpty
 from test.generic.models import TEST_TIME, Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
 
@@ -432,12 +432,12 @@ class TestSequences(TestCase):
 
     def test_increment_by_timedelta(self):
         dummy = mommy.make_recipe('test.generic.serial_datetime')
-        self.assertEqual(dummy.default_date_field, TEST_TIME.date() + timedelta(days=1))
-        self.assertEqual(dummy.default_date_time_field, TEST_TIME + timedelta(hours=3))
+        self.assertEqual(dummy.default_date_field, (TEST_TIME.date() + timedelta(days=1)))
+        self.assertEqual(dummy.default_date_time_field, tz_aware(TEST_TIME + timedelta(hours=3)))
         self.assertEqual(dummy.default_time_field, (TEST_TIME + timedelta(seconds=15)).time())
         dummy = mommy.make_recipe('test.generic.serial_datetime')
-        self.assertEqual(dummy.default_date_field, TEST_TIME.date() + timedelta(days=2))
-        self.assertEqual(dummy.default_date_time_field, TEST_TIME + timedelta(hours=6))
+        self.assertEqual(dummy.default_date_field, (TEST_TIME.date() + timedelta(days=2)))
+        self.assertEqual(dummy.default_date_time_field, tz_aware(TEST_TIME + timedelta(hours=6)))
         self.assertEqual(dummy.default_time_field, (TEST_TIME + timedelta(seconds=30)).time())
 
     def test_creates_unique_timedelta_recipe_using_quantity_argument(self):
