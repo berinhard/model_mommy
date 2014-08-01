@@ -32,7 +32,7 @@ Contributing
 .. code-block:: console
 
     pip install virtualenvwrapper
-    mkvirtualenv --no-site-packages --distribute
+    mkvirtualenv model_mommy --no-site-packages --distribute
 
 2. Install the requirements.
 
