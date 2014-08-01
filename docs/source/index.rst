@@ -38,7 +38,7 @@ Contributing
 
 .. code-block:: console
 
-    pip install -r requirements.txt
+    pip install -r dev_requirements.txt
 
 3. Run the tests.
 
