@@ -5,19 +5,44 @@
 # DO NOT ADD THE APP TO INSTALLED_APPS#
 #######################################
 from decimal import Decimal
+from tempfile import gettempdir
 
+from django import VERSION
 from django.db import models
 from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
+from .fields import *
+from model_mommy.timezone import smart_datetime as datetime
+import datetime as base_datetime
+
+# check whether or not PIL is installed
+try:
+    from PIL import ImageFile as PilImageFile
+except ImportError:
+    has_pil = False
+else:
+    has_pil = True
 
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
+OCCUPATION_CHOCIES = (
+    ('Service Industry', (
+        ('waitress', 'Waitress'),
+        ('bartender', 'Bartender'))),
+    ('Education', (
+        ('teacher', 'Teacher'),
+        ('principal', 'Principal'))))
+
+TEST_TIME = base_datetime.datetime(2014, 7, 21, 15, 39, 58, 457698)
+
+
+class ModelWithImpostorField(models.Model):
+    pass
 
 class Profile(models.Model):
     email = models.EmailField()
-
 
 class User(models.Model):
     profile = models.ForeignKey(Profile, blank=True, null=True)
@@ -31,14 +56,17 @@ class PaymentBill(models.Model):
 class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CH)
     happy = models.BooleanField(default=True)
+    unhappy = models.BooleanField(default=False)
+    bipolar = models.BooleanField()
     name = models.CharField(max_length=30)
-    nickname = models.SlugField()
+    nickname = models.SlugField(max_length=36)
     age = models.IntegerField()
     bio = models.TextField()
     birthday = models.DateField()
     birth_time = models.TimeField()
     appointment = models.DateTimeField()
     blog = models.URLField()
+    occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOCIES)
 
     #backward compatibilty with Django 1.1
     try:
@@ -50,15 +78,23 @@ class Person(models.Model):
 class Dog(models.Model):
     owner = models.ForeignKey('Person')
     breed = models.CharField(max_length=50)
+    created = models.DateTimeField(auto_now_add=True)
 
+class GuardDog(Dog):
+    pass
 
 class LonelyPerson(models.Model):
     only_friend = models.OneToOneField(Person)
 
 
+class Classroom(models.Model):
+    students = models.ManyToManyField(Person, null=True)
+
+
 class Store(models.Model):
     customers = models.ManyToManyField(Person, related_name='favorite_stores')
     employees = models.ManyToManyField(Person, related_name='employers')
+    suppliers = models.ManyToManyField(Person, related_name='suppliers', blank=True, null=True)
 
 
 class DummyIntModel(models.Model):
@@ -117,14 +153,13 @@ class DummyBlankFieldsModel(models.Model):
     blank_char_field = models.CharField(max_length=50, blank=True)
     blank_text_field = models.TextField(blank=True)
 
-
 class DummyDefaultFieldsModel(models.Model):
     default_char_field = models.CharField(max_length=50, default='default')
     default_text_field = models.TextField(default='default')
     default_int_field = models.IntegerField(default=123)
     default_float_field = models.FloatField(default=123.0)
-    default_date_field = models.DateField(default='2011-01-01')
-    default_date_time_field = models.DateTimeField(default='2011-01-01')
+    default_date_field = models.DateField(default='2012-01-01')
+    default_date_time_field = models.DateTimeField(default=datetime(2012, 1, 1))
     default_time_field = models.TimeField(default='00:00:00')
     default_decimal_field = models.DecimalField(max_digits=5, decimal_places=2,
                                                 default=Decimal('0'))
@@ -133,5 +168,58 @@ class DummyDefaultFieldsModel(models.Model):
 
 
 class DummyFileFieldModel(models.Model):
-    fs = FileSystemStorage(location='/tmp/')
+    fs = FileSystemStorage(location=gettempdir())
     file_field = models.FileField(upload_to="%Y/%m/%d", storage=fs)
+
+
+if has_pil:
+    class DummyImageFieldModel(models.Model):
+        fs = FileSystemStorage(location=gettempdir())
+        image_field = models.ImageField(upload_to="%Y/%m/%d", storage=fs)
+else:
+    # doesn't matter, won't be using
+    class DummyImageFieldModel(models.Model):
+        pass
+
+
+class DummyMultipleInheritanceModel(DummyDefaultFieldsModel, Person):
+    my_dummy_field = models.IntegerField()
+
+class Ambiguous(models.Model):
+    name = models.CharField(max_length=20)
+
+
+class School(models.Model):
+    name = models.CharField(max_length = 10)
+    students = models.ManyToManyField(Person, through='SchoolEnrollment')
+
+
+class SchoolEnrollment(models.Model):
+    start_date = models.DateField(auto_now_add=True)
+    school = models.ForeignKey(School)
+    student = models.ForeignKey(Person)
+
+class NonAbstractPerson(Person):
+    dummy_count = models.IntegerField()
+
+
+class CustomFieldWithGeneratorModel(models.Model):
+    custom_value = CustomFieldWithGenerator()
+
+
+class CustomFieldWithoutGeneratorModel(models.Model):
+    custom_value = CustomFieldWithoutGenerator()
+
+
+class DummyUniqueIntegerFieldModel(models.Model):
+    value = models.IntegerField(unique=True)
+
+
+if VERSION < (1, 4):
+    class DummyIPAddressFieldModel(models.Model):
+        ipv4_field = models.IPAddressField()  # Deprecated in Django 1.7
+else:
+    class DummyGenericIPAddressFieldModel(models.Model):
+        ipv4_field = models.GenericIPAddressField(protocol='IPv4')
+        ipv6_field = models.GenericIPAddressField(protocol='IPv6')
+        ipv46_field = models.GenericIPAddressField(protocol='both')

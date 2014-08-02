@@ -2,11 +2,19 @@ language: python
 python:
   - "2.7"
 env:
-  - DJANGO_VERSION=1.2.7
-  - DJANGO_VERSION=1.3.1
-  - DJANGO_VERSION=1.4
+  - DJANGO_VERSION=1.4.10
+  - DJANGO_VERSION=1.5.5
+  - DJANGO_VERSION=1.6
+matrix:
+  include:
+    - python: 3.3
+      env: DJANGO_VERSION=1.6
+before_install:
+  - sudo apt-get update && sudo apt-get build-dep python-imaging
 install:
    # Install whatever version of Django that's listed above
    # Travis is currently working on
  - pip install -q Django==$DJANGO_VERSION --use-mirrors
-script: python runtests.py 
+ - pip install -q Pillow --use-mirrors
+ - pip install -r requirements.txt
+script: python runtests.py

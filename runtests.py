@@ -1,33 +1,81 @@
 #!/usr/bin/env python
 
-import os
+from os.path import dirname, join
 import sys
-
-parent = os.path.abspath(os.path.dirname(__file__))
-tests_dir = os.path.join(parent, 'model_mommy', 'tests')
-sys.path.insert(0, parent)
-sys.path.insert(0, tests_dir)
-
-os.environ['DJANGO_SETTINGS_MODULE'] = 'test_settings'
+from optparse import OptionParser
+import warnings
+import django
 
 
-def runtests():
-    args = sys.argv[1:]
-    if args:
-        test_labels = ["model_mommy.%s" % arg for arg in args]
-    else:
-        test_labels = ['model_mommy']
+def parse_args():
+    parser = OptionParser()
+    parser.add_option('--use-tz', dest='USE_TZ', action='store_true')
+    return parser.parse_args()
 
-    try:
-        from django.test.simple import run_tests
-        result = run_tests(test_labels, 1, True)
-        sys.exit(result)
-    except ImportError:
-        from django.test.simple import DjangoTestSuiteRunner
-        test_suite = DjangoTestSuiteRunner(1, True)
-        result = test_suite.run_tests(test_labels)
-        sys.exit(result)
+
+def configure_settings(options):
+    from django.conf import settings
+
+    # If DJANGO_SETTINGS_MODULE envvar exists the settings will be
+    # configured by it. Otherwise it will use the parameters bellow.
+    if not settings.configured:
+        params = dict(
+            DATABASES={
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': ':memory:',
+                }
+            },
+            INSTALLED_APPS = (
+                'django.contrib.contenttypes',
+                'test.generic',
+                'test.ambiguous',
+                'test.ambiguous2',
+            ),
+            SITE_ID=1,
+            TEST_RUNNER='django.test.simple.DjangoTestSuiteRunner',
+            TEST_ROOT=join(dirname(__file__), 'test', 'generic', 'tests'),
+        )
+
+        # Force the use of timezone aware datetime and change Django's warning to
+        # be treated as errors.
+        if getattr(options, 'USE_TZ', False):
+            params.update(USE_TZ=True)
+            warnings.filterwarnings('error', r"DateTimeField received a naive datetime",
+                                    RuntimeWarning, r'django\.db\.models\.fields')
+
+        # Configure Django's settings
+        settings.configure(**params)
+
+    return settings
+
+
+def get_runner(settings):
+    '''
+    Asks Django for the TestRunner defined in settings or the default one.
+    '''
+    from django.test.utils import get_runner
+    TestRunner = get_runner(settings)
+    if django.VERSION >= (1, 7):
+        #  I suspect this will not be necessary in next release after 1.7.0a1:
+        #  See https://code.djangoproject.com/ticket/21831
+        setattr(settings, 'INSTALLED_APPS',
+                ['django.contrib.auth']
+                + list(getattr(settings, 'INSTALLED_APPS')))
+    return TestRunner(verbosity=1, interactive=True, failfast=False)
+
+
+def runtests(options=None, labels=None):
+    if not labels:
+        labels = ['generic']
+
+    settings = configure_settings(options)
+    runner = get_runner(settings)
+    if django.VERSION >= (1, 7):
+        django.setup()
+    sys.exit(runner.run_tests(labels))
 
 
 if __name__ == '__main__':
-    runtests()
+    options, labels = parse_args()
+    runtests(options, labels)

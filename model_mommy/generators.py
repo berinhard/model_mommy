@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
-
-__doc__ = """
+"""
 Generators are callables that return a value used to populate a field.
 
 If this callable has a `required` attribute (a list, mostly), for each item in
@@ -10,15 +9,15 @@ callable (which will receive `field` as first argument), it should return a
 list in the format (key, value) where key is the argument name for generator
 and value is the value for that argument.
 """
-import datetime
-from django import VERSION
+
+import string
 from decimal import Decimal
-from django.contrib.contenttypes.models import ContentType
-from django.db.models import get_models
-from django.core.files.base import ContentFile
 from os.path import abspath, join, dirname
 from random import randint, choice, random
-import string
+from django import VERSION
+from django.core.files.base import ContentFile
+
+from model_mommy.timezone import now
 
 
 MAX_LENGTH = 300
@@ -27,13 +26,19 @@ MAX_LENGTH = 300
 MAX_INT = 10000
 
 def get_content_file(content, name):
-    if VERSION[1] < 4:
+    if VERSION < (1, 4):
         return ContentFile(content)
-    elif VERSION[1] >= 4:
+    else:
         return ContentFile(content, name=name)
 
 def gen_file_field():
-    name = 'mock_file.txt'
+    name = u'mock_file.txt'
+    file_path = abspath(join(dirname(__file__), name))
+    with open(file_path, 'rb') as f:
+        return get_content_file(f.read(), name=name)
+
+def gen_image_field():
+    name = u'mock-img.jpeg'
     file_path = abspath(join(dirname(__file__), name))
     with open(file_path, 'rb') as f:
         return get_content_file(f.read(), name=name)
@@ -46,13 +51,19 @@ def gen_from_list(L):
     class KidMommy(Mommy):
       attr_mapping = {'some_field':gen_from_list([A, B, C])}
     '''
-    return lambda: choice(L)
+    return lambda: choice(list(L))
 
 # -- DEFAULT GENERATORS --
 
 
 def gen_from_choices(C):
-    choice_list = map(lambda x: x[0], C)
+    choice_list = []
+    for value, label in C:
+        if isinstance(label, (list, tuple)):
+            for val, lbl in label:
+                choice_list.append(val)
+        else:
+            choice_list.append(value)
     return gen_from_list(choice_list)
 
 
@@ -70,23 +81,28 @@ def gen_decimal(max_digits, decimal_places):
                               num_as_str(decimal_places)))
 gen_decimal.required = ['max_digits', 'decimal_places']
 
-gen_date = datetime.date.today
 
-gen_datetime = datetime.datetime.now
+def gen_date():
+    return now().date()
+
+
+def gen_datetime():
+    return now()
 
 
 def gen_time():
-    return datetime.datetime.now().time()
+    return now().time()
 
 
 def gen_string(max_length):
-    return ''.join(choice(string.printable) for i in range(max_length))
+    return u''.join(choice(string.ascii_letters) for i in range(max_length))
 gen_string.required = ['max_length']
 
 
-def gen_slug(max_length=50):
-    valid_chars = string.letters + string.digits + '_-'
-    return ''.join(choice(valid_chars) for i in range(max_length))
+def gen_slug(max_length):
+    valid_chars = string.ascii_letters + string.digits + '_-'
+    return u''.join(choice(valid_chars) for i in range(max_length))
+gen_slug.required = ['max_length']
 
 
 def gen_text():
@@ -98,12 +114,28 @@ def gen_boolean():
 
 
 def gen_url():
-    return 'http://www.%s.com' % gen_string(30)
+    return u'http://www.%s.com' % gen_string(30)
 
 
 def gen_email():
-    return "%s@example.com" % gen_string(10)
+    return u"%s@example.com" % gen_string(10)
+
+
+def gen_ipv6():
+    return ":".join(format(randint(1, 65535), 'x') for i in range(8))
+
+
+def gen_ipv4():
+    return ".".join(str(randint(1, 255)) for i in range(4))
+
+
+def gen_ipv46():
+    ip_gen = choice([gen_ipv4, gen_ipv6])
+    return ip_gen()
 
 
 def gen_content_type():
+    from django.contrib.contenttypes.models import ContentType
+    from django.db.models import get_models
+
     return ContentType.objects.get_for_model(choice(get_models()))

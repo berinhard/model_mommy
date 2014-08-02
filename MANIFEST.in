@@ -1,1 +1,4 @@
 include model_mommy/mock_file.txt
+include model_mommy/mock-img.jpeg
+include README.rst
+include requirements.txt
