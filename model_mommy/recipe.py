@@ -30,7 +30,7 @@ class Recipe(object):
                     m = finder.get_model(self.model)
                 else:
                     m = self.model
-                if m.objects.count() == 0:
+                if m.objects.count() == 0 or k not in self._iterator_backups:
                     self._iterator_backups[k] = itertools.tee(self._iterator_backups.get(k, [v])[0])
                 mapping[k] = self._iterator_backups[k][1]
             elif isinstance(v, RecipeForeignKey):
