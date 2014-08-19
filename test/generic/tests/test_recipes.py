@@ -446,6 +446,14 @@ class TestSequences(TestCase):
         self.assertEqual(dummies[1].default_date_field, TEST_TIME.date() + timedelta(days=2))
         self.assertEqual(dummies[2].default_date_field, TEST_TIME.date() + timedelta(days=3))
 
+    def test_increment_after_override_definition_field(self):
+        person = mommy.make_recipe('test.generic.serial_person', name='tom')
+        self.assertEqual(person.name, 'tom')
+        person = mommy.make_recipe('test.generic.serial_person')
+        self.assertEqual(person.name, 'joe1')
+        person = mommy.prepare_recipe('test.generic.serial_person')
+        self.assertEqual(person.name, 'joe2')
+
 class TestIterators(TestCase):
 
     def test_accepts_generators(self):
