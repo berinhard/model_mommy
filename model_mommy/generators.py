@@ -114,7 +114,7 @@ def gen_boolean():
 
 
 def gen_url():
-    return u'http://www.%s.com' % gen_string(30)
+    return u'http://www.%s.com/' % gen_string(30)
 
 
 def gen_email():
