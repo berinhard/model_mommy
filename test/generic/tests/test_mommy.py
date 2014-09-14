@@ -104,8 +104,8 @@ class MommyCreatesSimpleModel(TestCase):
     def test_multiple_inheritance_creation(self):
         multiple = mommy.make(DummyMultipleInheritanceModel)
         self.assertIsInstance(multiple, DummyMultipleInheritanceModel)
-        self.assertTrue(Person.objects.filter(id=multiple.id))
-        self.assertTrue(DummyDefaultFieldsModel.objects.filter(id=multiple.id))
+        self.assertTrue(Person.objects.filter(id=multiple.my_id))
+        self.assertTrue(DummyDefaultFieldsModel.objects.filter(default_id=multiple.id))
 
 
 class MommyRepeatedCreatesSimpleModel(TestCase):

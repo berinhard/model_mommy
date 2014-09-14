@@ -154,6 +154,7 @@ class DummyBlankFieldsModel(models.Model):
     blank_text_field = models.TextField(blank=True)
 
 class DummyDefaultFieldsModel(models.Model):
+    default_id = models.AutoField(primary_key=True)
     default_char_field = models.CharField(max_length=50, default='default')
     default_text_field = models.TextField(default='default')
     default_int_field = models.IntegerField(default=123)
@@ -183,6 +184,7 @@ else:
 
 
 class DummyMultipleInheritanceModel(DummyDefaultFieldsModel, Person):
+    my_id = models.AutoField(primary_key=True)
     my_dummy_field = models.IntegerField()
 
 class Ambiguous(models.Model):
