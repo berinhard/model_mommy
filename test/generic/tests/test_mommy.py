@@ -20,7 +20,7 @@ from test.generic.models import DummyGenericForeignKeyModel, NonAbstractPerson
 
 class ModelFinderTest(TestCase):
     def test_unicode_regression(self):
-        obj = mommy.prepare(u'generic.Person')
+        obj = mommy.prepare('generic.Person')
         self.assertIsInstance(obj, Person)
 
     def test_model_class(self):
