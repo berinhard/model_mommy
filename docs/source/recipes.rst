@@ -294,3 +294,18 @@ Passing values when calling `make_recipe` or `prepare_recipe` will override the 
     mommy.make_recipe('model_mommy.person', name='Peter Parker')
 
 This is useful when you have to create multiple objects and you have some unique field, for instance.
+
+Recipe inheritance
+------------------
+
+If you need to reuse and override existent recipe call extend method:
+
+.. code-block:: python
+
+    dog = Recipe(Dog,
+        breed = 'Pug',
+        owner = foreign_key(person)
+    )
+    extended_dog = dog.extend(
+        breed = 'Super basset',
+    )

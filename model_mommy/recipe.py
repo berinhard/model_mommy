@@ -52,6 +52,11 @@ class Recipe(object):
     def prepare(self, **attrs):
         return mommy.prepare(self.model, **self._mapping(attrs))
 
+    def extend(self, **attrs):
+        attr_mapping = self.attr_mapping.copy()
+        attr_mapping.update(attrs)
+        return Recipe(self.model, **attr_mapping)
+
 
 class RecipeForeignKey(object):
 
