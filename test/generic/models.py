@@ -79,6 +79,7 @@ class Dog(models.Model):
     owner = models.ForeignKey('Person')
     breed = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
+    friends_with = models.ManyToManyField('Dog')
 
 class GuardDog(Dog):
     pass

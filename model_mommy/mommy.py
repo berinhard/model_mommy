@@ -322,6 +322,7 @@ class Mommy(object):
             field = getattr(self.model, k, None)
             if isinstance(field, ForeignRelatedObjectsDescriptor):
                 one_to_many_keys[k] = attrs.pop(k)
+
         instance = self.model(**attrs)
         # m2m only works for persisted instances
         if _commit:
@@ -341,19 +342,14 @@ class Mommy(object):
 
             m2m_relation = getattr(instance, key)
             through_model = m2m_relation.through
-            through_fields = through_model._meta.fields
 
-            instance_key, value_key = '', ''
-            for field in through_fields:
-                if isinstance(field, ForeignKey):
-                    if isinstance(instance, field.rel.to):
-                        instance_key = field.name
-                    elif isinstance(values[0], field.rel.to):
-                        value_key = field.name
-
-            base_kwargs = {instance_key: instance}
-            for model_instance in values:
-                base_kwargs[value_key] = model_instance
+            for value in values:
+                if not value.pk:
+                    value.save()
+                base_kwargs = {
+                    m2m_relation.source_field_name: instance,
+                    m2m_relation.target_field_name: value
+                }
                 make(through_model, **base_kwargs)
 
     def _ip_generator(self, field):

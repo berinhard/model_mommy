@@ -55,6 +55,10 @@ other_dog = Recipe(Dog,
     owner = foreign_key('person')
 )
 
+dog_with_friends = dog.extend(
+    friends_with=related(dog, dog),
+)
+
 extended_dog = dog.extend(
     breed = 'Super basset',
 )
