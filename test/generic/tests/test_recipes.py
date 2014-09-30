@@ -372,6 +372,13 @@ class ForeignKeyTestCase(TestCase):
         self.assertEqual(lady.dog_set.all()[0].breed, 'Pug')
         self.assertEqual(lady.dog_set.all()[1].breed, 'Basset')
 
+
+class M2MFieldTestCase(TestCase):
+    def test_create_many_to_many(self):
+        dog = mommy.make_recipe('test.generic.dog_with_friends')
+        self.assertEqual(len(dog.friends_with.all()), 2)
+
+
 class TestSequences(TestCase):
     def test_increment_for_strings(self):
         person = mommy.make_recipe('test.generic.serial_person')
