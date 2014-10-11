@@ -208,6 +208,13 @@ class TestExecutingRecipes(TestCase):
             self.assertIsInstance(person, Person)
             self.assertNotEqual(person.id, None)
 
+    def test_make_extended_recipe(self):
+        extended_dog = mommy.make_recipe('test.generic.extended_dog')
+        self.assertEqual(extended_dog.breed, 'Super basset')
+        # No side effects happened due to extension
+        base_dog = mommy.make_recipe('test.generic.dog')
+        self.assertEqual(base_dog.breed, 'Pug')
+
     def test_make_recipe_with_quantity_parameter_respection_model_args(self):
         people = mommy.make_recipe('test.generic.person', _quantity=3, name='Dennis Ritchie', age=70)
         self.assertEqual(len(people), 3)
