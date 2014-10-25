@@ -20,4 +20,3 @@ Usage and Info
 ==============
 
 *     http://model-mommy.readthedocs.org/
-
