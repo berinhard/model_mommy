@@ -183,6 +183,28 @@ You can also use `related`, when you want two or more models to share the same p
 
 Note this will only work when calling `make_recipe` because the related manager requires the objects in the related_set to be persisted. That said, calling `prepare_recipe` the related_set will be empty.
 
+If you want to set m2m relationship you can use `related` as well:
+
+.. code-block:: python
+
+    class Dog(models.Model):
+        owner = models.ForeignKey('Person')
+        breed = models.CharField(max_length=50)
+        created = models.DateTimeField(auto_now_add=True)
+        friends_with = models.ManyToManyField('Dog')
+
+
+    from model_mommy.recipe import related, Recipe
+
+    dog = Recipe(Dog,
+        breed = 'Pug',
+    )
+
+    dog_with_friends = dog.extend(
+        friends_with=related(dog, dog),
+    )
+
+
 Recipes with callables
 ----------------------
 
