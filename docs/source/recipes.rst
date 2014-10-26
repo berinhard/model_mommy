@@ -138,7 +138,7 @@ You can define `foreign_key` relations:
 
 .. code-block:: python
 
-    from model_mommy.recipe import Recipe, foreign_key, seq
+    from model_mommy.recipe import Recipe, foreign_key
     from family.models import Person, Dog
 
 
@@ -181,6 +181,7 @@ You can also use `related`, when you want two or more models to share the same p
         dog_set = related('dog', 'other_dog')
     )
 
+Note this will only work when calling `make_recipe` because the related manager requires the objects in the related_set to be persisted. That said, calling `prepare_recipe` the related_set will be empty.
 
 If you want to set m2m relationship you can use `related` as well:
 
@@ -203,7 +204,6 @@ If you want to set m2m relationship you can use `related` as well:
         friends_with=related(dog, dog),
     )
 
-Note this will only work when calling `make_recipe` because the related manager requires the objects in the related_set to be persisted. That said, calling `prepare_recipe` the related_set will be empty.
 
 Recipes with callables
 ----------------------
