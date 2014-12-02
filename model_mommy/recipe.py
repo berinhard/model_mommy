@@ -30,7 +30,7 @@ class Recipe(object):
                     m = finder.get_model(self.model)
                 else:
                     m = self.model
-                if m.objects.count() == 0:
+                if m.objects.count() == 0 or k not in self._iterator_backups:
                     self._iterator_backups[k] = itertools.tee(self._iterator_backups.get(k, [v])[0])
                 mapping[k] = self._iterator_backups[k][1]
             elif isinstance(v, RecipeForeignKey):
@@ -51,6 +51,11 @@ class Recipe(object):
 
     def prepare(self, **attrs):
         return mommy.prepare(self.model, **self._mapping(attrs))
+
+    def extend(self, **attrs):
+        attr_mapping = self.attr_mapping.copy()
+        attr_mapping.update(attrs)
+        return Recipe(self.model, **attr_mapping)
 
 
 class RecipeForeignKey(object):
@@ -100,6 +105,7 @@ def seq(value, increment_by=1):
     else:
         for n in itertools.count(increment_by, increment_by):
             yield value + type(value)(n)
+
 
 class related(object):
     def __init__(self, *args):

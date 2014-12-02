@@ -79,6 +79,7 @@ class Dog(models.Model):
     owner = models.ForeignKey('Person')
     breed = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
+    friends_with = models.ManyToManyField('Dog')
 
 class GuardDog(Dog):
     pass
@@ -151,9 +152,10 @@ class DummyNullFieldsModel(models.Model):
 
 class DummyBlankFieldsModel(models.Model):
     blank_char_field = models.CharField(max_length=50, blank=True)
-    blank_text_field = models.TextField(blank=True)
+    blank_text_field = models.TextField(max_length=300, blank=True)
 
 class DummyDefaultFieldsModel(models.Model):
+    default_id = models.AutoField(primary_key=True)
     default_char_field = models.CharField(max_length=50, default='default')
     default_text_field = models.TextField(default='default')
     default_int_field = models.IntegerField(default=123)
@@ -183,6 +185,7 @@ else:
 
 
 class DummyMultipleInheritanceModel(DummyDefaultFieldsModel, Person):
+    my_id = models.AutoField(primary_key=True)
     my_dummy_field = models.IntegerField()
 
 class Ambiguous(models.Model):

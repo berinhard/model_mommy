@@ -20,7 +20,7 @@ from test.generic.models import DummyGenericForeignKeyModel, NonAbstractPerson
 
 class ModelFinderTest(TestCase):
     def test_unicode_regression(self):
-        obj = mommy.prepare(u'generic.Person')
+        obj = mommy.prepare('generic.Person')
         self.assertIsInstance(obj, Person)
 
     def test_model_class(self):
@@ -104,8 +104,8 @@ class MommyCreatesSimpleModel(TestCase):
     def test_multiple_inheritance_creation(self):
         multiple = mommy.make(DummyMultipleInheritanceModel)
         self.assertIsInstance(multiple, DummyMultipleInheritanceModel)
-        self.assertTrue(Person.objects.filter(id=multiple.id))
-        self.assertTrue(DummyDefaultFieldsModel.objects.filter(id=multiple.id))
+        self.assertTrue(Person.objects.filter(id=multiple.my_id))
+        self.assertTrue(DummyDefaultFieldsModel.objects.filter(default_id=multiple.id))
 
 
 class MommyRepeatedCreatesSimpleModel(TestCase):
@@ -340,6 +340,25 @@ class SkipBlanksTestCase(TestCase):
         dummy = mommy.make(DummyBlankFieldsModel)
         self.assertEqual(dummy.blank_char_field, '')
         self.assertEqual(dummy.blank_text_field, '')
+
+
+class FillBlanksTestCase(TestCase):
+    def test_fill_field_optional(self):
+        dummy = mommy.make(DummyBlankFieldsModel, _fill_optional=['blank_char_field'])
+        self.assertEqual(len(dummy.blank_char_field), 50)
+
+    def test_fill_many_optional(self):
+        dummy = mommy.make(DummyBlankFieldsModel, _fill_optional=['blank_char_field', 'blank_text_field'])
+        self.assertEqual(len(dummy.blank_text_field), 300)
+
+    def test_fill_all_optional(self):
+        dummy = mommy.make(DummyBlankFieldsModel, _fill_optional=True)
+        self.assertEqual(len(dummy.blank_char_field), 50)
+        self.assertEqual(len(dummy.blank_text_field), 300)
+
+    def test_fill_optional_with_integer(self):
+        with self.assertRaises(TypeError):
+            dummy = mommy.make(DummyBlankFieldsModel, _fill_optional=1)
 
 
 class SkipDefaultsTestCase(TestCase):

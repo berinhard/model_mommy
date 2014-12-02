@@ -267,6 +267,7 @@ class Mommy(object):
         return self.model._meta.fields + self.model._meta.many_to_many
 
     def _make(self, commit=True, **attrs):
+        fill_in_optional = attrs.pop('_fill_optional', False)
         is_rel_field = lambda x: '__' in x
         iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
         model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
@@ -274,6 +275,11 @@ class Mommy(object):
         self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
 
         for field in self.get_fields():
+            # check for fill optional argument
+            if isinstance(fill_in_optional, bool):
+                field.fill_optional = fill_in_optional
+            else:
+                field.fill_optional = field.name in fill_in_optional
 
             # Skip links to parent so parent is not created twice.
             if isinstance(field, OneToOneField) and field.rel.parent_link:
@@ -286,7 +292,7 @@ class Mommy(object):
 
             if all([field.name not in model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
                 # Django is quirky in that BooleanFields are always "blank", but have no default default.
-                if not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not isinstance(field, BooleanField)):
+                if not field.fill_optional and (not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not isinstance(field, BooleanField))):
                     continue
 
             if isinstance(field, ManyToManyField):
@@ -295,7 +301,7 @@ class Mommy(object):
                 else:
                     self.m2m_dict[field.name] = model_attrs.pop(field.name)
             elif field_value_not_defined:
-                if field.name not in self.rel_fields and field.null:
+                if field.name not in self.rel_fields and (field.null and not field.fill_optional):
                     continue
                 else:
                     model_attrs[field.name] = self.generate_value(field)
@@ -322,6 +328,7 @@ class Mommy(object):
             field = getattr(self.model, k, None)
             if isinstance(field, ForeignRelatedObjectsDescriptor):
                 one_to_many_keys[k] = attrs.pop(k)
+
         instance = self.model(**attrs)
         # m2m only works for persisted instances
         if _commit:
@@ -341,19 +348,14 @@ class Mommy(object):
 
             m2m_relation = getattr(instance, key)
             through_model = m2m_relation.through
-            through_fields = through_model._meta.fields
 
-            instance_key, value_key = '', ''
-            for field in through_fields:
-                if isinstance(field, ForeignKey):
-                    if isinstance(instance, field.rel.to):
-                        instance_key = field.name
-                    elif isinstance(values[0], field.rel.to):
-                        value_key = field.name
-
-            base_kwargs = {instance_key: instance}
-            for model_instance in values:
-                base_kwargs[value_key] = model_instance
+            for value in values:
+                if not value.pk:
+                    value.save()
+                base_kwargs = {
+                    m2m_relation.source_field_name: instance,
+                    m2m_relation.target_field_name: value
+                }
                 make(through_model, **base_kwargs)
 
     def _ip_generator(self, field):

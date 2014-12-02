@@ -208,6 +208,13 @@ class TestExecutingRecipes(TestCase):
             self.assertIsInstance(person, Person)
             self.assertNotEqual(person.id, None)
 
+    def test_make_extended_recipe(self):
+        extended_dog = mommy.make_recipe('test.generic.extended_dog')
+        self.assertEqual(extended_dog.breed, 'Super basset')
+        # No side effects happened due to extension
+        base_dog = mommy.make_recipe('test.generic.dog')
+        self.assertEqual(base_dog.breed, 'Pug')
+
     def test_make_recipe_with_quantity_parameter_respection_model_args(self):
         people = mommy.make_recipe('test.generic.person', _quantity=3, name='Dennis Ritchie', age=70)
         self.assertEqual(len(people), 3)
@@ -365,6 +372,16 @@ class ForeignKeyTestCase(TestCase):
         self.assertEqual(lady.dog_set.all()[0].breed, 'Pug')
         self.assertEqual(lady.dog_set.all()[1].breed, 'Basset')
 
+
+class M2MFieldTestCase(TestCase):
+    def test_create_many_to_many(self):
+        dog = mommy.make_recipe('test.generic.dog_with_friends')
+        self.assertEqual(len(dog.friends_with.all()), 2)
+        for friend in dog.friends_with.all():
+            self.assertEqual(friend.breed, 'Pug')
+            self.assertEqual(friend.owner.name, 'John Doe')
+
+
 class TestSequences(TestCase):
     def test_increment_for_strings(self):
         person = mommy.make_recipe('test.generic.serial_person')
@@ -445,6 +462,14 @@ class TestSequences(TestCase):
         self.assertEqual(dummies[0].default_date_field, TEST_TIME.date() + timedelta(days=1))
         self.assertEqual(dummies[1].default_date_field, TEST_TIME.date() + timedelta(days=2))
         self.assertEqual(dummies[2].default_date_field, TEST_TIME.date() + timedelta(days=3))
+
+    def test_increment_after_override_definition_field(self):
+        person = mommy.make_recipe('test.generic.serial_person', name='tom')
+        self.assertEqual(person.name, 'tom')
+        person = mommy.make_recipe('test.generic.serial_person')
+        self.assertEqual(person.name, 'joe1')
+        person = mommy.prepare_recipe('test.generic.serial_person')
+        self.assertEqual(person.name, 'joe2')
 
 class TestIterators(TestCase):
 
