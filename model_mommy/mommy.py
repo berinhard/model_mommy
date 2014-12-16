@@ -402,7 +402,7 @@ class Mommy(object):
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
             generator = generators.gen_from_choices(field.choices)
-        elif isinstance(field, ForeignKey) and isinstance(field.rel.to, ContentType):
+        elif isinstance(field, ForeignKey) and issubclass(field.rel.to, ContentType):
             generator = self.type_mapping[ContentType]
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
