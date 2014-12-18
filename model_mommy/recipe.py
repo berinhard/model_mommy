@@ -1,4 +1,5 @@
 #coding: utf-8
+from functools import wraps
 import inspect
 import itertools
 from . import mommy
@@ -7,6 +8,20 @@ from .exceptions import RecipeNotFound, RecipeIteratorEmpty
 
 from six import string_types
 import datetime
+
+
+# Python 2.6.x compatibility code
+itertools_count = itertools.count
+try:
+    itertools_count(0, 1)
+except TypeError:
+    def count_decorator(func):
+        @wraps(func)
+        def wrapper(start=0, step=1):
+            # Second parameter ignored because in Python 2.6.x count() accepted only one parameter
+            return func(start)
+        return wrapper
+    itertools_count = count_decorator(itertools_count)
 
 finder = mommy.ModelFinder()
 
@@ -92,9 +107,9 @@ def seq(value, increment_by=1):
         else:
             date = value
         # convert to epoch time
-        start = (date - datetime.datetime(1970,1,1)).total_seconds()
-        increment_by =  increment_by.total_seconds()
-        for n in itertools.count(increment_by, increment_by):
+        start = (date - datetime.datetime(1970, 1, 1)).total_seconds()
+        increment_by = increment_by.total_seconds()
+        for n in itertools_count(1, increment_by):
             series_date = tz_aware(datetime.datetime.utcfromtimestamp(start + n))
             if type(value) is datetime.time:
                 yield series_date.time()
@@ -103,7 +118,7 @@ def seq(value, increment_by=1):
             else:
                 yield series_date
     else:
-        for n in itertools.count(increment_by, increment_by):
+        for n in itertools_count(1, increment_by):
             yield value + type(value)(n)
 
 
