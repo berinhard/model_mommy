@@ -109,7 +109,7 @@ def seq(value, increment_by=1):
         # convert to epoch time
         start = (date - datetime.datetime(1970, 1, 1)).total_seconds()
         increment_by = increment_by.total_seconds()
-        for n in itertools_count(1, increment_by):
+        for n in itertools_count(increment_by, increment_by):
             series_date = tz_aware(datetime.datetime.utcfromtimestamp(start + n))
             if type(value) is datetime.time:
                 yield series_date.time()
@@ -118,7 +118,7 @@ def seq(value, increment_by=1):
             else:
                 yield series_date
     else:
-        for n in itertools_count(1, increment_by):
+        for n in itertools_count(increment_by, increment_by):
             yield value + type(value)(n)
 
 
