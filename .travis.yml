@@ -8,13 +8,23 @@ env:
   - DJANGO_VERSION=1.7
 matrix:
   include:
+    - python: 2.6
+      env: DJANGO_VERSION=1.4.10
+    - python: 2.6
+      env: DJANGO_VERSION=1.5.5
+    - python: 2.6
+      env: DJANGO_VERSION=1.6
+    - python: 3.2
+      env: DJANGO_VERSION=1.5.5
     - python: 3.2
       env: DJANGO_VERSION=1.6
     - python: 3.2
       env: DJANGO_VERSION=1.7
-    - python: 3.3
+    - python: 3.4
+      env: DJANGO_VERSION=1.5.5
+    - python: 3.4
       env: DJANGO_VERSION=1.6
-    - python: 3.3
+    - python: 3.4
       env: DJANGO_VERSION=1.7
 before_install:
   - sudo apt-get update && sudo apt-get build-dep python-imaging
