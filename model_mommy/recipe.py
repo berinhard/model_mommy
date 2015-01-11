@@ -15,13 +15,12 @@ itertools_count = itertools.count
 try:
     itertools_count(0, 1)
 except TypeError:
-    def count_decorator(func):
-        @wraps(func)
-        def wrapper(start=0, step=1):
-            # Second parameter ignored because in Python 2.6.x count() accepted only one parameter
-            return func(start)
-        return wrapper
-    itertools_count = count_decorator(itertools_count)
+    def count(start=0, step=1):
+        n = start
+        while True:
+            yield n
+            n += step
+    itertools_count =  count
 
 finder = mommy.ModelFinder()
 
