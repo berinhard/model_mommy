@@ -311,7 +311,7 @@ class Mommy(object):
                 try:
                     model_attrs[field.name] = advance_iterator(iterator_attrs[field.name])
                 except StopIteration:
-                    raise RecipeIteratorEmpty('{} iterator is empty.'.format(field.name))
+                    raise RecipeIteratorEmpty('{0} iterator is empty.'.format(field.name))
 
         return self.instance(model_attrs, _commit=commit)
 
