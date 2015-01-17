@@ -284,6 +284,10 @@ class MommyCreatesAssociatedModels(TestCase):
         user = mommy.make(User)
         self.assertFalse(user.profile)
 
+    def test_passing_m2m_value(self):
+        store = mommy.make(Store, customers=[mommy.make(Person)])
+        self.assertEqual(store.customers.count(), 1)
+
     def test_ensure_recursive_ForeignKey_population(self):
         bill = mommy.make(PaymentBill, user__profile__email="a@b.com")
         self.assertEqual('a@b.com', bill.user.profile.email)
