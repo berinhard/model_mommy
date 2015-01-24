@@ -343,20 +343,23 @@ class Mommy(object):
 
     def _handle_m2m(self, instance):
         for key, values in self.m2m_dict.items():
-            if not values:
-                continue
-
-            m2m_relation = getattr(instance, key)
-            through_model = m2m_relation.through
-
             for value in values:
                 if not value.pk:
                     value.save()
-                base_kwargs = {
-                    m2m_relation.source_field_name: instance,
-                    m2m_relation.target_field_name: value
-                }
-                make(through_model, **base_kwargs)
+            m2m_relation = getattr(instance, key)
+            through_model = m2m_relation.through
+
+            # using related manager to fire m2m_changed signal
+            if through_model._meta.auto_created:
+                m2m_relation.add(*values)
+            else:
+                for value in values:
+                    base_kwargs = {
+                        m2m_relation.source_field_name: instance,
+                        m2m_relation.target_field_name: value
+                    }
+                    make(through_model, **base_kwargs)
+
 
     def _ip_generator(self, field):
         protocol = getattr(field, 'protocol', '').lower()

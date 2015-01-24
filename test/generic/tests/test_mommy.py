@@ -6,6 +6,7 @@ from django import VERSION
 from django.db.models.options import Options
 from django.db.models import Manager
 from mock import patch
+from django.db.models.signals import m2m_changed
 from model_mommy import mommy
 from model_mommy import generators
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
@@ -231,6 +232,9 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(store.customers.count(), mommy.MAX_MANY_QUANTITY)
 
     def test_create_many_to_many_with_through_option(self):
+        """
+         This does not works
+        """
         # School student's attr is a m2m relationship with a model through
         school = mommy.make(School, make_m2m=True)
         self.assertEqual(School.objects.count(), 1)
@@ -250,6 +254,15 @@ class MommyCreatesAssociatedModels(TestCase):
     def test_nullable_many_to_many_is_not_created_even_if_flagged(self):
         classroom = mommy.make(Classroom, make_m2m=True)
         self.assertEqual(classroom.students.count(), 0)
+
+    def test_m2m_changed_signal_is_fired(self):
+        # Use object attrs instead of mocks for Django 1.4 compat
+        self.m2m_changed_fired = False
+        def test_m2m_changed(*args, **kwargs):
+            self.m2m_changed_fired = True
+        m2m_changed.connect(test_m2m_changed, dispatch_uid='test_m2m_changed')
+        store = mommy.make(Store, make_m2m=True)
+        self.assertTrue(self.m2m_changed_fired)
 
     def test_simple_creating_person_with_parameters(self):
         kid = mommy.make(Person, happy=True, age=10, name='Mike')
