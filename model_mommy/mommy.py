@@ -34,6 +34,11 @@ try:
 except ImportError:
     GenericIPAddressField = IPAddressField
 
+try:
+    from django.db.models import BinaryField
+except ImportError:
+    BinaryField = None
+
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv4_address
 try:
@@ -150,6 +155,9 @@ default_mapping = {
 
     ContentType: generators.gen_content_type,
 }
+
+if BinaryField:
+    default_mapping[BinaryField] = generators.gen_byte_string
 
 
 class ModelFinder(object):

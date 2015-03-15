@@ -71,6 +71,12 @@ class Person(models.Model):
     appointment = models.DateTimeField()
     blog = models.URLField()
     occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOCIES)
+    try:
+        name_hash = models.BinaryField(max_length=16)
+    except AttributeError:
+        # We can't test the binary field if it is not supported
+        # (django < 1,6)
+        pass
 
     #backward compatibilty with Django 1.1
     try:

@@ -28,7 +28,7 @@ except ImportError:
     pass
     #BigIntegerField = IntegerField
 
-from six import text_type, string_types
+from six import text_type, string_types, binary_type
 
 from model_mommy import mommy
 from test.generic.models import has_pil
@@ -40,6 +40,11 @@ from test.generic.models import DummyGenericForeignKeyModel
 from test.generic.models import DummyFileFieldModel
 from test.generic.models import DummyImageFieldModel
 from test.generic.models import CustomFieldWithoutGeneratorModel, CustomFieldWithGeneratorModel
+
+try:
+    from django.db.models.fields import BinaryField
+except ImportError:
+    BinaryField = None
 
 from django.core.validators import validate_ipv4_address
 try:
@@ -57,6 +62,9 @@ __all__ = [
     'FillingEmailField', 'FillingIPAddressField', 'FillingGenericForeignKeyField', 'FillingFileField',
     'FillingImageFileField', 'TimeFieldsFilling', 'FillingCustomFields',
 ]
+
+if BinaryField:
+    __all__.append('BinaryFieldsFilling')
 
 
 def assert_not_raise(method, parameters, exception):
@@ -107,6 +115,16 @@ class StringFieldsFilling(FieldFillingTestCase):
         self.assertIsInstance(person_bio_field, TextField)
 
         self.assertIsInstance(self.person.bio, text_type)
+
+
+class BinaryFieldsFilling(FieldFillingTestCase):
+    if BinaryField:
+        def test_fill_BinaryField_with_random_binary(self):
+            name_hash_field = Person._meta.get_field('name_hash')
+            self.assertIsInstance(name_hash_field, BinaryField)
+            name_hash = self.person.name_hash
+            self.assertIsInstance(name_hash, binary_type)
+            self.assertEqual(len(name_hash), name_hash_field.max_length)
 
 
 class BooleanFieldsFilling(FieldFillingTestCase):

@@ -16,6 +16,7 @@ from os.path import abspath, join, dirname
 from random import randint, choice, random
 from django import VERSION
 from django.core.files.base import ContentFile
+import six
 
 from model_mommy.timezone import now
 
@@ -139,6 +140,13 @@ def gen_ipv46():
     ip_gen = choice([gen_ipv4, gen_ipv6])
     return ip_gen()
 
+
+def gen_byte_string(max_length=16):
+    generator = (randint(0, 255) for x in range(max_length))
+    if six.PY2:
+        return "".join(map(chr, generator))
+    elif six.PY3:
+        return bytes(generator)
 
 def gen_content_type():
     from django.contrib.contenttypes.models import ContentType
