@@ -31,7 +31,6 @@ before_install:
 install:
    # Install whatever version of Django that's listed above
    # Travis is currently working on
- - pip install -q Django==$DJANGO_VERSION --use-mirrors
- - pip install -q Pillow --use-mirrors
- - pip install -r requirements.txt
+ - travis_retry pip install -q Django==$DJANGO_VERSION --use-mirrors
+ - travis_retry pip install -r requirements.txt
 script: python runtests.py
