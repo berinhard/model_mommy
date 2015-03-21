@@ -27,9 +27,12 @@ matrix:
       env: DJANGO_VERSION=1.6
     - python: 3.4
       env: DJANGO_VERSION=1.7
+before_install:
+  - sudo apt-get update && sudo apt-get build-dep python-imaging
 install:
    # Install whatever version of Django that's listed above
    # Travis is currently working on
- - travis_retry pip install -q Django==$DJANGO_VERSION --use-mirrors
- - travis_retry pip install -r requirements.txt
+ - pip install -q Django==$DJANGO_VERSION --use-mirrors
+ - pip install -q Pillow --use-mirrors
+ - pip install -r requirements.txt
 script: python runtests.py
