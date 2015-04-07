@@ -54,7 +54,12 @@ mock_file_txt = join(dirname(__file__), 'mock_file.txt')
 
 
 #TODO: improve related models handling
-foreign_key_required = [lambda field: ('model', field.related.parent_model)]
+def _fk_model(field):
+    try:
+        return ('model', field.related.parent_model)
+    except AttributeError:
+        return ('model', field.related_model)
+foreign_key_required = [_fk_model]
 
 MAX_MANY_QUANTITY = 5
 
@@ -259,8 +264,8 @@ class Mommy(object):
     def prepare(self, **attrs):
         '''Creates, but does not persist, an instance of the model
         associated with Mommy instance.'''
-        self.type_mapping[ForeignKey] = prepare
-        self.type_mapping[OneToOneField] = prepare
+        self.type_mapping[ForeignKey] = make
+        self.type_mapping[OneToOneField] = make
         return self._make(commit=False, **attrs)
 
     def get_fields(self):

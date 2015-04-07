@@ -66,10 +66,14 @@ def get_runner(settings):
 
 
 def runtests(options=None, labels=None):
-    if not labels:
-        labels = ['generic']
-
     settings = configure_settings(options)
+    if django.VERSION >= (1, 8):
+        settings.TEST_RUNNER='django.test.runner.DiscoverRunner'
+        if not labels:
+            labels = ['test.generic']
+    else:
+        if not labels:
+            labels = ['generic']
     runner = get_runner(settings)
     if django.VERSION >= (1, 7):
         django.setup()

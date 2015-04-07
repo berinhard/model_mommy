@@ -7,10 +7,12 @@ if VERSION < (1, 4):
 
     class DummyIPAddressFieldForm(ModelForm):
         class Meta:
+            fields = ('ipv4_field',)
             model = DummyIPAddressFieldModel
 else:
     from test.generic.models import DummyGenericIPAddressFieldModel
 
     class DummyGenericIPAddressFieldForm(ModelForm):
         class Meta:
+            fields = ('ipv4_field', 'ipv6_field', 'ipv46_field')
             model = DummyGenericIPAddressFieldModel
