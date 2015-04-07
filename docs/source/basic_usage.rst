@@ -129,7 +129,12 @@ File: test_model.py ::
             self.rex = mommy.make('family.Dog')
 
 She will also create the Kid, automagically.
+**NOTE: ForeignKeys and OneToOneFields**
+Since Django 1.8, ForeignKey and OneToOne fields don't accept unpersisted model instances anymore. This means if you do:
 
+    mommy.prepare('family.Dog')
+
+You'll end with a persisted "Kid" instance.
 
 M2M Relationships
 -----------------
