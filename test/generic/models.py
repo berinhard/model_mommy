@@ -57,7 +57,7 @@ class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CH)
     happy = models.BooleanField(default=True)
     unhappy = models.BooleanField(default=False)
-    bipolar = models.BooleanField()
+    bipolar = models.BooleanField(default=False)
     name = models.CharField(max_length=30)
     nickname = models.SlugField(max_length=36)
     age = models.IntegerField()
