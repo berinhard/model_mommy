@@ -361,6 +361,12 @@ class FillNullsTestCase(TestCase):
         classroom = mommy.make(Classroom, make_m2m=True, _fill_optional=True)
         self.assertEqual(classroom.students.count(), 5)
 
+    def test_nullable_many_to_many_is_not_created_if_not_flagged_and_fill_optional(self):
+        classroom = mommy.make(Classroom, make_m2m=False, _fill_optional=True)
+        self.assertEqual(classroom.students.count(), 0)
+
+    # test_nullable_many_to_many_is_not_created_even_if_flagged_and_not_fill_optional in line 252
+    
 
 class SkipBlanksTestCase(TestCase):
     def test_skip_blank(self):
