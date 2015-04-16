@@ -350,6 +350,22 @@ class SkipNullsTestCase(TestCase):
         self.assertEqual(dummy.null_integer_field, None)
 
 
+class FillNullsTestCase(TestCase):
+    def test_create_nullable_many_to_many_if_flagged_and_fill_field_optional(
+        self):
+        classroom = mommy.make(Classroom, make_m2m=True, _fill_optional=[
+            'students'])
+        self.assertEqual(classroom.students.count(), 5)
+
+    def test_create_nullable_many_to_many_if_flagged_and_fill_optional(self):
+        classroom = mommy.make(Classroom, make_m2m=True, _fill_optional=True)
+        self.assertEqual(classroom.students.count(), 5)
+
+    def test_nullable_many_to_many_is_not_created_if_not_flagged_and_fill_optional(self):
+        classroom = mommy.make(Classroom, make_m2m=False, _fill_optional=True)
+        self.assertEqual(classroom.students.count(), 0)
+
+
 class SkipBlanksTestCase(TestCase):
     def test_skip_blank(self):
         dummy = mommy.make(DummyBlankFieldsModel)

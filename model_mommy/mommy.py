@@ -326,7 +326,7 @@ class Mommy(object):
     def m2m_value(self, field):
         if field.name in self.rel_fields:
             return self.generate_value(field)
-        if not self.make_m2m or field.null:
+        if not self.make_m2m or field.null and not field.fill_optional:
             return []
         return self.generate_value(field)
 

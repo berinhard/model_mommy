@@ -11,3 +11,5 @@ share/
 .idea
 .tox
 build/
+lib64
+pyvenv.cfg
