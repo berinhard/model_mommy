@@ -267,8 +267,12 @@ class Mommy(object):
     def prepare(self, **attrs):
         '''Creates, but does not persist, an instance of the model
         associated with Mommy instance.'''
-        self.type_mapping[ForeignKey] = make
-        self.type_mapping[OneToOneField] = make
+        if django.VERSION >= (1, 8):
+            self.type_mapping[ForeignKey] = make
+            self.type_mapping[OneToOneField] = make
+        else:
+            self.type_mapping[ForeignKey] = prepare
+            self.type_mapping[OneToOneField] = prepare
         return self._make(commit=False, **attrs)
 
     def get_fields(self):

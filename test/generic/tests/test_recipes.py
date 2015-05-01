@@ -1,6 +1,7 @@
 #coding: utf-8
 
 import itertools
+import django
 from random import choice
 from mock import patch
 from decimal import Decimal
@@ -363,7 +364,10 @@ class ForeignKeyTestCase(TestCase):
         self.assertEqual(dog.owner.name, 'James')
 
         dog = dog_recipe.prepare(owner__name='Zezin')
-        self.assertEqual(Person.objects.count(), 2)
+        if django.VERSION >= (1, 8):
+            self.assertEqual(Person.objects.count(), 2)
+        else:
+            self.assertEqual(Person.objects.count(), 1)
         self.assertEqual(dog.owner.name, 'Zezin')
 
     def test_related_models_recipes(self):

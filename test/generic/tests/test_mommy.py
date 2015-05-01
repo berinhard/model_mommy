@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
-from decimal import Decimal
 
+import django
+from decimal import Decimal
 from django.test import TestCase
 from django import VERSION
 from django.db.models.options import Options
@@ -187,20 +188,26 @@ class MommyCreatesAssociatedModels(TestCase):
         for person in Person.objects.all():
             self.assertEqual(person.name, 'john')
 
-    def test_prepare_should_not_create_one_object(self):
+    def test_prepare_fk(self):
         dog = mommy.prepare(Dog)
         self.assertIsInstance(dog, Dog)
         self.assertIsInstance(dog.owner, Person)
 
-        self.assertEqual(Person.objects.all().count(), 1)
+        if django.VERSION >= (1, 8):
+            self.assertEqual(Person.objects.all().count(), 1)
+        else:
+            self.assertEqual(Person.objects.all().count(), 0)
         self.assertEqual(Dog.objects.all().count(), 0)
 
-    def test_prepare_one_to_one_should_not_persist_one_object(self):
+    def test_prepare_one_to_one(self):
         lonely_person = mommy.prepare(LonelyPerson)
 
         self.assertEqual(LonelyPerson.objects.all().count(), 0)
         self.assertTrue(isinstance(lonely_person.only_friend, Person))
-        self.assertEqual(Person.objects.all().count(), 1)
+        if django.VERSION >= (1, 8):
+            self.assertEqual(Person.objects.all().count(), 1)
+        else:
+            self.assertEqual(Person.objects.all().count(), 0)
 
     def test_create_one_to_one(self):
         lonely_person = mommy.make(LonelyPerson)
