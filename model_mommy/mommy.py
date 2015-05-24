@@ -2,15 +2,18 @@
 import warnings
 
 from django.conf import settings
-from django.utils import importlib
-from django.contrib.contenttypes import generic
 from django.contrib.contenttypes.models import ContentType
 import django
-from django.db.models.loading import get_model
 if django.VERSION >= (1, 7):
+    import importlib
     from django.apps import apps
+    get_model = apps.get_model
+    from django.contrib.contenttypes.fields import GenericRelation
 else:
+    from django.db.models.loading import get_model
+    from django.utils import importlib
     from django.db.models.loading import cache
+    from django.contrib.contenttypes.generic import GenericRelation
 from django.db.models.base import ModelBase
 from django.db.models import (
     CharField, EmailField, SlugField, TextField, URLField,
@@ -292,7 +295,7 @@ class Mommy(object):
 
             field_value_not_defined = field.name not in model_attrs
 
-            if isinstance(field, (AutoField, generic.GenericRelation)):
+            if isinstance(field, (AutoField, GenericRelation)):
                 continue
 
             if all([field.name not in model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):

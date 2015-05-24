@@ -12,7 +12,11 @@ from django.db import models
 from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes import generic
+if VERSION >= (1, 7):
+    from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
+else:
+    from django.contrib.contenttypes.generic import GenericRelation, GenericForeignKey
+
 from .fields import *
 from model_mommy.timezone import smart_datetime as datetime
 import datetime as base_datetime
@@ -57,7 +61,7 @@ class Person(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CH)
     happy = models.BooleanField(default=True)
     unhappy = models.BooleanField(default=False)
-    bipolar = models.BooleanField()
+    bipolar = models.BooleanField(default=False)
     name = models.CharField(max_length=30)
     nickname = models.SlugField(max_length=36)
     age = models.IntegerField()
@@ -140,11 +144,11 @@ class DummyEmailModel(models.Model):
 class DummyGenericForeignKeyModel(models.Model):
     content_type = models.ForeignKey(ContentType)
     object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    content_object = GenericForeignKey('content_type', 'object_id')
 
 
 class DummyGenericRelationModel(models.Model):
-    relation = generic.GenericRelation(DummyGenericForeignKeyModel)
+    relation = GenericRelation(DummyGenericForeignKeyModel)
 
 
 class DummyNullFieldsModel(models.Model):

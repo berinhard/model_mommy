@@ -37,6 +37,11 @@ def configure_settings(options):
             TEST_ROOT=join(dirname(__file__), 'test', 'generic', 'tests'),
         )
 
+        if django.VERSION >= (1, 7):
+            params.update(
+                MIDDLEWARE_CLASSES=tuple()
+            )
+
         # Force the use of timezone aware datetime and change Django's warning to
         # be treated as errors.
         if getattr(options, 'USE_TZ', False):
