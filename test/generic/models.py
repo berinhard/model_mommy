@@ -107,6 +107,8 @@ class Store(models.Model):
     employees = models.ManyToManyField(Person, related_name='employers')
     suppliers = models.ManyToManyField(Person, related_name='suppliers', blank=True, null=True)
 
+class DummyEmptyModel(models.Model):
+    pass
 
 class DummyIntModel(models.Model):
     int_field = models.IntegerField()

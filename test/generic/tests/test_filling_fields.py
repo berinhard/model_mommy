@@ -8,7 +8,7 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.fields import CharField, TextField, SlugField
 from django.db.models.fields import DateField, DateTimeField,TimeField, EmailField
-from django.db.models.fields import IPAddressField
+from django.db.models.fields import IPAddressField, AutoField
 try:
     from django.db.models.fields import GenericIPAddressField
 except ImportError:
@@ -34,7 +34,7 @@ from model_mommy import mommy
 from test.generic.models import has_pil
 from test.generic.models import Person
 from test.generic.models import DummyIntModel, DummyPositiveIntModel
-from test.generic.models import DummyNumbersModel
+from test.generic.models import DummyNumbersModel, DummyEmptyModel
 from test.generic.models import DummyDecimalModel, DummyEmailModel
 from test.generic.models import DummyGenericForeignKeyModel
 from test.generic.models import DummyFileFieldModel
@@ -341,3 +341,11 @@ class FillingCustomFields(TestCase):
     def test_uses_generator_defined_on_settings_for_custom_field(self):
         obj = mommy.make(CustomFieldWithGeneratorModel)
         self.assertEqual("value", obj.custom_value)
+
+class FillingAutoFields(TestCase):
+
+    def test_filling_AutoField(self):
+        obj = mommy.make(DummyEmptyModel)
+        field = DummyEmptyModel._meta.get_field('id')
+        self.assertIsInstance(field, AutoField)
+        self.assertIsInstance(obj.id, int)

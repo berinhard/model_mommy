@@ -18,6 +18,7 @@ from test.generic.models import UnsupportedModel, DummyGenericRelationModel
 from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
 from test.generic.models import DummyDefaultFieldsModel, DummyMultipleInheritanceModel
 from test.generic.models import DummyGenericForeignKeyModel, NonAbstractPerson
+from test.generic.models import DummyEmptyModel
 
 
 class ModelFinderTest(TestCase):
@@ -398,6 +399,20 @@ class FillBlanksTestCase(TestCase):
         with self.assertRaises(TypeError):
             dummy = mommy.make(DummyBlankFieldsModel, _fill_optional=1)
 
+
+class FillAutoFieldsTestCase(TestCase):
+
+    def test_fill_autofields_with_provided_value(self):
+        dummy = mommy.make(DummyEmptyModel, id=237)
+        saved_dummy = DummyEmptyModel.objects.get()
+        self.assertEqual(saved_dummy.id, 237)
+
+    def test_keeps_prepare_autovalues(self):
+        dummy = mommy.prepare(DummyEmptyModel, id=543)
+        self.assertEqual(dummy.id, 543)
+        dummy.save()
+        saved_dummy = DummyEmptyModel.objects.get()
+        self.assertEqual(saved_dummy.id, 543)
 
 class SkipDefaultsTestCase(TestCase):
     def test_skip_fields_with_default(self):
