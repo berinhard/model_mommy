@@ -148,6 +148,12 @@ def gen_byte_string(max_length=16):
     elif six.PY3:
         return bytes(generator)
 
+def gen_interval(interval_key='milliseconds'):
+    from datetime import timedelta
+    interval = gen_integer()
+    kwargs = {interval_key: interval}
+    return timedelta(**kwargs)
+
 def gen_content_type():
     from django.contrib.contenttypes.models import ContentType
     from django.db.models import get_models
