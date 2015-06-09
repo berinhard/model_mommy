@@ -235,6 +235,17 @@ class DummyUniqueIntegerFieldModel(models.Model):
     value = models.IntegerField(unique=True)
 
 
+class ModelWithNext(models.Model):
+    attr = models.CharField(max_length=10)
+
+    def next(self):
+        return 'foo'
+
+
+class BaseModelForNext(models.Model):
+    fk = models.ForeignKey(ModelWithNext)
+
+
 if VERSION < (1, 4):
     class DummyIPAddressFieldModel(models.Model):
         ipv4_field = models.IPAddressField()  # Deprecated in Django 1.7

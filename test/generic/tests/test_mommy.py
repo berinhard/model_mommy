@@ -19,6 +19,7 @@ from test.generic.models import DummyNullFieldsModel, DummyBlankFieldsModel
 from test.generic.models import DummyDefaultFieldsModel, DummyMultipleInheritanceModel
 from test.generic.models import DummyGenericForeignKeyModel, NonAbstractPerson
 from test.generic.models import DummyEmptyModel
+from test.generic.models import ModelWithNext, BaseModelForNext
 
 
 class ModelFinderTest(TestCase):
@@ -427,6 +428,19 @@ class SkipDefaultsTestCase(TestCase):
         self.assertEqual(dummy.default_decimal_field, Decimal('0'))
         self.assertEqual(dummy.default_email_field, 'foo@bar.org')
         self.assertEqual(dummy.default_slug_field, 'a-slug')
+
+
+class MommyHandlesModelWithNext(TestCase):
+    def test_creates_instance_for_model_with_next(self):
+        instance = mommy.make(
+            BaseModelForNext,
+            fk=mommy.make(ModelWithNext),
+        )
+
+        self.assertTrue(instance.id)
+        self.assertTrue(instance.fk.id)
+        self.assertTrue(instance.fk.attr)
+        self.assertEqual('foo', instance.fk.next())
 
 
 if VERSION < (1, 4):
