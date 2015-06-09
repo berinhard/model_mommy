@@ -84,6 +84,11 @@ class Person(models.Model):
     except AttributeError:
         wanted_games_qtd = models.IntegerField()
 
+    try:
+        duration_of_sleep = models.DurationField()
+    except AttributeError:
+        pass
+
 
 class Dog(models.Model):
     owner = models.ForeignKey('Person')

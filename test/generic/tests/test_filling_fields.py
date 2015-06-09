@@ -1,4 +1,4 @@
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from os.path import abspath
 from tempfile import gettempdir
@@ -46,6 +46,11 @@ try:
 except ImportError:
     BinaryField = None
 
+try:
+    from django.db.models.fields import DurationField
+except ImportError:
+    DurationField = None
+
 from django.core.validators import validate_ipv4_address
 try:
     from django.core.validators import validate_ipv6_address, validate_ipv46_address
@@ -65,6 +70,9 @@ __all__ = [
 
 if BinaryField:
     __all__.append('BinaryFieldsFilling')
+
+if DurationField:
+    __all__.append('DurationField')
 
 
 def assert_not_raise(method, parameters, exception):
@@ -125,6 +133,15 @@ class BinaryFieldsFilling(FieldFillingTestCase):
             name_hash = self.person.name_hash
             self.assertIsInstance(name_hash, binary_type)
             self.assertEqual(len(name_hash), name_hash_field.max_length)
+
+
+class DurationFieldsFilling(FieldFillingTestCase):
+    if DurationField:
+        def test_fill_DurationField_with_random_interval_in_miliseconds(self):
+            duration_of_sleep_field = Person._meta.get_field('duration_of_sleep')
+            self.assertIsInstance(duration_of_sleep_field, DurationField)
+            duration_of_sleep = self.person.duration_of_sleep
+            self.assertIsInstance(duration_of_sleep, timedelta)
 
 
 class BooleanFieldsFilling(FieldFillingTestCase):

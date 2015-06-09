@@ -39,6 +39,11 @@ try:
 except ImportError:
     BinaryField = None
 
+try:
+    from django.db.models import DurationField
+except ImportError:
+    DurationField = None
+
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv4_address
 try:
@@ -158,6 +163,8 @@ default_mapping = {
 
 if BinaryField:
     default_mapping[BinaryField] = generators.gen_byte_string
+if DurationField:
+    default_mapping[DurationField] = generators.gen_interval
 
 
 class ModelFinder(object):
