@@ -246,6 +246,10 @@ class BaseModelForNext(models.Model):
     fk = models.ForeignKey(ModelWithNext)
 
 
+class BaseModelForList(models.Model):
+    fk = FakeListField()
+
+
 if VERSION < (1, 4):
     class DummyIPAddressFieldModel(models.Model):
         ipv4_field = models.IPAddressField()  # Deprecated in Django 1.7

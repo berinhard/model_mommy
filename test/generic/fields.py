@@ -5,3 +5,10 @@ class CustomFieldWithGenerator(models.TextField):
 
 class CustomFieldWithoutGenerator(models.TextField):
     pass
+
+class FakeListField(models.TextField):
+    def to_python(self, value):
+        return value.split()
+
+    def get_prep_value(self, value):
+        return super(FakeListField, self).get_prep_value(' '.join(value))

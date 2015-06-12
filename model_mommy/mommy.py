@@ -241,11 +241,13 @@ class ModelFinder(object):
 
 
 def is_iterator(value):
-    try:
-        iter(value)
-        return not isinstance(value, string_types)
-    except TypeError:
+    if not hasattr(value, '__iter__'):
         return False
+
+    if PY3:
+        return hasattr(value, '__next__')
+    else:
+        return hasattr(value, 'next')
 
 
 class Mommy(object):

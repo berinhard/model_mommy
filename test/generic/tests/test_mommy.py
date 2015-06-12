@@ -20,6 +20,7 @@ from test.generic.models import DummyDefaultFieldsModel, DummyMultipleInheritanc
 from test.generic.models import DummyGenericForeignKeyModel, NonAbstractPerson
 from test.generic.models import DummyEmptyModel
 from test.generic.models import ModelWithNext, BaseModelForNext
+from test.generic.models import BaseModelForList
 
 
 class ModelFinderTest(TestCase):
@@ -442,6 +443,16 @@ class MommyHandlesModelWithNext(TestCase):
         self.assertTrue(instance.fk.attr)
         self.assertEqual('foo', instance.fk.next())
 
+
+class MommyHandlesModelWithList(TestCase):
+    def test_creates_instance_for_model_with_list(self):
+        instance = mommy.make(
+            BaseModelForList,
+            fk=["foo"]
+        )
+
+        self.assertTrue(instance.id)
+        self.assertEqual(["foo"], instance.fk)
 
 if VERSION < (1, 4):
     from test.generic.forms import DummyIPAddressFieldForm
