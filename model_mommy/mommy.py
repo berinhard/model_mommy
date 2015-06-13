@@ -57,6 +57,7 @@ from . import generators
 from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty
 
 from six import string_types, advance_iterator, PY3
+from mock import patch
 
 recipes = None
 
@@ -91,7 +92,16 @@ def make(model, _quantity=None, make_m2m=False, **attrs):
     else:
         return mommy.make(**attrs)
 
+def _allow_unsaved(fn, *args, **kwargs):
+    def p(*args, **kwargs):
+        if django.VERSION >= (1, 8):
+            with patch.object(ForeignKey, 'allow_unsaved_instance_assignment', True):
+                with patch.object(OneToOneField, 'allow_unsaved_instance_assignment', True):
+                    return fn(*args, **kwargs)
+        return fn(*args, **kwargs)
+    return p
 
+@_allow_unsaved
 def prepare(model, _quantity=None, **attrs):
     """
     Creates BUT DOESN'T persist an instance from a given model its
@@ -107,7 +117,6 @@ def prepare(model, _quantity=None, **attrs):
         return [mommy.prepare(**attrs) for i in range(_quantity)]
     else:
         return mommy.prepare(**attrs)
-
 
 def _recipe(name):
     app, recipe_name = name.rsplit('.', 1)
@@ -285,12 +294,8 @@ class Mommy(object):
     def prepare(self, **attrs):
         '''Creates, but does not persist, an instance of the model
         associated with Mommy instance.'''
-        if django.VERSION >= (1, 8):
-            self.type_mapping[ForeignKey] = make
-            self.type_mapping[OneToOneField] = make
-        else:
-            self.type_mapping[ForeignKey] = prepare
-            self.type_mapping[OneToOneField] = prepare
+        self.type_mapping[ForeignKey] = prepare
+        self.type_mapping[OneToOneField] = prepare
         return self._make(commit=False, **attrs)
 
     def get_fields(self):

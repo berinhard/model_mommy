@@ -364,10 +364,7 @@ class ForeignKeyTestCase(TestCase):
         self.assertEqual(dog.owner.name, 'James')
 
         dog = dog_recipe.prepare(owner__name='Zezin')
-        if django.VERSION >= (1, 8):
-            self.assertEqual(Person.objects.count(), 2)
-        else:
-            self.assertEqual(Person.objects.count(), 1)
+        self.assertEqual(Person.objects.count(), 1)
         self.assertEqual(dog.owner.name, 'Zezin')
 
     def test_related_models_recipes(self):

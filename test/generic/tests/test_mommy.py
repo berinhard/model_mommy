@@ -196,10 +196,7 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertIsInstance(dog, Dog)
         self.assertIsInstance(dog.owner, Person)
 
-        if django.VERSION >= (1, 8):
-            self.assertEqual(Person.objects.all().count(), 1)
-        else:
-            self.assertEqual(Person.objects.all().count(), 0)
+        self.assertEqual(Person.objects.all().count(), 0)
         self.assertEqual(Dog.objects.all().count(), 0)
 
     def test_prepare_one_to_one(self):
@@ -207,10 +204,7 @@ class MommyCreatesAssociatedModels(TestCase):
 
         self.assertEqual(LonelyPerson.objects.all().count(), 0)
         self.assertTrue(isinstance(lonely_person.only_friend, Person))
-        if django.VERSION >= (1, 8):
-            self.assertEqual(Person.objects.all().count(), 1)
-        else:
-            self.assertEqual(Person.objects.all().count(), 0)
+        self.assertEqual(Person.objects.all().count(), 0)
 
     def test_create_one_to_one(self):
         lonely_person = mommy.make(LonelyPerson)
