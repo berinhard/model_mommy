@@ -24,6 +24,7 @@ from django.db.models import (
     FileField, ImageField, Field, IPAddressField,
     ForeignKey, ManyToManyField, OneToOneField)
 from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
+from django.db.models.fields.proxy import OrderWrt
 try:
     from django.db.models import BigIntegerField
 except ImportError:
@@ -322,7 +323,7 @@ class Mommy(object):
 
             field_value_not_defined = field.name not in model_attrs
 
-            if isinstance(field, (AutoField, GenericRelation)):
+            if isinstance(field, (AutoField, GenericRelation, OrderWrt)):
                 continue
 
             if all([field.name not in model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):

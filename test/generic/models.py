@@ -91,6 +91,10 @@ class Person(models.Model):
 
 
 class Dog(models.Model):
+
+    class Meta:
+        order_with_respect_to = 'owner'
+
     owner = models.ForeignKey('Person')
     breed = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
