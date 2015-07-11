@@ -294,6 +294,7 @@ class FillingGenericForeignKeyField(TestCase):
     def test_filling_content_type_field(self):
         dummy = mommy.make(DummyGenericForeignKeyModel)
         self.assertIsInstance(dummy.content_type, ContentType)
+        self.assertIsNotNone(dummy.content_type.model_class())
 
 
 class FillingFileField(TestCase):
