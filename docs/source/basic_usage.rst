@@ -238,7 +238,7 @@ File: test_model.py ::
 Non persistent objects
 ----------------------
 
-If don't need a persisted object, *Mommy* can handle this for you as well:
+If you don't need a persisted object, *Mommy* can handle this for you as well:
 
 .. code-block:: python
 
