@@ -91,7 +91,7 @@ File: model.py ::
 
         def __unicode__(self):
             """
-            Retorn the name of kid
+            Return the name of kid
             """
             return u'%s' % (self.name)
 
