@@ -282,7 +282,8 @@ class Mommy(object):
         generators_from_settings = getattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', {})
         for k, v in generators_from_settings.items():
             field_class = import_if_str(k)
-            self.type_mapping[field_class] = v
+            generator = import_if_str(v)
+            self.type_mapping[field_class] = generator
 
     def make(self, **attrs):
         '''Creates and persists an instance of the model

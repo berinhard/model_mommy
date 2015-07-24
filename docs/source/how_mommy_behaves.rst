@@ -53,7 +53,11 @@ Currently supported fields
 Custom fields
 -------------
 
-Model-mommy allows you to define generators methods for your custom fields or overrides its default generators. This could be achieved by specifing a dict on settings that its keys are the field paths and the values their generators functions, as the example bellow:
+Model-mommy allows you to define generators methods for your custom fields or overrides its default generators.
+This could be achieved by specifing a dict on settings with keys defining the fields and values the generator functions.
+Both can be the real python objects imported in settings or just specified as import path string.
+
+Examples:
 
 .. code-block:: python
 
@@ -63,4 +67,15 @@ Model-mommy allows you to define generators methods for your custom fields or ov
 
     MOMMY_CUSTOM_FIELDS_GEN = {
         'test.generic.fields.CustomField': gen_func,
+    }
+
+.. code-block:: python
+
+    # in the module code.path:
+    def gen_func():
+        return 'value'
+
+    # in your settings.py file:
+    MOMMY_CUSTOM_FIELDS_GEN = {
+        'test.generic.fields.CustomField': 'code.path.gen_func',
     }

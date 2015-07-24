@@ -40,6 +40,7 @@ from test.generic.models import DummyGenericForeignKeyModel
 from test.generic.models import DummyFileFieldModel
 from test.generic.models import DummyImageFieldModel
 from test.generic.models import CustomFieldWithoutGeneratorModel, CustomFieldWithGeneratorModel
+from test.generic.generators import gen_value_string
 
 try:
     from django.db.models.fields import BinaryField
@@ -347,7 +348,7 @@ class FillingImageFileField(TestCase):
 class FillingCustomFields(TestCase):
 
     def setUp(self):
-        generator_dict = {'test.generic.fields.CustomFieldWithGenerator': lambda: "value"}
+        generator_dict = {'test.generic.fields.CustomFieldWithGenerator': gen_value_string}
         setattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', generator_dict)
 
     def tearDown(self):
@@ -359,6 +360,15 @@ class FillingCustomFields(TestCase):
     def test_uses_generator_defined_on_settings_for_custom_field(self):
         obj = mommy.make(CustomFieldWithGeneratorModel)
         self.assertEqual("value", obj.custom_value)
+
+    def test_uses_generator_defined_as_string_on_settings_for_custom_field(self):
+        generator_dict = {'test.generic.fields.CustomFieldWithGenerator':
+                                'test.generic.generators.gen_value_string'}
+        setattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', generator_dict)
+
+        obj = mommy.make(CustomFieldWithGeneratorModel)
+        self.assertEqual("value", obj.custom_value)
+
 
 class FillingAutoFields(TestCase):
 
