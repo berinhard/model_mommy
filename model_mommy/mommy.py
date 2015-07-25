@@ -84,7 +84,7 @@ def make(model, _quantity=None, make_m2m=False, **attrs):
     which fields you want to define its values by yourself.
     """
     mommy = Mommy(model, make_m2m=make_m2m)
-    if _quantity and (not isinstance(_quantity, int) or _quantity < 1):
+    if _quantity is not None and (not isinstance(_quantity, int) or _quantity < 1):
         raise InvalidQuantityException
 
     if _quantity:
@@ -110,7 +110,7 @@ def prepare(model, _quantity=None, **attrs):
     which fields you want to define its values by yourself.
     """
     mommy = Mommy(model)
-    if _quantity and (not isinstance(_quantity, int) or _quantity < 1):
+    if _quantity is not None and (not isinstance(_quantity, int) or _quantity < 1):
         raise InvalidQuantityException
 
     if _quantity:
