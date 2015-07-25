@@ -5,13 +5,11 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 import django
 if django.VERSION >= (1, 7):
-    import importlib
     from django.apps import apps
     get_model = apps.get_model
     from django.contrib.contenttypes.fields import GenericRelation
 else:
     from django.db.models.loading import get_model
-    from django.utils import importlib
     from django.db.models.loading import cache
     from django.contrib.contenttypes.generic import GenericRelation
 from django.db.models.base import ModelBase
@@ -56,6 +54,7 @@ except ImportError:
 
 from . import generators
 from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty
+from .utils import import_from_str, import_if_str
 
 from six import string_types, advance_iterator, PY3
 from mock import patch
@@ -121,8 +120,7 @@ def prepare(model, _quantity=None, **attrs):
 
 def _recipe(name):
     app, recipe_name = name.rsplit('.', 1)
-    recipes = importlib.import_module('.'.join([app, 'mommy_recipes']))
-    return getattr(recipes, recipe_name)
+    return import_from_str('.'.join((app, 'mommy_recipes', recipe_name)))
 
 def make_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
     return _recipe(mommy_recipe_name).make(_quantity=_quantity, **new_attrs)
@@ -281,11 +279,11 @@ class Mommy(object):
 
     def init_type_mapping(self):
         self.type_mapping = default_mapping.copy()
-        generator_from_settings = getattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', {})
-        for k, v in generator_from_settings.items():
-            path, field_name = k.rsplit('.', 1)
-            field_class = getattr(importlib.import_module(path), field_name)
-            self.type_mapping[field_class] = v
+        generators_from_settings = getattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', {})
+        for k, v in generators_from_settings.items():
+            field_class = import_if_str(k)
+            generator = import_if_str(v)
+            self.type_mapping[field_class] = generator
 
     def make(self, **attrs):
         '''Creates and persists an instance of the model
