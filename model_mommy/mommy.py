@@ -77,6 +77,9 @@ foreign_key_required = [_fk_model]
 
 MAX_MANY_QUANTITY = 5
 
+def _valid_quantity(quantity):
+    return quantity is not None and (not isinstance(quantity, int) or quantity < 1)
+
 def make(model, _quantity=None, make_m2m=False, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
@@ -84,7 +87,7 @@ def make(model, _quantity=None, make_m2m=False, **attrs):
     which fields you want to define its values by yourself.
     """
     mommy = Mommy(model, make_m2m=make_m2m)
-    if _quantity is not None and (not isinstance(_quantity, int) or _quantity < 1):
+    if _valid_quantity(_quantity):
         raise InvalidQuantityException
 
     if _quantity:
@@ -110,7 +113,7 @@ def prepare(model, _quantity=None, **attrs):
     which fields you want to define its values by yourself.
     """
     mommy = Mommy(model)
-    if _quantity is not None and (not isinstance(_quantity, int) or _quantity < 1):
+    if _valid_quantity(_quantity):
         raise InvalidQuantityException
 
     if _quantity:
