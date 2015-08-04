@@ -156,6 +156,12 @@ def gen_interval(interval_key='milliseconds'):
 
 def gen_content_type():
     from django.contrib.contenttypes.models import ContentType
-    from django.db.models import get_models
+    try:
+        # for >= 1.7
+        from django.apps import apps
+        get_models = apps.get_models
+    except ImportError:
+        # Deprecated
+        from django.db.models import get_models
 
     return ContentType.objects.get_for_model(choice(get_models()))
