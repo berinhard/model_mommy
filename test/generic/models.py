@@ -235,6 +235,10 @@ class CustomFieldWithoutGeneratorModel(models.Model):
     custom_value = CustomFieldWithoutGenerator()
 
 
+class CustomForeignKeyWithGeneratorModel(models.Model):
+    custom_fk = CustomForeignKey(Profile, blank=True, null=True)
+
+
 class DummyUniqueIntegerFieldModel(models.Model):
     value = models.IntegerField(unique=True)
 

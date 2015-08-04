@@ -40,6 +40,7 @@ from test.generic.models import DummyGenericForeignKeyModel
 from test.generic.models import DummyFileFieldModel
 from test.generic.models import DummyImageFieldModel
 from test.generic.models import CustomFieldWithoutGeneratorModel, CustomFieldWithGeneratorModel
+from test.generic.models import CustomForeignKeyWithGeneratorModel
 from test.generic.generators import gen_value_string
 
 try:
@@ -368,6 +369,12 @@ class FillingCustomFields(TestCase):
 
         obj = mommy.make(CustomFieldWithGeneratorModel)
         self.assertEqual("value", obj.custom_value)
+
+    def test_uses_generator_defined_on_settings_for_custom_foreignkey(self):
+        generator_dict = {'test.generic.fields.CustomForeignKey': 'model_mommy.mommy.make'}
+        setattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', generator_dict)
+        obj = mommy.make(CustomForeignKeyWithGeneratorModel, custom_fk__email="a@b.com")
+        self.assertEqual('a@b.com', obj.custom_fk.email)
 
 
 class FillingAutoFields(TestCase):

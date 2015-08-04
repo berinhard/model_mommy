@@ -121,6 +121,8 @@ def prepare(model, _quantity=None, **attrs):
     else:
         return mommy.prepare(**attrs)
 
+make.prepare = prepare
+
 def _recipe(name):
     app, recipe_name = name.rsplit('.', 1)
     return import_from_str('.'.join((app, 'mommy_recipes', recipe_name)))
@@ -296,8 +298,6 @@ class Mommy(object):
     def prepare(self, **attrs):
         '''Creates, but does not persist, an instance of the model
         associated with Mommy instance.'''
-        self.type_mapping[ForeignKey] = prepare
-        self.type_mapping[OneToOneField] = prepare
         return self._make(commit=False, **attrs)
 
     def get_fields(self):
@@ -341,7 +341,7 @@ class Mommy(object):
                 if field.name not in self.rel_fields and (field.null and not field.fill_optional):
                     continue
                 else:
-                    model_attrs[field.name] = self.generate_value(field)
+                    model_attrs[field.name] = self.generate_value(field, commit)
             elif callable(model_attrs[field.name]):
                 model_attrs[field.name] = model_attrs[field.name]()
             elif field.name in iterator_attrs:
@@ -424,7 +424,7 @@ class Mommy(object):
 
         return generator
 
-    def generate_value(self, field):
+    def generate_value(self, field, commit=True):
         '''
         Calls the generator associated with a field passing all required args.
 
@@ -458,6 +458,8 @@ class Mommy(object):
         if field.name in self.rel_fields:
             generator_attrs.update(filter_rel_attrs(field.name, **self.rel_attrs))
 
+        if not commit:
+            generator = getattr(generator, 'prepare', generator)
         return generator(**generator_attrs)
 
 

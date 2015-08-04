@@ -12,3 +12,6 @@ class FakeListField(models.TextField):
 
     def get_prep_value(self, value):
         return super(FakeListField, self).get_prep_value(' '.join(value))
+
+class CustomForeignKey(models.ForeignKey):
+    pass
