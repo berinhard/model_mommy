@@ -95,16 +95,7 @@ def make(model, _quantity=None, make_m2m=False, **attrs):
     else:
         return mommy.make(**attrs)
 
-def _allow_unsaved(fn, *args, **kwargs):
-    def p(*args, **kwargs):
-        if django.VERSION >= (1, 8):
-            with patch.object(ForeignKey, 'allow_unsaved_instance_assignment', True):
-                with patch.object(OneToOneField, 'allow_unsaved_instance_assignment', True):
-                    return fn(*args, **kwargs)
-        return fn(*args, **kwargs)
-    return p
 
-@_allow_unsaved
 def prepare(model, _quantity=None, **attrs):
     """
     Creates BUT DOESN'T persist an instance from a given model its
