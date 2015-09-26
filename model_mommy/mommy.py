@@ -70,9 +70,9 @@ mock_file_txt = join(dirname(__file__), 'mock_file.txt')
 #TODO: improve related models handling
 def _fk_model(field):
     try:
-        return ('model', field.related.parent_model)
-    except AttributeError:
         return ('model', field.related_model)
+    except AttributeError:
+        return ('model', field.related.parent_model)
 foreign_key_required = [_fk_model]
 
 MAX_MANY_QUANTITY = 5
