@@ -21,7 +21,10 @@ from django.db.models import (
     BooleanField, DecimalField, FloatField,
     FileField, ImageField, Field, IPAddressField,
     ForeignKey, ManyToManyField, OneToOneField)
-from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
+if django.VERSION >= (1, 9):
+    from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
+else:
+    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
 from django.db.models.fields.proxy import OrderWrt
 try:
     from django.db.models import BigIntegerField
