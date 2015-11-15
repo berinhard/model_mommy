@@ -57,7 +57,6 @@ from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityExcept
 from .utils import import_from_str, import_if_str
 
 from six import string_types, advance_iterator, PY3
-from mock import patch
 
 recipes = None
 

@@ -14,6 +14,7 @@ setuptools.setup(
         'django<1.9',
         'pil',
         'tox',
+        'mock'
     ],
     test_suite='runtests.runtests',
     author="vandersonmota",
