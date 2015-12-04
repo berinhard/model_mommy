@@ -369,7 +369,11 @@ class Mommy(object):
 
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
-            setattr(instance, k, v)
+            if django.VERSION >= (1, 9):
+                manager = getattr(instance, k)
+                manager.set(v, bulk=False)
+            else:
+                setattr(instance, k, v)
 
     def _handle_m2m(self, instance):
         for key, values in self.m2m_dict.items():
