@@ -69,6 +69,7 @@ class TestDefiningRecipes(TestCase):
 
     def test_always_calls_when_creating(self):
         with patch('test.generic.tests.test_recipes.choice') as choice_mock:
+            choice.return_value = 'foo'
             l = ['foo', 'bar', 'spam', 'eggs']
             r = Recipe(DummyBlankFieldsModel,
                 blank_char_field = lambda: choice(l)
@@ -79,6 +80,7 @@ class TestDefiningRecipes(TestCase):
 
     def test_always_calls_with_quantity(self):
         with patch('test.generic.tests.test_recipes.choice') as choice_mock:
+            choice.return_value = 'foo'
             l = ['foo', 'bar', 'spam', 'eggs']
             r = Recipe(DummyBlankFieldsModel,
                 blank_char_field = lambda: choice(l)
