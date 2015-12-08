@@ -17,6 +17,9 @@ With a simple and powerful API you can create many objects with a single line of
     :target: https://crate.io/packages/model_mommy/
     :alt: Number of PyPI downloads
 
+.. image:: https://img.shields.io/gratipay/vandersonmota.svg?style=social&label=Donate
+    :target: https://www.gratipay.com/vandersonmota
+
 Install
 =======
 

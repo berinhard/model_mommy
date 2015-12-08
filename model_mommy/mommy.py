@@ -21,7 +21,10 @@ from django.db.models import (
     BooleanField, DecimalField, FloatField,
     FileField, ImageField, Field, IPAddressField,
     ForeignKey, ManyToManyField, OneToOneField)
-from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
+if django.VERSION >= (1, 9):
+    from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
+else:
+    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
 from django.db.models.fields.proxy import OrderWrt
 try:
     from django.db.models import BigIntegerField
@@ -366,7 +369,11 @@ class Mommy(object):
 
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
-            setattr(instance, k, v)
+            if django.VERSION >= (1, 9):
+                manager = getattr(instance, k)
+                manager.set(v, bulk=False)
+            else:
+                setattr(instance, k, v)
 
     def _handle_m2m(self, instance):
         for key, values in self.m2m_dict.items():
