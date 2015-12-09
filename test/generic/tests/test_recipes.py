@@ -375,6 +375,10 @@ class ForeignKeyTestCase(TestCase):
         self.assertEqual(lady.dog_set.all()[0].breed, 'Pug')
         self.assertEqual(lady.dog_set.all()[1].breed, 'Basset')
 
+    def test_nullable_related(self):
+        nullable = mommy.make_recipe('test.generic.nullable_related')
+        self.assertEqual(nullable.dummynullfieldsmodel_set.count(), 1)
+
 
 class M2MFieldTestCase(TestCase):
     def test_create_many_to_many(self):

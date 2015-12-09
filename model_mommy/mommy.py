@@ -369,6 +369,9 @@ class Mommy(object):
 
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
+            for value in v:
+                if not value.pk:
+                    value.save()
             if django.VERSION >= (1, 9):
                 manager = getattr(instance, k)
                 manager.set(v, bulk=False)

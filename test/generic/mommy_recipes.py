@@ -75,3 +75,7 @@ dummy_unique_field = Recipe(DummyUniqueIntegerFieldModel,
 dog_lady = Recipe(Person,
     dog_set = related('dog', other_dog)
 )
+
+nullable_related = Recipe('generic.DummyBlankFieldsModel',
+    dummynullfieldsmodel_set=related(Recipe('generic.DummyNullFieldsModel'))
+)
