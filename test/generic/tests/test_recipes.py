@@ -379,6 +379,10 @@ class ForeignKeyTestCase(TestCase):
         nullable = mommy.make_recipe('test.generic.nullable_related')
         self.assertEqual(nullable.dummynullfieldsmodel_set.count(), 1)
 
+    def test_chained_related(self):
+        movie = mommy.make_recipe('test.generic.movie_with_cast')
+        self.assertEqual(movie.cast_members.count(), 2)
+
 
 class M2MFieldTestCase(TestCase):
     def test_create_many_to_many(self):
