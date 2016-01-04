@@ -75,3 +75,13 @@ dummy_unique_field = Recipe(DummyUniqueIntegerFieldModel,
 dog_lady = Recipe(Person,
     dog_set = related('dog', other_dog)
 )
+
+nullable_related = Recipe('generic.DummyBlankFieldsModel',
+    dummynullfieldsmodel_set=related(Recipe('generic.DummyNullFieldsModel'))
+)
+
+cast_member = Recipe('generic.CastMember', person=foreign_key(person))
+
+movie_with_cast = Recipe('generic.Movie',
+    cast_members=related(cast_member, cast_member)
+)

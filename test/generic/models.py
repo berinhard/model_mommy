@@ -257,6 +257,12 @@ class BaseModelForNext(models.Model):
 class BaseModelForList(models.Model):
     fk = FakeListField()
 
+class Movie(models.Model):
+    title = models.CharField(max_length=30)
+
+class CastMember(models.Model):
+    movie = models.ForeignKey(Movie, related_name='cast_members')
+    person = models.ForeignKey(Person)
 
 if VERSION < (1, 4):
     class DummyIPAddressFieldModel(models.Model):
