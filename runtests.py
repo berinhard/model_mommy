@@ -10,6 +10,7 @@ import django
 def parse_args():
     parser = OptionParser()
     parser.add_option('--use-tz', dest='USE_TZ', action='store_true')
+    parser.add_option('--postgresql', dest='USE_POSTGRESQL', action='store_true')
     return parser.parse_args()
 
 
@@ -27,8 +28,9 @@ def configure_settings(options):
                 }
             },
             INSTALLED_APPS = (
-                'django.contrib.contenttypes',
                 'test.generic',
+                'django.contrib.contenttypes',
+                'test_without_migrations',
                 'test.ambiguous',
                 'test.ambiguous2',
             ),
@@ -36,6 +38,15 @@ def configure_settings(options):
             TEST_RUNNER='django.test.simple.DjangoTestSuiteRunner',
             TEST_ROOT=join(dirname(__file__), 'test', 'generic', 'tests'),
         )
+        if getattr(options, 'USE_POSTGRESQL', False):
+            params['DATABASES'] = {
+                'default': {
+                    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                    'NAME': 'model_mommy',
+                    'TEST_NAME': 'test_model_mommy',
+                    'USER': 'postgres',
+                }
+            }
 
         if django.VERSION >= (1, 7):
             params.update(
@@ -60,13 +71,15 @@ def get_runner(settings):
     Asks Django for the TestRunner defined in settings or the default one.
     '''
     from django.test.utils import get_runner
-    TestRunner = get_runner(settings)
     if django.VERSION >= (1, 7):
         #  I suspect this will not be necessary in next release after 1.7.0a1:
         #  See https://code.djangoproject.com/ticket/21831
         setattr(settings, 'INSTALLED_APPS',
                 ['django.contrib.auth']
                 + list(getattr(settings, 'INSTALLED_APPS')))
+        from test_without_migrations.management.commands.test import DisableMigrations
+        setattr(settings, 'MIGRATION_MODULES', DisableMigrations())
+    TestRunner = get_runner(settings)
     return TestRunner(verbosity=1, interactive=True, failfast=False)
 
 
