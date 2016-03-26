@@ -497,33 +497,3 @@ def filter_rel_attrs(field_name, **rel_attrs):
             clean_dict[k] = v
 
     return clean_dict
-
-
-### DEPRECATED METHODS (should be removed in the future)
-def make_many(model, quantity=None, **attrs):
-    msg = "make_many is deprecated. You should use make with _quantity parameter."
-    warnings.warn(msg, DeprecationWarning)
-    quantity = quantity or MAX_MANY_QUANTITY
-    mommy = Mommy(model)
-    return [mommy.make(**attrs) for i in range(quantity)]
-
-
-def make_one(model, make_m2m=False, **attrs):
-    msg = "make_one is deprecated. You should use the method make instead."
-    warnings.warn(msg, DeprecationWarning)
-    mommy = Mommy(model, make_m2m=make_m2m)
-    return mommy.make(**attrs)
-
-
-def prepare_one(model, **attrs):
-    msg = "prepare_one is deprecated. You should use the method prepare instead."
-    warnings.warn(msg, DeprecationWarning)
-    mommy = Mommy(model)
-    return mommy.prepare(**attrs)
-
-
-def make_many_from_recipe(mommy_recipe_name, quantity=None, **new_attrs):
-    msg = "make_many_from_recipe is deprecated. You should use the method make_recipe with the _quantity parameter instead."
-    warnings.warn(msg, DeprecationWarning)
-    quantity = quantity or MAX_MANY_QUANTITY
-    return [make_recipe(mommy_recipe_name, **new_attrs) for x in range(quantity)]
