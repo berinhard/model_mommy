@@ -353,6 +353,12 @@ class M2MFieldTestCase(TestCase):
             self.assertEqual(friend.breed, 'Pug')
             self.assertEqual(friend.owner.name, 'John Doe')
 
+    def test_create_nested(self):
+        dog = mommy.make_recipe('test.generic.dog_with_more_friends')
+        self.assertEqual(len(dog.friends_with.all()), 1)
+        friend = dog.friends_with.all()[0]
+        self.assertEqual(len(friend.friends_with.all()), 2)
+
 
 class TestSequences(TestCase):
     def test_increment_for_strings(self):
