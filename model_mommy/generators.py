@@ -84,8 +84,11 @@ def gen_float():
 
 def gen_decimal(max_digits, decimal_places):
     num_as_str = lambda x: ''.join([str(randint(0, 9)) for i in range(x)])
-    return Decimal("%s.%s" % (num_as_str(max_digits - decimal_places - 1),
+    if decimal_places:
+        return Decimal("%s.%s" % (num_as_str(max_digits - decimal_places - 1),
                               num_as_str(decimal_places)))
+    return Decimal(num_as_str(max_digits))
+
 gen_decimal.required = ['max_digits', 'decimal_places']
 
 

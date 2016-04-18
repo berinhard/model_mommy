@@ -138,7 +138,7 @@ class DummyNumbersModel(models.Model):
 
 
 class DummyDecimalModel(models.Model):
-    decimal_field = models.DecimalField(max_digits=5, decimal_places=2)
+    decimal_field = models.DecimalField(max_digits=1, decimal_places=0)
 
 
 class UnsupportedField(models.Field):
