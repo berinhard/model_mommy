@@ -79,3 +79,26 @@ Examples:
     MOMMY_CUSTOM_FIELDS_GEN = {
         'test.generic.fields.CustomField': 'code.path.gen_func',
     }
+
+Customizing Mommy
+-------------
+
+In some rare cases, you might need to customize the way Mommy behaves.
+This can be achieved by creating a new class and specifying it in your settings files. It is likely that you will want to extend Mommy, however the minimum requirement is that the custom class have `make` and `prepare` functions.
+In order for the custom class to be used, make sure to use the `model_mommy.mommy.make` and `model_mommy.mommy.prepare` functions, and not `model_mommy.mommy.Mommy` directly.
+
+Examples:
+
+.. code-block:: python
+
+    # in the module code.path:
+    class CustomMommy(mommy.Mommy)
+        def get_fields(self):
+            return [
+                field
+                for field in super(CustomMommy, self).get_fields()
+                if not field isinstance CustomField
+            ]
+
+    # in your settings.py file:
+    MOMMY_CUSTOM_CLASS = 'code.path.CustomMommy'
