@@ -19,3 +19,11 @@ class AmbiguousModelName(Exception):
 
 class InvalidQuantityException(Exception):
     pass
+
+
+class CustomMommyNotFound(Exception):
+    pass
+
+
+class InvalidCustomMommy(Exception):
+    pass

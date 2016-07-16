@@ -3,9 +3,10 @@ from django.test import TestCase
 
 from model_mommy import mommy
 from model_mommy.generators import gen_from_list
+from model_mommy.exceptions import CustomMommyNotFound, InvalidCustomMommy
 from test.generic.models import Person
 
-__all__ = ['SimpleExtendMommy', 'LessSimpleExtendMommy']
+__all__ = ['SimpleExtendMommy', 'LessSimpleExtendMommy', 'CustomizeMommyClassViaSettings']
 
 
 class SimpleExtendMommy(TestCase):
@@ -79,3 +80,47 @@ class LessSimpleExtendMommy(TestCase):
         # for boolean
         gen_age.required = [True]
         self.assertRaises(ValueError, mom.make)
+
+class ClassWithoutMake(object):
+    def prepare(self):
+        pass
+
+class ClassWithoutPrepare(object):
+    def make(self):
+        pass
+
+class MommySubclass(mommy.Mommy):
+    pass
+
+class MommyDuck(object):
+    def __init__(*args, **kwargs):
+        pass
+
+    def make(self):
+        pass
+
+    def prepare(self):
+        pass
+
+class CustomizeMommyClassViaSettings(TestCase):
+    def class_to_import_string(self, class_to_convert):
+        return '%s.%s' % (self.__module__, class_to_convert.__name__)
+
+    def test_create_vanilla_mommy_used_by_default(self):
+        mommy_instance = mommy.Mommy.create(Person)
+        self.assertIs(mommy_instance.__class__, mommy.Mommy)
+
+    def test_create_fail_on_custom_mommy_load_error(self):
+        with self.settings(MOMMY_CUSTOM_CLASS='invalid_module.invalid_class'):
+            self.assertRaises(CustomMommyNotFound, mommy.Mommy.create, Person)
+
+    def test_create_fail_on_missing_required_functions(self):
+        for invalid_mommy_class in [ClassWithoutMake, ClassWithoutPrepare]:
+            with self.settings(MOMMY_CUSTOM_CLASS=self.class_to_import_string(invalid_mommy_class)):
+                self.assertRaises(InvalidCustomMommy, mommy.Mommy.create, Person)
+
+    def test_create_succeeds_with_valid_custom_mommy(self):
+        for valid_mommy_class in [MommySubclass, MommyDuck]:
+            with self.settings(MOMMY_CUSTOM_CLASS=self.class_to_import_string(valid_mommy_class)):
+                custom_mommy_instance = mommy.Mommy.create(Person)
+                self.assertIs(custom_mommy_instance.__class__, valid_mommy_class)
