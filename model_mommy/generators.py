@@ -11,6 +11,7 @@ and value is the value for that argument.
 """
 
 import string
+import warnings
 from decimal import Decimal
 from os.path import abspath, join, dirname
 from random import randint, choice, random
@@ -166,5 +167,8 @@ def gen_content_type():
     except ImportError:
         # Deprecated
         from django.db.models import get_models
-
-    return ContentType.objects.get_for_model(choice(get_models()))
+    try:
+        return ContentType.objects.get_for_model(choice(get_models()))
+    except AssertionError:
+        warnings.warn('Database access disabled, returning ContentType raw instance')
+        return ContentType()

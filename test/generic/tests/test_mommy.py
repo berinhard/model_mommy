@@ -314,7 +314,14 @@ class HandlingContentTypeField(TestCase):
     def test_create_model_with_contenttype_field(self):
         dummy = mommy.make(DummyGenericForeignKeyModel)
         self.assertIsInstance(dummy, DummyGenericForeignKeyModel)
-
+try:
+    from django.test import SimpleTestCase
+    class HandlingContentTypeFieldNoQueries(SimpleTestCase):
+        def test_create_model_with_contenttype_field(self):
+            dummy = mommy.prepare(DummyGenericForeignKeyModel)
+            self.assertIsInstance(dummy, DummyGenericForeignKeyModel)
+except ImportError:
+    pass
 
 class SkipNullsTestCase(TestCase):
     def test_skip_null(self):
