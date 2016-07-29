@@ -53,6 +53,11 @@ try:
 except ImportError:
     DurationField = None
 
+try:
+    from django.db.models.fields import UUIDField
+except ImportError:
+    UUIDField = None
+
 from django.core.validators import validate_ipv4_address
 try:
     from django.core.validators import validate_ipv6_address, validate_ipv46_address
@@ -187,6 +192,18 @@ class TimeFieldsFilling(FieldFillingTestCase):
         self.assertIsInstance(birth_time_field, TimeField)
 
         self.assertIsInstance(self.person.birth_time, time)
+
+
+class UUIDFieldsFilling(FieldFillingTestCase):
+
+    if UUIDField:
+        def test_fill_UUIDField_with_uuid_object(self):
+            import uuid
+
+            uuid_field = Person._meta.get_field('uuid')
+            self.assertIsInstance(uuid_field, UUIDField)
+
+            self.assertIsInstance(self.person.uuid, uuid.UUID)
 
 
 class FillingIntFields(TestCase):

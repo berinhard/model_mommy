@@ -172,3 +172,7 @@ def gen_content_type():
     except AssertionError:
         warnings.warn('Database access disabled, returning ContentType raw instance')
         return ContentType()
+
+def gen_uuid():
+    import uuid
+    return uuid.uuid4()
