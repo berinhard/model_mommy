@@ -46,6 +46,11 @@ try:
 except ImportError:
     DurationField = None
 
+try:
+    from django.db.models import UUIDField
+except ImportError:
+    UUIDField = None
+
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv4_address
 try:
@@ -172,7 +177,8 @@ if BinaryField:
     default_mapping[BinaryField] = generators.gen_byte_string
 if DurationField:
     default_mapping[DurationField] = generators.gen_interval
-
+if UUIDField:
+    default_mapping[UUIDField] = generators.gen_uuid
 
 class ModelFinder(object):
     '''

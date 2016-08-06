@@ -72,6 +72,11 @@ class Person(models.Model):
     blog = models.URLField()
     occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOCIES)
     try:
+        uuid = models.UUIDField(primary_key=False)
+    except AttributeError:
+        # New at Django 1.9
+        pass
+    try:
         name_hash = models.BinaryField(max_length=16)
     except AttributeError:
         # We can't test the binary field if it is not supported
