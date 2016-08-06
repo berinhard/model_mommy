@@ -1,6 +1,6 @@
 1.3.0
 -----
-- Added UUIDField and ArrayField support
+- Added UUIDField, JSONField and ArrayField support
 - Python 3.2 support dropped
 - Fix nested m2m recipes
 - Removes deprecated API

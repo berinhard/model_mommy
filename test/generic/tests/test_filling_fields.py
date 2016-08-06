@@ -63,6 +63,11 @@ try:
 except ImportError:
     ArrayField = None
 
+try:
+    from django.contrib.postgres.fields import JSONField
+except ImportError:
+    JSONField = None
+
 from django.core.validators import validate_ipv4_address
 try:
     from django.core.validators import validate_ipv6_address, validate_ipv46_address
@@ -217,6 +222,12 @@ class ArrayFieldsFilling(FieldFillingTestCase):
         def test_fill_ArrayField_with_uuid_object(self):
             self.assertEqual(self.person.acquaintances, [])
 
+
+class JSONFieldsFilling(FieldFillingTestCase):
+
+    if JSONField:
+        def test_fill_ArrayField_with_uuid_object(self):
+            self.assertEqual(self.person.data, {})
 
 class FillingIntFields(TestCase):
 

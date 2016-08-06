@@ -89,6 +89,13 @@ class Person(models.Model):
         # New at Django 1.9
         pass
 
+    try:
+        from django.contrib.postgres.fields import JSONField
+        data = JSONField()
+    except ImportError:
+        # New at Django 1.9
+        pass
+
     #backward compatibilty with Django 1.1
     try:
         wanted_games_qtd = models.BigIntegerField()

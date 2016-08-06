@@ -56,6 +56,11 @@ try:
 except ImportError:
     ArrayField = None
 
+try:
+    from django.contrib.postgres.fields import JSONField
+except ImportError:
+    JSONField = None
+
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv4_address
 try:
@@ -186,6 +191,8 @@ if UUIDField:
     default_mapping[UUIDField] = generators.gen_uuid
 if ArrayField:
     default_mapping[ArrayField] = generators.gen_array
+if JSONField:
+    default_mapping[JSONField] = generators.gen_json
 
 class ModelFinder(object):
     '''

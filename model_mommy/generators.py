@@ -180,3 +180,7 @@ def gen_uuid():
 
 def gen_array():
     return []
+
+
+def gen_json():
+    return {}
