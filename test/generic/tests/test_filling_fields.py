@@ -58,6 +58,11 @@ try:
 except ImportError:
     UUIDField = None
 
+try:
+    from django.contrib.postgres.fields import ArrayField
+except ImportError:
+    ArrayField = None
+
 from django.core.validators import validate_ipv4_address
 try:
     from django.core.validators import validate_ipv6_address, validate_ipv46_address
@@ -204,6 +209,13 @@ class UUIDFieldsFilling(FieldFillingTestCase):
             self.assertIsInstance(uuid_field, UUIDField)
 
             self.assertIsInstance(self.person.uuid, uuid.UUID)
+
+
+class ArrayFieldsFilling(FieldFillingTestCase):
+
+    if ArrayField:
+        def test_fill_ArrayField_with_uuid_object(self):
+            self.assertEqual(self.person.acquaintances, [])
 
 
 class FillingIntFields(TestCase):

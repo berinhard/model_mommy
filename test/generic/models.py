@@ -82,6 +82,12 @@ class Person(models.Model):
         # We can't test the binary field if it is not supported
         # (django < 1,6)
         pass
+    try:
+        from django.contrib.postgres.fields import ArrayField
+        acquaintances = ArrayField(models.IntegerField())
+    except ImportError:
+        # New at Django 1.9
+        pass
 
     #backward compatibilty with Django 1.1
     try:

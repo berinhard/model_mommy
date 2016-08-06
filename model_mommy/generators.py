@@ -176,3 +176,7 @@ def gen_content_type():
 def gen_uuid():
     import uuid
     return uuid.uuid4()
+
+
+def gen_array():
+    return []

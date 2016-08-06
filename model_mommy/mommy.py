@@ -51,6 +51,11 @@ try:
 except ImportError:
     UUIDField = None
 
+try:
+    from django.contrib.postgres.fields import ArrayField
+except ImportError:
+    ArrayField = None
+
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv4_address
 try:
@@ -179,6 +184,8 @@ if DurationField:
     default_mapping[DurationField] = generators.gen_interval
 if UUIDField:
     default_mapping[UUIDField] = generators.gen_uuid
+if ArrayField:
+    default_mapping[ArrayField] = generators.gen_array
 
 class ModelFinder(object):
     '''
