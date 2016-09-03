@@ -72,10 +72,28 @@ class Person(models.Model):
     blog = models.URLField()
     occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOCIES)
     try:
+        uuid = models.UUIDField(primary_key=False)
+    except AttributeError:
+        # New at Django 1.9
+        pass
+    try:
         name_hash = models.BinaryField(max_length=16)
     except AttributeError:
         # We can't test the binary field if it is not supported
         # (django < 1,6)
+        pass
+    try:
+        from django.contrib.postgres.fields import ArrayField
+        acquaintances = ArrayField(models.IntegerField())
+    except ImportError:
+        # New at Django 1.9
+        pass
+
+    try:
+        from django.contrib.postgres.fields import JSONField
+        data = JSONField()
+    except ImportError:
+        # New at Django 1.9
         pass
 
     #backward compatibilty with Django 1.1
@@ -138,7 +156,7 @@ class DummyNumbersModel(models.Model):
 
 
 class DummyDecimalModel(models.Model):
-    decimal_field = models.DecimalField(max_digits=5, decimal_places=2)
+    decimal_field = models.DecimalField(max_digits=1, decimal_places=0)
 
 
 class UnsupportedField(models.Field):

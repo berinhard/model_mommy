@@ -46,6 +46,21 @@ try:
 except ImportError:
     DurationField = None
 
+try:
+    from django.db.models import UUIDField
+except ImportError:
+    UUIDField = None
+
+try:
+    from django.contrib.postgres.fields import ArrayField
+except ImportError:
+    ArrayField = None
+
+try:
+    from django.contrib.postgres.fields import JSONField
+except ImportError:
+    JSONField = None
+
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv4_address
 try:
@@ -56,7 +71,8 @@ except ImportError:
     validate_ipv46_address = validate_ipv6_address
 
 from . import generators
-from .exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty
+from .exceptions import (ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty,
+                         CustomMommyNotFound, InvalidCustomMommy)
 from .utils import import_from_str, import_if_str
 
 from six import string_types, advance_iterator, PY3
@@ -88,7 +104,7 @@ def make(model, _quantity=None, make_m2m=False, **attrs):
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
     """
-    mommy = Mommy(model, make_m2m=make_m2m)
+    mommy = Mommy.create(model, make_m2m=make_m2m)
     if _valid_quantity(_quantity):
         raise InvalidQuantityException
 
@@ -105,7 +121,7 @@ def prepare(model, _quantity=None, **attrs):
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
     """
-    mommy = Mommy(model)
+    mommy = Mommy.create(model)
     if _valid_quantity(_quantity):
         raise InvalidQuantityException
 
@@ -171,7 +187,12 @@ if BinaryField:
     default_mapping[BinaryField] = generators.gen_byte_string
 if DurationField:
     default_mapping[DurationField] = generators.gen_interval
-
+if UUIDField:
+    default_mapping[UUIDField] = generators.gen_uuid
+if ArrayField:
+    default_mapping[ArrayField] = generators.gen_array
+if JSONField:
+    default_mapping[JSONField] = generators.gen_json
 
 class ModelFinder(object):
     '''
@@ -255,6 +276,25 @@ def is_iterator(value):
     else:
         return hasattr(value, 'next')
 
+def _custom_mommy_class():
+    """
+    Returns custom mommy class specified by MOMMY_CUSTOM_CLASS in the django
+    settings, or None if no custom class is defined
+    """
+    custom_class_string = getattr(settings, 'MOMMY_CUSTOM_CLASS', None)
+    if custom_class_string is None:
+        return None
+
+    try:
+        mommy_class = import_from_str(custom_class_string)
+
+        for required_function_name in ['make', 'prepare']:
+            if not hasattr(mommy_class, required_function_name):
+                raise InvalidCustomMommy('Custom Mommy classes must have a "%s" function' % required_function_name)
+
+        return mommy_class
+    except ImportError:
+        raise CustomMommyNotFound("Could not find custom mommy class '%s'" % custom_class_string)
 
 class Mommy(object):
     attr_mapping = {}
@@ -263,6 +303,14 @@ class Mommy(object):
     # Note: we're using one finder for all Mommy instances to avoid
     # rebuilding the model cache for every make_* or prepare_* call.
     finder = ModelFinder()
+
+    @classmethod
+    def create(cls, model, make_m2m=False):
+        """
+        Factory which creates the mommy class defined by the MOMMY_CUSTOM_CLASS setting
+        """
+        mommy_class = _custom_mommy_class() or cls
+        return mommy_class(model, make_m2m)
 
     def __init__(self, model, make_m2m=False):
         self.make_m2m = make_m2m
@@ -497,33 +545,3 @@ def filter_rel_attrs(field_name, **rel_attrs):
             clean_dict[k] = v
 
     return clean_dict
-
-
-### DEPRECATED METHODS (should be removed in the future)
-def make_many(model, quantity=None, **attrs):
-    msg = "make_many is deprecated. You should use make with _quantity parameter."
-    warnings.warn(msg, DeprecationWarning)
-    quantity = quantity or MAX_MANY_QUANTITY
-    mommy = Mommy(model)
-    return [mommy.make(**attrs) for i in range(quantity)]
-
-
-def make_one(model, make_m2m=False, **attrs):
-    msg = "make_one is deprecated. You should use the method make instead."
-    warnings.warn(msg, DeprecationWarning)
-    mommy = Mommy(model, make_m2m=make_m2m)
-    return mommy.make(**attrs)
-
-
-def prepare_one(model, **attrs):
-    msg = "prepare_one is deprecated. You should use the method prepare instead."
-    warnings.warn(msg, DeprecationWarning)
-    mommy = Mommy(model)
-    return mommy.prepare(**attrs)
-
-
-def make_many_from_recipe(mommy_recipe_name, quantity=None, **new_attrs):
-    msg = "make_many_from_recipe is deprecated. You should use the method make_recipe with the _quantity parameter instead."
-    warnings.warn(msg, DeprecationWarning)
-    quantity = quantity or MAX_MANY_QUANTITY
-    return [make_recipe(mommy_recipe_name, **new_attrs) for x in range(quantity)]

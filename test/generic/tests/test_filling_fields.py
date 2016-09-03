@@ -53,6 +53,21 @@ try:
 except ImportError:
     DurationField = None
 
+try:
+    from django.db.models.fields import UUIDField
+except ImportError:
+    UUIDField = None
+
+try:
+    from django.contrib.postgres.fields import ArrayField
+except ImportError:
+    ArrayField = None
+
+try:
+    from django.contrib.postgres.fields import JSONField
+except ImportError:
+    JSONField = None
+
 from django.core.validators import validate_ipv4_address
 try:
     from django.core.validators import validate_ipv6_address, validate_ipv46_address
@@ -188,6 +203,31 @@ class TimeFieldsFilling(FieldFillingTestCase):
 
         self.assertIsInstance(self.person.birth_time, time)
 
+
+class UUIDFieldsFilling(FieldFillingTestCase):
+
+    if UUIDField:
+        def test_fill_UUIDField_with_uuid_object(self):
+            import uuid
+
+            uuid_field = Person._meta.get_field('uuid')
+            self.assertIsInstance(uuid_field, UUIDField)
+
+            self.assertIsInstance(self.person.uuid, uuid.UUID)
+
+
+class ArrayFieldsFilling(FieldFillingTestCase):
+
+    if ArrayField:
+        def test_fill_ArrayField_with_uuid_object(self):
+            self.assertEqual(self.person.acquaintances, [])
+
+
+class JSONFieldsFilling(FieldFillingTestCase):
+
+    if JSONField:
+        def test_fill_ArrayField_with_uuid_object(self):
+            self.assertEqual(self.person.data, {})
 
 class FillingIntFields(TestCase):
 

@@ -11,6 +11,7 @@ and value is the value for that argument.
 """
 
 import string
+import warnings
 from decimal import Decimal
 from os.path import abspath, join, dirname
 from random import randint, choice, random
@@ -84,8 +85,11 @@ def gen_float():
 
 def gen_decimal(max_digits, decimal_places):
     num_as_str = lambda x: ''.join([str(randint(0, 9)) for i in range(x)])
-    return Decimal("%s.%s" % (num_as_str(max_digits - decimal_places - 1),
+    if decimal_places:
+        return Decimal("%s.%s" % (num_as_str(max_digits - decimal_places - 1),
                               num_as_str(decimal_places)))
+    return Decimal(num_as_str(max_digits))
+
 gen_decimal.required = ['max_digits', 'decimal_places']
 
 
@@ -163,5 +167,20 @@ def gen_content_type():
     except ImportError:
         # Deprecated
         from django.db.models import get_models
+    try:
+        return ContentType.objects.get_for_model(choice(get_models()))
+    except AssertionError:
+        warnings.warn('Database access disabled, returning ContentType raw instance')
+        return ContentType()
 
-    return ContentType.objects.get_for_model(choice(get_models()))
+def gen_uuid():
+    import uuid
+    return uuid.uuid4()
+
+
+def gen_array():
+    return []
+
+
+def gen_json():
+    return {}

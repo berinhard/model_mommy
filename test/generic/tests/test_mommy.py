@@ -81,25 +81,6 @@ class MommyCreatesSimpleModel(TestCase):
 
         self.assertEqual(person.id, None)
 
-    def test_make_one_should_create_one_object(self):
-        """
-        make_one method is deprecated, so this test must be removed when the
-        method is removed
-        """
-        person = mommy.make_one(Person)
-        self.assertIsInstance(person, Person)
-        self.assertTrue(Person.objects.filter(id=person.id))
-
-    def test_prepare_one_should_not_persist_one_object(self):
-        """
-        prepare_one method is deprecated, so this test must be removed when the
-        method is removed
-        """
-        person = mommy.prepare_one(Person)
-        self.assertIsInstance(person, Person)
-        self.assertEqual(Person.objects.all().count(), 0)
-        self.assertEqual(person.id, None)
-
     def test_non_abstract_model_creation(self):
         person = mommy.make(NonAbstractPerson, name='bob', happy=False)
         self.assertIsInstance(person, NonAbstractPerson)
@@ -109,8 +90,8 @@ class MommyCreatesSimpleModel(TestCase):
     def test_multiple_inheritance_creation(self):
         multiple = mommy.make(DummyMultipleInheritanceModel)
         self.assertIsInstance(multiple, DummyMultipleInheritanceModel)
-        self.assertTrue(Person.objects.filter(id=multiple.my_id))
-        self.assertTrue(DummyDefaultFieldsModel.objects.filter(default_id=multiple.id))
+        self.assertTrue(Person.objects.filter(id=multiple.id))
+        self.assertTrue(DummyDefaultFieldsModel.objects.filter(default_id=multiple.default_id))
 
 
 class MommyRepeatedCreatesSimpleModel(TestCase):
@@ -151,17 +132,6 @@ class MommyRepeatedCreatesSimpleModel(TestCase):
         self.assertRaises(
             InvalidQuantityException, mommy.prepare, model=Person, _quantity=0
         )
-
-    def test_make_many_method(self):
-        """
-        make_many method is deprecated, so this test must be removed when the
-        method is removed
-        """
-        people = mommy.make_many(Person, quantity=5)
-        self.assertEqual(Person.objects.count(), 5)
-
-        people = mommy.make_many(Person, name="George Washington")
-        self.assertTrue(all(p.name == "George Washington" for p in people))
 
 
 class MommyCreatesAssociatedModels(TestCase):
@@ -204,13 +174,6 @@ class MommyCreatesAssociatedModels(TestCase):
 
         self.assertEqual(Person.objects.all().count(), 0)
         self.assertEqual(Dog.objects.all().count(), 0)
-
-    def test_prepare_one_to_one(self):
-        lonely_person = mommy.prepare(LonelyPerson)
-
-        self.assertEqual(LonelyPerson.objects.all().count(), 0)
-        self.assertTrue(isinstance(lonely_person.only_friend, Person))
-        self.assertEqual(Person.objects.all().count(), 0)
 
     def test_create_one_to_one(self):
         lonely_person = mommy.make(LonelyPerson)
@@ -351,7 +314,14 @@ class HandlingContentTypeField(TestCase):
     def test_create_model_with_contenttype_field(self):
         dummy = mommy.make(DummyGenericForeignKeyModel)
         self.assertIsInstance(dummy, DummyGenericForeignKeyModel)
-
+try:
+    from django.test import SimpleTestCase
+    class HandlingContentTypeFieldNoQueries(SimpleTestCase):
+        def test_create_model_with_contenttype_field(self):
+            dummy = mommy.prepare(DummyGenericForeignKeyModel)
+            self.assertIsInstance(dummy, DummyGenericForeignKeyModel)
+except ImportError:
+    pass
 
 class SkipNullsTestCase(TestCase):
     def test_skip_null(self):

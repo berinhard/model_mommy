@@ -279,37 +279,6 @@ class TestExecutingRecipes(TestCase):
         person = mommy.prepare_recipe(recipe_name)
         self.assertEqual(person.name, 'John Deeper')
 
-    def test_make_many_from_recipe(self):
-        """
-        make_many_from_recipe is deprecated, so this test must be deleted when
-        the method is
-        """
-        persons = mommy.make_many_from_recipe('test.generic.person')
-        self.assertIsInstance(persons, list)
-        self.assertEqual(len(persons), mommy.MAX_MANY_QUANTITY)
-        for person in persons:
-            self.assertIsInstance(person, Person)
-            self.assertNotEqual(person.id, None)
-
-    def test_make_many_from_recipe_with_specified_quantity(self):
-        """
-        make_many_from_recipe is deprecated, so this test must be deleted when
-        the method is
-        """
-        quantity = 2
-        persons = mommy.make_many_from_recipe('test.generic.person', quantity=quantity)
-        self.assertIsInstance(persons, list)
-        self.assertEqual(len(persons), quantity)
-
-    def test_make_many_with_model_args(self):
-        """
-        make_many_from_recipe is deprecated, so this test must be deleted when
-        the method is
-        """
-        persons = mommy.make_many_from_recipe('test.generic.person', name='Dennis Ritchie', age=70)
-        for person in persons:
-            self.assertEqual(person.name, 'Dennis Ritchie')
-            self.assertEqual(person.age, 70)
 
 class ForeignKeyTestCase(TestCase):
     def test_foreign_key_method_returns_a_recipe_foreign_key_object(self):
@@ -391,6 +360,12 @@ class M2MFieldTestCase(TestCase):
         for friend in dog.friends_with.all():
             self.assertEqual(friend.breed, 'Pug')
             self.assertEqual(friend.owner.name, 'John Doe')
+
+    def test_create_nested(self):
+        dog = mommy.make_recipe('test.generic.dog_with_more_friends')
+        self.assertEqual(len(dog.friends_with.all()), 1)
+        friend = dog.friends_with.all()[0]
+        self.assertEqual(len(friend.friends_with.all()), 2)
 
 
 class TestSequences(TestCase):

@@ -1,50 +1,52 @@
 sudo: true
 language: python
 python:
+  - "2.6"
   - "2.7"
+  - "3.2"
+  - "3.4"
+  - "3.5"
 env:
-  - DJANGO_VERSION=1.4.10
-  - DJANGO_VERSION=1.5.5
-  - DJANGO_VERSION=1.6
-  - DJANGO_VERSION=1.7
-  - DJANGO_VERSION=1.8.5
-  - DJANGO_VERSION=1.9
+  - DJANGO=django14
+  - DJANGO=django15
+  - DJANGO=django16
+  - DJANGO=django17
+  - DJANGO=django18
+  - DJANGO=django19
 matrix:
-  include:
-    - python: 2.6
-      env: DJANGO_VERSION=1.4.10
-    - python: 2.6
-      env: DJANGO_VERSION=1.5.5
-    - python: 2.6
-      env: DJANGO_VERSION=1.6
-    - python: 3.2
-      env: DJANGO_VERSION=1.5.5
-    - python: 3.2
-      env: DJANGO_VERSION=1.6
-    - python: 3.2
-      env: DJANGO_VERSION=1.7
-    - python: 3.2
-      env: DJANGO_VERSION=1.8.5
-    - python: 3.4
-      env: DJANGO_VERSION=1.5.5
-    - python: 3.4
-      env: DJANGO_VERSION=1.6
-    - python: 3.4
-      env: DJANGO_VERSION=1.7
-    - python: 3.4
-      env: DJANGO_VERSION=1.8.5
-    - python: 3.4
-      env: DJANGO_VERSION=1.9
-    - python: 3.5
-      env: DJANGO_VERSION=1.8.5
-    - python: 3.5
-      env: DJANGO_VERSION=1.9
+  exclude:
+    - python: "2.6"
+      env: DJANGO=django17
+    - python: "2.6"
+      env: DJANGO=django18
+    - python: "2.6"
+      env: DJANGO=django19
+    - python: "3.2"
+      env: DJANGO=django14
+    - python: "3.2"
+      env: DJANGO=django19
+    - python: "3.4"
+      env: DJANGO=django14
+    - python: "3.5"
+      env: DJANGO=django14
+    - python: "3.5"
+      env: DJANGO=django15
+    - python: "3.5"
+      env: DJANGO=django16
+    - python: "3.5"
+      env: DJANGO=django17
 before_install:
   - sudo apt-get update && sudo apt-get build-dep python-imaging
 install:
-   # Install whatever version of Django that's listed above
-   # Travis is currently working on
- - pip install -q Django==$DJANGO_VERSION
- - pip install -q Pillow
- - pip install -r requirements.txt
-script: python runtests.py
+ - pip install tox
+addons:
+  postgresql: "9.4"
+services:
+  - postgresql
+before_script:
+  - psql -U postgres -c "create extension postgis"
+  - psql -c 'create database model_mommy;' -U postgres
+  - psql -c 'create database model_mommy_test;' -U postgres
+script:
+  - TOX_TEST_PASSENV="TRAVIS TRAVIS_JOB_ID TRAVIS_BRANCH" tox -e py${TRAVIS_PYTHON_VERSION//[.]/}-$DJANGO-{postgresql}
+  - TOX_TEST_PASSENV="TRAVIS TRAVIS_JOB_ID TRAVIS_BRANCH" tox -e py${TRAVIS_PYTHON_VERSION//[.]/}-$DJANGO-{sqlite}
