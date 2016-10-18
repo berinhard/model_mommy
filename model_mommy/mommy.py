@@ -139,8 +139,8 @@ def _recipe(name):
 def make_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
     return _recipe(mommy_recipe_name).make(_quantity=_quantity, **new_attrs)
 
-def prepare_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
-    return _recipe(mommy_recipe_name).prepare(_quantity=_quantity, **new_attrs)
+def prepare_recipe(mommy_recipe_name, _quantity=None, _save_related=False, **new_attrs):
+    return _recipe(mommy_recipe_name).prepare(_quantity=_quantity, _save_related=_save_related, **new_attrs)
 
 
 def __m2m_generator(model, **attrs):
