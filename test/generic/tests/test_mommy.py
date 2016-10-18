@@ -165,6 +165,12 @@ class MommyPrepareSavingRelatedInstancesTests(TestCase):
         with self.assertRaises(ValueError):
             dog2.friends_with
 
+    def test_create_one_to_one(self):
+        lonely_person = mommy.prepare(LonelyPerson, _save_related=True)
+
+        self.assertIsNone(lonely_person.pk)
+        self.assertTrue(lonely_person.only_friend.pk)
+
 
 class MommyCreatesAssociatedModels(TestCase):
 
