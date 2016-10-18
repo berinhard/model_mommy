@@ -134,6 +134,16 @@ class MommyRepeatedCreatesSimpleModel(TestCase):
         )
 
 
+class MommyPrepareSavingRelatedInstancesTests(TestCase):
+
+    def test_default_behaviour_for_and_fk(self):
+        dog = mommy.prepare(Dog)
+
+        self.assertIsNone(dog.pk)
+        self.assertIsNone(dog.owner.pk)
+        with self.assertRaises(ValueError):
+            dog.friends_with
+
 class MommyCreatesAssociatedModels(TestCase):
 
     def test_dependent_models_with_ForeignKey(self):
