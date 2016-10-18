@@ -114,7 +114,7 @@ def make(model, _quantity=None, make_m2m=False, **attrs):
         return mommy.make(**attrs)
 
 
-def prepare(model, _quantity=None, **attrs):
+def prepare(model, _quantity=None, _save_related=False, **attrs):
     """
     Creates BUT DOESN'T persist an instance from a given model its
     associated models.
@@ -126,9 +126,9 @@ def prepare(model, _quantity=None, **attrs):
         raise InvalidQuantityException
 
     if _quantity:
-        return [mommy.prepare(**attrs) for i in range(_quantity)]
+        return [mommy.prepare(_save_related=_save_related, **attrs) for i in range(_quantity)]
     else:
-        return mommy.prepare(**attrs)
+        return mommy.prepare(_save_related=_save_related, **attrs)
 
 make.prepare = prepare
 
@@ -334,17 +334,17 @@ class Mommy(object):
     def make(self, **attrs):
         '''Creates and persists an instance of the model
         associated with Mommy instance.'''
-        return self._make(commit=True, **attrs)
+        return self._make(commit=True, commit_related=True, **attrs)
 
-    def prepare(self, **attrs):
+    def prepare(self, _save_related=False, **attrs):
         '''Creates, but does not persist, an instance of the model
         associated with Mommy instance.'''
-        return self._make(commit=False, **attrs)
+        return self._make(commit=False, commit_related=_save_related, **attrs)
 
     def get_fields(self):
         return self.model._meta.fields + self.model._meta.many_to_many
 
-    def _make(self, commit=True, **attrs):
+    def _make(self, commit=True, commit_related=True, **attrs):
         fill_in_optional = attrs.pop('_fill_optional', False)
         is_rel_field = lambda x: '__' in x
         iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
@@ -382,7 +382,7 @@ class Mommy(object):
                 if field.name not in self.rel_fields and (field.null and not field.fill_optional):
                     continue
                 else:
-                    model_attrs[field.name] = self.generate_value(field, commit)
+                    model_attrs[field.name] = self.generate_value(field, commit_related)
             elif callable(model_attrs[field.name]):
                 model_attrs[field.name] = model_attrs[field.name]()
             elif field.name in iterator_attrs:

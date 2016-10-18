@@ -144,6 +144,28 @@ class MommyPrepareSavingRelatedInstancesTests(TestCase):
         with self.assertRaises(ValueError):
             dog.friends_with
 
+    def test_create_fk_instances(self):
+        dog = mommy.prepare(Dog, _save_related=True)
+
+        self.assertIsNone(dog.pk)
+        self.assertTrue(dog.owner.pk)
+        with self.assertRaises(ValueError):
+            dog.friends_with
+
+    def test_create_fk_instances_with_quantity(self):
+        dog1, dog2 = mommy.prepare(Dog, _save_related=True, _quantity=2)
+
+        self.assertIsNone(dog1.pk)
+        self.assertTrue(dog1.owner.pk)
+        with self.assertRaises(ValueError):
+            dog1.friends_with
+
+        self.assertIsNone(dog2.pk)
+        self.assertTrue(dog2.owner.pk)
+        with self.assertRaises(ValueError):
+            dog2.friends_with
+
+
 class MommyCreatesAssociatedModels(TestCase):
 
     def test_dependent_models_with_ForeignKey(self):
