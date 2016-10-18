@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import warnings
 from os.path import dirname, join
 
 import django

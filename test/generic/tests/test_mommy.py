@@ -1,10 +1,8 @@
 # -*- coding:utf-8 -*-
 from decimal import Decimal
 
-import django
 from django import VERSION
 from django.test import TestCase
-from django.db.models.options import Options
 from django.db.models import Manager
 from django.db.models.signals import m2m_changed
 
