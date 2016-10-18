@@ -20,7 +20,7 @@ from test.generic.models import DummyDefaultFieldsModel, DummyMultipleInheritanc
 from test.generic.models import DummyGenericForeignKeyModel, NonAbstractPerson
 from test.generic.models import DummyEmptyModel
 from test.generic.models import ModelWithNext, BaseModelForNext
-from test.generic.models import BaseModelForList
+from test.generic.models import BaseModelForList, ModelWithOverridedSave
 
 
 class ModelFinderTest(TestCase):
@@ -444,3 +444,17 @@ else:
                 'ipv46_field': generators.gen_ipv46(),
             }
             self.assertTrue(DummyGenericIPAddressFieldForm(form_data).is_valid())
+
+
+class MommyAllowsSaveParameters(TestCase):
+
+    def setUp(self):
+        self.owner = mommy.make(Person)
+
+    def test_allows_save_kwargs_on_mommy_make(self):
+        dog = mommy.make(ModelWithOverridedSave, _save_kwargs={'owner': self.owner})
+        self.assertEqual(self.owner, dog.owner)
+
+        dog1, dog2 = mommy.make(ModelWithOverridedSave, _save_kwargs={'owner': self.owner}, _quantity=2)
+        self.assertEqual(self.owner, dog1.owner)
+        self.assertEqual(self.owner, dog2.owner)
