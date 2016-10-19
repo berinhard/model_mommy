@@ -71,6 +71,7 @@ except ImportError:
     validate_ipv46_address = validate_ipv6_address
 
 from . import generators
+from . import random_gen
 from .exceptions import (ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty,
                          CustomMommyNotFound, InvalidCustomMommy)
 from .utils import import_from_str, import_if_str
@@ -143,56 +144,12 @@ def prepare_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
     return _recipe(mommy_recipe_name).prepare(_quantity=_quantity, **new_attrs)
 
 
-def __m2m_generator(model, **attrs):
+def _m2m_generator(model, **attrs):
     return make(model, _quantity=MAX_MANY_QUANTITY, **attrs)
 
 make.required = foreign_key_required
 prepare.required = foreign_key_required
-__m2m_generator.required = foreign_key_required
-
-default_mapping = {
-    BooleanField: generators.gen_boolean,
-    IntegerField: generators.gen_integer,
-    BigIntegerField: generators.gen_integer,
-    SmallIntegerField: generators.gen_integer,
-
-    PositiveIntegerField: lambda: generators.gen_integer(0),
-    PositiveSmallIntegerField: lambda: generators.gen_integer(0),
-
-    FloatField: generators.gen_float,
-    DecimalField: generators.gen_decimal,
-
-    CharField: generators.gen_string,
-    TextField: generators.gen_text,
-    SlugField: generators.gen_slug,
-
-    ForeignKey: make,
-    OneToOneField: make,
-    ManyToManyField: __m2m_generator,
-
-    DateField: generators.gen_date,
-    DateTimeField: generators.gen_datetime,
-    TimeField: generators.gen_time,
-
-    URLField: generators.gen_url,
-    EmailField: generators.gen_email,
-    IPAddressField: generators.gen_ipv4,
-    FileField: generators.gen_file_field,
-    ImageField: generators.gen_image_field,
-
-    ContentType: generators.gen_content_type,
-}
-
-if BinaryField:
-    default_mapping[BinaryField] = generators.gen_byte_string
-if DurationField:
-    default_mapping[DurationField] = generators.gen_interval
-if UUIDField:
-    default_mapping[UUIDField] = generators.gen_uuid
-if ArrayField:
-    default_mapping[ArrayField] = generators.gen_array
-if JSONField:
-    default_mapping[JSONField] = generators.gen_json
+_m2m_generator.required = foreign_key_required
 
 class ModelFinder(object):
     '''
@@ -328,7 +285,10 @@ class Mommy(object):
         self.init_type_mapping()
 
     def init_type_mapping(self):
-        self.type_mapping = default_mapping.copy()
+        self.type_mapping = generators.default_mapping.copy()
+        self.type_mapping[ForeignKey] = make
+        self.type_mapping[OneToOneField] = make
+        self.type_mapping[ManyToManyField] = _m2m_generator
         generators_from_settings = getattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', {})
         for k, v in generators_from_settings.items():
             field_class = import_if_str(k)
@@ -464,19 +424,19 @@ class Mommy(object):
             try:
                 field_validator(dummy_ipv4)
                 field_validator(dummy_ipv6)
-                generator = generators.gen_ipv46
+                generator = random_gen.gen_ipv46
             except ValidationError:
                 try:
                     field_validator(dummy_ipv4)
-                    generator = generators.gen_ipv4
+                    generator = random_gen.gen_ipv4
                 except ValidationError:
-                    generator = generators.gen_ipv6
+                    generator = random_gen.gen_ipv6
         elif protocol == 'ipv4':
-            generator = generators.gen_ipv4
+            generator = random_gen.gen_ipv4
         elif protocol == 'ipv6':
-            generator = generators.gen_ipv6
+            generator = random_gen.gen_ipv6
         else:
-            generator = generators.gen_ipv46
+            generator = random_gen.gen_ipv46
 
         return generator
 
@@ -497,7 +457,7 @@ class Mommy(object):
         if field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
-            generator = generators.gen_from_choices(field.choices)
+            generator = random_gen.gen_from_choices(field.choices)
         elif isinstance(field, ForeignKey) and issubclass(field.rel.to, ContentType):
             generator = self.type_mapping[ContentType]
         elif field.__class__ in self.type_mapping:
