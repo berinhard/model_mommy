@@ -211,3 +211,22 @@ def gen_array():
 
 def gen_json():
     return {}
+
+
+def _fk_model(field):
+    try:
+        return ('model', field.related_model)
+    except AttributeError:
+        return ('model', field.related.parent_model)
+
+
+def _prepare_related(model, **attrs):
+    from .mommy import prepare
+    return prepare(model, **attrs)
+
+
+def gen_related(model, **attrs):
+    from .mommy import make
+    return make(model, **attrs)
+gen_related.required = [_fk_model]
+gen_related.prepare = _prepare_related
