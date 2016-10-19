@@ -304,13 +304,6 @@ class Mommy(object):
     # rebuilding the model cache for every make_* or prepare_* call.
     finder = ModelFinder()
 
-    def __init__(self):
-        self.iterator_attrs = {}
-        self.model_attrs = {}
-        self.rel_attrs = {}
-        self.rel_fields = []
-
-
     @classmethod
     def create(cls, model, make_m2m=False):
         """
@@ -322,6 +315,10 @@ class Mommy(object):
     def __init__(self, model, make_m2m=False):
         self.make_m2m = make_m2m
         self.m2m_dict = {}
+        self.iterator_attrs = {}
+        self.model_attrs = {}
+        self.rel_attrs = {}
+        self.rel_fields = []
 
         if isinstance(model, ModelBase):
             self.model = model
@@ -429,7 +426,6 @@ class Mommy(object):
                 return True
 
         return False
-
 
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
