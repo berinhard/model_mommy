@@ -355,36 +355,16 @@ class Mommy(object):
         self._clean_attrs(attrs)
 
         for field in self.get_fields():
-            # check for fill optional argument
-            if isinstance(self.fill_in_optional, bool):
-                field.fill_optional = self.fill_in_optional
-            else:
-                field.fill_optional = field.name in self.fill_in_optional
-
-            # Skip links to parent so parent is not created twice.
-            if isinstance(field, OneToOneField) and field.rel.parent_link:
+            if self._skip_field(field):
                 continue
-
-            field_value_not_defined = field.name not in self.model_attrs
-
-            if isinstance(field, (AutoField, GenericRelation, OrderWrt)):
-                continue
-
-            if all([field.name not in self.model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
-                # Django is quirky in that BooleanFields are always "blank", but have no default default.
-                if not field.fill_optional and (not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not isinstance(field, BooleanField))):
-                    continue
 
             if isinstance(field, ManyToManyField):
                 if field.name not in self.model_attrs:
                     self.m2m_dict[field.name] = self.m2m_value(field)
                 else:
                     self.m2m_dict[field.name] = self.model_attrs.pop(field.name)
-            elif field_value_not_defined:
-                if field.name not in self.rel_fields and (field.null and not field.fill_optional):
-                    continue
-                else:
-                    self.model_attrs[field.name] = self.generate_value(field, commit)
+            elif field.name not in self.model_attrs:
+                self.model_attrs[field.name] = self.generate_value(field, commit)
             elif callable(self.model_attrs[field.name]):
                 self.model_attrs[field.name] = self.model_attrs[field.name]()
             elif field.name in self.iterator_attrs:
@@ -424,6 +404,32 @@ class Mommy(object):
         self.model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
         self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
         self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
+
+    def _skip_field(self, field):
+        # check for fill optional argument
+        if isinstance(self.fill_in_optional, bool):
+            field.fill_optional = self.fill_in_optional
+        else:
+            field.fill_optional = field.name in self.fill_in_optional
+
+        # Skip links to parent so parent is not created twice.
+        if isinstance(field, OneToOneField) and field.rel.parent_link:
+            return True
+
+        if isinstance(field, (AutoField, GenericRelation, OrderWrt)):
+            return True
+
+        if all([field.name not in self.model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
+            # Django is quirky in that BooleanFields are always "blank", but have no default default.
+            if not field.fill_optional and (not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not isinstance(field, BooleanField))):
+                return True
+
+        if field.name not in self.model_attrs:
+            if field.name not in self.rel_fields and (field.null and not field.fill_optional):
+                return True
+
+        return False
+
 
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
