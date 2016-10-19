@@ -304,6 +304,13 @@ class Mommy(object):
     # rebuilding the model cache for every make_* or prepare_* call.
     finder = ModelFinder()
 
+    def __init__(self):
+        self.iterator_attrs = {}
+        self.model_attrs = {}
+        self.rel_attrs = {}
+        self.rel_fields = []
+
+
     @classmethod
     def create(cls, model, make_m2m=False):
         """
