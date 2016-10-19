@@ -345,53 +345,53 @@ class Mommy(object):
         return self.model._meta.fields + self.model._meta.many_to_many
 
     def _make(self, commit=True, **attrs):
-        fill_in_optional = attrs.pop('_fill_optional', False)
+        self.fill_in_optional = attrs.pop('_fill_optional', False)
         is_rel_field = lambda x: '__' in x
-        iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
-        model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
+        self.iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
+        self.model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
         self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
         self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
 
         for field in self.get_fields():
             # check for fill optional argument
-            if isinstance(fill_in_optional, bool):
-                field.fill_optional = fill_in_optional
+            if isinstance(self.fill_in_optional, bool):
+                field.fill_optional = self.fill_in_optional
             else:
-                field.fill_optional = field.name in fill_in_optional
+                field.fill_optional = field.name in self.fill_in_optional
 
             # Skip links to parent so parent is not created twice.
             if isinstance(field, OneToOneField) and field.rel.parent_link:
                 continue
 
-            field_value_not_defined = field.name not in model_attrs
+            field_value_not_defined = field.name not in self.model_attrs
 
             if isinstance(field, (AutoField, GenericRelation, OrderWrt)):
                 continue
 
-            if all([field.name not in model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
+            if all([field.name not in self.model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
                 # Django is quirky in that BooleanFields are always "blank", but have no default default.
                 if not field.fill_optional and (not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not isinstance(field, BooleanField))):
                     continue
 
             if isinstance(field, ManyToManyField):
-                if field.name not in model_attrs:
+                if field.name not in self.model_attrs:
                     self.m2m_dict[field.name] = self.m2m_value(field)
                 else:
-                    self.m2m_dict[field.name] = model_attrs.pop(field.name)
+                    self.m2m_dict[field.name] = self.model_attrs.pop(field.name)
             elif field_value_not_defined:
                 if field.name not in self.rel_fields and (field.null and not field.fill_optional):
                     continue
                 else:
-                    model_attrs[field.name] = self.generate_value(field, commit)
-            elif callable(model_attrs[field.name]):
-                model_attrs[field.name] = model_attrs[field.name]()
-            elif field.name in iterator_attrs:
+                    self.model_attrs[field.name] = self.generate_value(field, commit)
+            elif callable(self.model_attrs[field.name]):
+                self.model_attrs[field.name] = self.model_attrs[field.name]()
+            elif field.name in self.iterator_attrs:
                 try:
-                    model_attrs[field.name] = advance_iterator(iterator_attrs[field.name])
+                    self.model_attrs[field.name] = advance_iterator(self.iterator_attrs[field.name])
                 except StopIteration:
                     raise RecipeIteratorEmpty('{0} iterator is empty.'.format(field.name))
 
-        return self.instance(model_attrs, _commit=commit)
+        return self.instance(self.model_attrs, _commit=commit)
 
     def m2m_value(self, field):
         if field.name in self.rel_fields:
