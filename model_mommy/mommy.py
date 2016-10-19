@@ -352,12 +352,7 @@ class Mommy(object):
         return self.model._meta.fields + self.model._meta.many_to_many
 
     def _make(self, commit=True, **attrs):
-        self.fill_in_optional = attrs.pop('_fill_optional', False)
-        is_rel_field = lambda x: '__' in x
-        self.iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
-        self.model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
-        self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
-        self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
+        self._clean_attrs(attrs)
 
         for field in self.get_fields():
             # check for fill optional argument
@@ -422,6 +417,14 @@ class Mommy(object):
             self._handle_m2m(instance)
         return instance
 
+    def _clean_attrs(self, attrs):
+        self.fill_in_optional = attrs.pop('_fill_optional', False)
+        is_rel_field = lambda x: '__' in x
+        self.iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
+        self.model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
+        self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
+        self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
+
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
             if django.VERSION >= (1, 9):
@@ -448,7 +451,6 @@ class Mommy(object):
                         m2m_relation.target_field_name: value
                     }
                     make(through_model, **base_kwargs)
-
 
     def _ip_generator(self, field):
         protocol = getattr(field, 'protocol', '').lower()
