@@ -75,6 +75,7 @@ default_mapping = {
     URLField: random_gen.gen_url,
     EmailField: random_gen.gen_email,
     IPAddressField: random_gen.gen_ipv4,
+    GenericIPAddressField: random_gen.gen_ip,
     FileField: random_gen.gen_file_field,
     ImageField: random_gen.gen_image_field,
 

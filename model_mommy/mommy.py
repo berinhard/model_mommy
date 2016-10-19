@@ -19,7 +19,7 @@ from django.db.models import (
     AutoField, IntegerField, SmallIntegerField,
     PositiveIntegerField, PositiveSmallIntegerField,
     BooleanField, DecimalField, FloatField,
-    FileField, ImageField, Field, IPAddressField,
+    FileField, ImageField, Field,
     ForeignKey, ManyToManyField, OneToOneField)
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
@@ -30,11 +30,6 @@ try:
     from django.db.models import BigIntegerField
 except ImportError:
     BigIntegerField = IntegerField
-
-try:
-    from django.db.models import GenericIPAddressField
-except ImportError:
-    GenericIPAddressField = IPAddressField
 
 try:
     from django.db.models import BinaryField
@@ -63,12 +58,6 @@ except ImportError:
 
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_ipv4_address
-try:
-    from django.core.validators import validate_ipv6_address, validate_ipv46_address
-except ImportError:
-    def validate_ipv6_address(v):
-        raise ValidationError()
-    validate_ipv46_address = validate_ipv6_address
 
 from . import generators
 from . import random_gen
@@ -411,32 +400,6 @@ class Mommy(object):
                     }
                     make(through_model, **base_kwargs)
 
-    def _ip_generator(self, field):
-        protocol = getattr(field, 'protocol', '').lower()
-
-        if not protocol:
-            field_validator = field.default_validators[0]
-            dummy_ipv4 = '1.1.1.1'
-            dummy_ipv6 = 'FE80::0202:B3FF:FE1E:8329'
-            try:
-                field_validator(dummy_ipv4)
-                field_validator(dummy_ipv6)
-                generator = random_gen.gen_ipv46
-            except ValidationError:
-                try:
-                    field_validator(dummy_ipv4)
-                    generator = random_gen.gen_ipv4
-                except ValidationError:
-                    generator = random_gen.gen_ipv6
-        elif protocol == 'ipv4':
-            generator = random_gen.gen_ipv4
-        elif protocol == 'ipv6':
-            generator = random_gen.gen_ipv6
-        else:
-            generator = random_gen.gen_ipv46
-
-        return generator
-
     def generate_value(self, field, commit=True):
         '''
         Calls the generator associated with a field passing all required args.
@@ -459,8 +422,6 @@ class Mommy(object):
             generator = self.type_mapping[ContentType]
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
-        elif isinstance(field, GenericIPAddressField):
-            generator = self._ip_generator(field)
         else:
             raise TypeError('%s is not supported by mommy.' % field.__class__)
 

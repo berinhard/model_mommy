@@ -17,6 +17,7 @@ from os.path import abspath, join, dirname
 from random import randint, choice, random
 from django import VERSION
 from django.core.files.base import ContentFile
+from django.core.exceptions import ValidationError
 import six
 
 from model_mommy.timezone import now
@@ -144,6 +145,32 @@ def gen_ipv46():
     ip_gen = choice([gen_ipv4, gen_ipv6])
     return ip_gen()
 
+def gen_ip(protocol, default_validators):
+    protocol = (protocol or '').lower()
+
+    if not protocol:
+        field_validator = default_validators[0]
+        dummy_ipv4 = '1.1.1.1'
+        dummy_ipv6 = 'FE80::0202:B3FF:FE1E:8329'
+        try:
+            field_validator(dummy_ipv4)
+            field_validator(dummy_ipv6)
+            generator = gen_ipv46
+        except ValidationError:
+            try:
+                field_validator(dummy_ipv4)
+                generator = gen_ipv4
+            except ValidationError:
+                generator = gen_ipv6
+    elif protocol == 'ipv4':
+        generator = gen_ipv4
+    elif protocol == 'ipv6':
+        generator = gen_ipv6
+    else:
+        generator = gen_ipv46
+
+    return generator()
+gen_ip.required = ['protocol', 'default_validators']
 
 def gen_byte_string(max_length=16):
     generator = (randint(0, 255) for x in range(max_length))
