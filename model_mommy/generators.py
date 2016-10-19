@@ -1,6 +1,3 @@
-import random_gen
-from .random_gen import *
-
 import django
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import (
@@ -11,11 +8,6 @@ from django.db.models import (
     BooleanField, DecimalField, FloatField,
     FileField, ImageField, Field, IPAddressField,
     ForeignKey, ManyToManyField, OneToOneField)
-if django.VERSION >= (1, 9):
-    from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
-else:
-    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
-from django.db.models.fields.proxy import OrderWrt
 try:
     from django.db.models import BigIntegerField
 except ImportError:
@@ -51,7 +43,7 @@ try:
 except ImportError:
     JSONField = None
 
-
+import random_gen
 default_mapping = {
     ForeignKey: random_gen.gen_related,
     OneToOneField: random_gen.gen_related,

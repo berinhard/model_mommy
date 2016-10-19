@@ -13,51 +13,12 @@ else:
     from django.db.models.loading import cache
     from django.contrib.contenttypes.generic import GenericRelation
 from django.db.models.base import ModelBase
-from django.db.models import (
-    CharField, EmailField, SlugField, TextField, URLField,
-    DateField, DateTimeField, TimeField,
-    AutoField, IntegerField, SmallIntegerField,
-    PositiveIntegerField, PositiveSmallIntegerField,
-    BooleanField, DecimalField, FloatField,
-    FileField, ImageField, Field,
-    ForeignKey, ManyToManyField, OneToOneField)
+from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, AutoField, BooleanField
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
 else:
     from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
 from django.db.models.fields.proxy import OrderWrt
-try:
-    from django.db.models import BigIntegerField
-except ImportError:
-    BigIntegerField = IntegerField
-
-try:
-    from django.db.models import BinaryField
-except ImportError:
-    BinaryField = None
-
-try:
-    from django.db.models import DurationField
-except ImportError:
-    DurationField = None
-
-try:
-    from django.db.models import UUIDField
-except ImportError:
-    UUIDField = None
-
-try:
-    from django.contrib.postgres.fields import ArrayField
-except ImportError:
-    ArrayField = None
-
-try:
-    from django.contrib.postgres.fields import JSONField
-except ImportError:
-    JSONField = None
-
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_ipv4_address
 
 from . import generators
 from . import random_gen
