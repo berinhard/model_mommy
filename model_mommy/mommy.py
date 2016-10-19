@@ -285,10 +285,7 @@ class Mommy(object):
         self.init_type_mapping()
 
     def init_type_mapping(self):
-        self.type_mapping = generators.default_mapping.copy()
-        self.type_mapping[ForeignKey] = make
-        self.type_mapping[OneToOneField] = make
-        self.type_mapping[ManyToManyField] = _m2m_generator
+        self.type_mapping = generators.get_type_mapping()
         generators_from_settings = getattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', {})
         for k, v in generators_from_settings.items():
             field_class = import_if_str(k)

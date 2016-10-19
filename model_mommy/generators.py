@@ -91,3 +91,14 @@ if ArrayField:
     default_mapping[ArrayField] = random_gen.gen_array
 if JSONField:
     default_mapping[JSONField] = random_gen.gen_json
+
+
+def get_type_mapping():
+    from .mommy import make, _m2m_generator
+
+    mapping = default_mapping.copy()
+    mapping[ForeignKey] = make
+    mapping[OneToOneField] = make
+    mapping[ManyToManyField] = _m2m_generator
+
+    return mapping.copy()
