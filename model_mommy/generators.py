@@ -55,6 +55,7 @@ except ImportError:
 default_mapping = {
     ForeignKey: random_gen.gen_related,
     OneToOneField: random_gen.gen_related,
+    ManyToManyField: random_gen.gen_m2m,
 
     BooleanField: random_gen.gen_boolean,
     IntegerField: random_gen.gen_integer,
@@ -98,9 +99,5 @@ if JSONField:
 
 
 def get_type_mapping():
-    from .mommy import make, _m2m_generator
-
     mapping = default_mapping.copy()
-    mapping[ManyToManyField] = _m2m_generator
-
     return mapping.copy()
