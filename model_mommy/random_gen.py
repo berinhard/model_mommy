@@ -232,8 +232,7 @@ gen_related.required = [_fk_model]
 gen_related.prepare = _prepare_related
 
 
-MAX_MANY_QUANTITY = 5
 def gen_m2m(model, **attrs):
-    from .mommy import make
+    from .mommy import make, MAX_MANY_QUANTITY
     return make(model, _quantity=MAX_MANY_QUANTITY, **attrs)
 gen_m2m.required = [_fk_model]

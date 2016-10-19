@@ -74,15 +74,6 @@ from os.path import dirname, join
 mock_file_jpeg = join(dirname(__file__), 'mock-img.jpeg')
 mock_file_txt = join(dirname(__file__), 'mock_file.txt')
 
-
-#TODO: improve related models handling
-def _fk_model(field):
-    try:
-        return ('model', field.related_model)
-    except AttributeError:
-        return ('model', field.related.parent_model)
-foreign_key_required = [_fk_model]
-
 MAX_MANY_QUANTITY = 5
 
 def _valid_quantity(quantity):
@@ -120,8 +111,6 @@ def prepare(model, _quantity=None, **attrs):
     else:
         return mommy.prepare(**attrs)
 
-make.prepare = prepare
-
 def _recipe(name):
     app, recipe_name = name.rsplit('.', 1)
     return import_from_str('.'.join((app, 'mommy_recipes', recipe_name)))
@@ -132,13 +121,6 @@ def make_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
 def prepare_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
     return _recipe(mommy_recipe_name).prepare(_quantity=_quantity, **new_attrs)
 
-
-def _m2m_generator(model, **attrs):
-    return make(model, _quantity=MAX_MANY_QUANTITY, **attrs)
-
-make.required = foreign_key_required
-prepare.required = foreign_key_required
-_m2m_generator.required = foreign_key_required
 
 class ModelFinder(object):
     '''
