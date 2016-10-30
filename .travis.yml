@@ -20,6 +20,8 @@ matrix:
       env: DJANGO=django18
     - python: "2.6"
       env: DJANGO=django19
+    - python: "2.6"
+      env: DJANGO=django110
     - python: "3.4"
       env: DJANGO=django14
     - python: "3.5"
