@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
-import warnings
+from os.path import dirname, join
+
+import django
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-import django
 if django.VERSION >= (1, 7):
     from django.apps import apps
     get_model = apps.get_model
     from django.contrib.contenttypes.fields import GenericRelation
 else:
-    from django.db.models.loading import get_model
-    from django.db.models.loading import cache
+    from django.db.models.loading import get_model, cache
     from django.contrib.contenttypes.generic import GenericRelation
+
 from django.db.models.base import ModelBase
 from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, AutoField, BooleanField
 if django.VERSION >= (1, 9):
@@ -25,20 +26,20 @@ from . import random_gen
 from .exceptions import (ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty,
                          CustomMommyNotFound, InvalidCustomMommy)
 from .utils import import_from_str, import_if_str
-
 from six import string_types, advance_iterator, PY3
 
 recipes = None
 
 # FIXME: use pkg_resource
-from os.path import dirname, join
 mock_file_jpeg = join(dirname(__file__), 'mock-img.jpeg')
 mock_file_txt = join(dirname(__file__), 'mock_file.txt')
 
 MAX_MANY_QUANTITY = 5
 
+
 def _valid_quantity(quantity):
     return quantity is not None and (not isinstance(quantity, int) or quantity < 1)
+
 
 def make(model, _quantity=None, make_m2m=False, **attrs):
     """
@@ -72,12 +73,15 @@ def prepare(model, _quantity=None, **attrs):
     else:
         return mommy.prepare(**attrs)
 
+
 def _recipe(name):
     app, recipe_name = name.rsplit('.', 1)
     return import_from_str('.'.join((app, 'mommy_recipes', recipe_name)))
 
+
 def make_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
     return _recipe(mommy_recipe_name).make(_quantity=_quantity, **new_attrs)
+
 
 def prepare_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
     return _recipe(mommy_recipe_name).prepare(_quantity=_quantity, **new_attrs)
@@ -165,6 +169,7 @@ def is_iterator(value):
     else:
         return hasattr(value, 'next')
 
+
 def _custom_mommy_class():
     """
     Returns custom mommy class specified by MOMMY_CUSTOM_CLASS in the django
@@ -184,6 +189,7 @@ def _custom_mommy_class():
         return mommy_class
     except ImportError:
         raise CustomMommyNotFound("Could not find custom mommy class '%s'" % custom_class_string)
+
 
 class Mommy(object):
     attr_mapping = {}
@@ -404,6 +410,7 @@ def get_required_values(generator, field):
                                   Don't make mommy sad." % str(item))
 
     return rt
+
 
 def filter_rel_attrs(field_name, **rel_attrs):
     clean_dict = {}
