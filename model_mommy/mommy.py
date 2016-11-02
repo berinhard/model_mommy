@@ -94,20 +94,21 @@ def _valid_quantity(quantity):
     return quantity is not None and (not isinstance(quantity, int) or quantity < 1)
 
 
-def make(model, _quantity=None, make_m2m=False, **attrs):
+def make(model, _quantity=None, make_m2m=False, _save_kwargs=None, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
     """
+    _save_kwargs = _save_kwargs or {}
     mommy = Mommy.create(model, make_m2m=make_m2m)
     if _valid_quantity(_quantity):
         raise InvalidQuantityException
 
     if _quantity:
-        return [mommy.make(**attrs) for i in range(_quantity)]
+        return [mommy.make(_save_kwargs=_save_kwargs, **attrs) for i in range(_quantity)]
     else:
-        return mommy.make(**attrs)
+        return mommy.make(_save_kwargs=_save_kwargs, **attrs)
 
 
 def prepare(model, _quantity=None, **attrs):
@@ -333,10 +334,10 @@ class Mommy(object):
             generator = import_if_str(v)
             self.type_mapping[field_class] = generator
 
-    def make(self, **attrs):
+    def make(self, _save_kwargs=None, **attrs):
         '''Creates and persists an instance of the model
         associated with Mommy instance.'''
-        return self._make(commit=True, **attrs)
+        return self._make(commit=True, _save_kwargs=_save_kwargs, **attrs)
 
     def prepare(self, **attrs):
         '''Creates, but does not persist, an instance of the model
@@ -346,7 +347,8 @@ class Mommy(object):
     def get_fields(self):
         return self.model._meta.fields + self.model._meta.many_to_many
 
-    def _make(self, commit=True, **attrs):
+    def _make(self, commit=True, _save_kwargs=None, **attrs):
+        _save_kwargs = _save_kwargs or {}
         fill_in_optional = attrs.pop('_fill_optional', False)
         is_rel_field = lambda x: '__' in x
         iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
@@ -393,7 +395,7 @@ class Mommy(object):
                 except StopIteration:
                     raise RecipeIteratorEmpty('{0} iterator is empty.'.format(field.name))
 
-        return self.instance(model_attrs, _commit=commit)
+        return self.instance(model_attrs, _commit=commit, _save_kwargs=_save_kwargs)
 
     def m2m_value(self, field):
         if field.name in self.rel_fields:
@@ -402,7 +404,7 @@ class Mommy(object):
             return []
         return self.generate_value(field)
 
-    def instance(self, attrs, _commit):
+    def instance(self, attrs, _commit, _save_kwargs):
         one_to_many_keys = {}
         for k in tuple(attrs.keys()):
             field = getattr(self.model, k, None)
@@ -412,7 +414,7 @@ class Mommy(object):
         instance = self.model(**attrs)
         # m2m only works for persisted instances
         if _commit:
-            instance.save()
+            instance.save(**_save_kwargs)
             self._handle_one_to_many(instance, one_to_many_keys)
             self._handle_m2m(instance)
         return instance

@@ -89,3 +89,5 @@ cast_member = Recipe('generic.CastMember', person=foreign_key(person))
 movie_with_cast = Recipe('generic.Movie',
     cast_members=related(cast_member, cast_member)
 )
+
+overrided_save = Recipe('generic.ModelWithOverridedSave')
