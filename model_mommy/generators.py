@@ -43,7 +43,7 @@ try:
 except ImportError:
     JSONField = None
 
-import random_gen
+from . import random_gen
 default_mapping = {
     ForeignKey: random_gen.gen_related,
     OneToOneField: random_gen.gen_related,
