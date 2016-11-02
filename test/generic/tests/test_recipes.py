@@ -218,6 +218,15 @@ class TestExecutingRecipes(TestCase):
         base_dog = mommy.make_recipe('test.generic.dog')
         self.assertEqual(base_dog.breed, 'Pug')
 
+    def test_save_related_instances_on_prepare_recipe(self):
+        dog = mommy.prepare_recipe('test.generic.homeless_dog')
+        self.assertIsNone(dog.id)
+        self.assertIsNone(dog.owner.id)
+
+        dog = mommy.prepare_recipe('test.generic.homeless_dog', _save_related=True)
+        self.assertIsNone(dog.id)
+        self.assertTrue(dog.owner.id)
+
     def test_make_recipe_with_quantity_parameter_respection_model_args(self):
         people = mommy.make_recipe('test.generic.person', _quantity=3, name='Dennis Ritchie', age=70)
         self.assertEqual(len(people), 3)

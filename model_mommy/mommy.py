@@ -111,7 +111,7 @@ def make(model, _quantity=None, make_m2m=False, _save_kwargs=None, **attrs):
         return mommy.make(_save_kwargs=_save_kwargs, **attrs)
 
 
-def prepare(model, _quantity=None, **attrs):
+def prepare(model, _quantity=None, _save_related=False, **attrs):
     """
     Creates BUT DOESN'T persist an instance from a given model its
     associated models.
@@ -123,9 +123,9 @@ def prepare(model, _quantity=None, **attrs):
         raise InvalidQuantityException
 
     if _quantity:
-        return [mommy.prepare(**attrs) for i in range(_quantity)]
+        return [mommy.prepare(_save_related=_save_related, **attrs) for i in range(_quantity)]
     else:
-        return mommy.prepare(**attrs)
+        return mommy.prepare(_save_related=_save_related, **attrs)
 
 make.prepare = prepare
 
@@ -138,10 +138,8 @@ def _recipe(name):
 def make_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
     return _recipe(mommy_recipe_name).make(_quantity=_quantity, **new_attrs)
 
-
-def prepare_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
-    return _recipe(mommy_recipe_name).prepare(_quantity=_quantity, **new_attrs)
-
+def prepare_recipe(mommy_recipe_name, _quantity=None, _save_related=False, **new_attrs):
+    return _recipe(mommy_recipe_name).prepare(_quantity=_quantity, _save_related=_save_related, **new_attrs)
 
 def __m2m_generator(model, **attrs):
     return make(model, _quantity=MAX_MANY_QUANTITY, **attrs)
@@ -337,17 +335,17 @@ class Mommy(object):
     def make(self, _save_kwargs=None, **attrs):
         '''Creates and persists an instance of the model
         associated with Mommy instance.'''
-        return self._make(commit=True, _save_kwargs=_save_kwargs, **attrs)
+        return self._make(commit=True, commit_related=True, _save_kwargs=_save_kwargs, **attrs)
 
-    def prepare(self, **attrs):
+    def prepare(self, _save_related=False, **attrs):
         '''Creates, but does not persist, an instance of the model
         associated with Mommy instance.'''
-        return self._make(commit=False, **attrs)
+        return self._make(commit=False, commit_related=_save_related, **attrs)
 
     def get_fields(self):
         return self.model._meta.fields + self.model._meta.many_to_many
 
-    def _make(self, commit=True, _save_kwargs=None, **attrs):
+    def _make(self, commit=True, commit_related=True, _save_kwargs=None, **attrs):
         _save_kwargs = _save_kwargs or {}
         fill_in_optional = attrs.pop('_fill_optional', False)
         is_rel_field = lambda x: '__' in x
@@ -386,7 +384,7 @@ class Mommy(object):
                 if field.name not in self.rel_fields and (field.null and not field.fill_optional):
                     continue
                 else:
-                    model_attrs[field.name] = self.generate_value(field, commit)
+                    model_attrs[field.name] = self.generate_value(field, commit_related)
             elif callable(model_attrs[field.name]):
                 model_attrs[field.name] = model_attrs[field.name]()
             elif field.name in iterator_attrs:

@@ -50,6 +50,10 @@ dog = Recipe(Dog,
     owner = foreign_key(person)
 )
 
+homeless_dog = Recipe(Dog,
+    breed = 'Pug',
+)
+
 other_dog = Recipe(Dog,
     breed = 'Basset',
     owner = foreign_key('person')
