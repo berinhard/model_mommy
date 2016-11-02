@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from mock import patch
 from decimal import Decimal
 
 from django import VERSION
@@ -10,8 +11,6 @@ from model_mommy import mommy
 from model_mommy import generators
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
-
-from mock import patch
 
 from test.generic import models
 
@@ -477,3 +476,17 @@ else:
                 'ipv46_field': generators.gen_ipv46(),
             }
             self.assertTrue(DummyGenericIPAddressFieldForm(form_data).is_valid())
+
+
+class MommyAllowsSaveParameters(TestCase):
+
+    def setUp(self):
+        self.owner = mommy.make(models.Person)
+
+    def test_allows_save_kwargs_on_mommy_make(self):
+        dog = mommy.make(models.ModelWithOverridedSave, _save_kwargs={'owner': self.owner})
+        self.assertEqual(self.owner, dog.owner)
+
+        dog1, dog2 = mommy.make(models.ModelWithOverridedSave, _save_kwargs={'owner': self.owner}, _quantity=2)
+        self.assertEqual(self.owner, dog1.owner)
+        self.assertEqual(self.owner, dog2.owner)

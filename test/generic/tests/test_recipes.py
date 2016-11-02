@@ -288,6 +288,12 @@ class TestExecutingRecipes(TestCase):
         person = mommy.prepare_recipe(recipe_name)
         self.assertEqual(person.name, 'John Deeper')
 
+    def test_pass_save_kwargs(self):
+        owner = mommy.make(Person)
+
+        dog = mommy.make_recipe('test.generic.overrided_save', _save_kwargs={'owner': owner})
+        self.assertEqual(owner, dog.owner)
+
 
 class ForeignKeyTestCase(TestCase):
     def test_foreign_key_method_returns_a_recipe_foreign_key_object(self):

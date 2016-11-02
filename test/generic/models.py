@@ -125,6 +125,13 @@ class LonelyPerson(models.Model):
     only_friend = models.OneToOneField(Person)
 
 
+class ModelWithOverridedSave(Dog):
+
+    def save(self, *args, **kwargs):
+        self.owner = kwargs.pop('owner')
+        return super(ModelWithOverridedSave, self).save(*args, **kwargs)
+
+
 class Classroom(models.Model):
     students = models.ManyToManyField(Person, null=True)
 
