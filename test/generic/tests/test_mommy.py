@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from mock import patch
 from decimal import Decimal
 
 from django import VERSION
@@ -10,8 +11,6 @@ from model_mommy import mommy
 from model_mommy import random_gen
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
-
-from mock import patch
 
 from test.generic import models
 
@@ -125,6 +124,44 @@ class MommyRepeatedCreatesSimpleModel(TestCase):
         self.assertRaises(
             InvalidQuantityException, mommy.prepare, model=models.Person, _quantity=0
         )
+
+
+class MommyPrepareSavingRelatedInstancesTests(TestCase):
+
+    def test_default_behaviour_for_and_fk(self):
+        dog = mommy.prepare(models.Dog)
+
+        self.assertIsNone(dog.pk)
+        self.assertIsNone(dog.owner.pk)
+        with self.assertRaises(ValueError):
+            dog.friends_with
+
+    def test_create_fk_instances(self):
+        dog = mommy.prepare(models.Dog, _save_related=True)
+
+        self.assertIsNone(dog.pk)
+        self.assertTrue(dog.owner.pk)
+        with self.assertRaises(ValueError):
+            dog.friends_with
+
+    def test_create_fk_instances_with_quantity(self):
+        dog1, dog2 = mommy.prepare(models.Dog, _save_related=True, _quantity=2)
+
+        self.assertIsNone(dog1.pk)
+        self.assertTrue(dog1.owner.pk)
+        with self.assertRaises(ValueError):
+            dog1.friends_with
+
+        self.assertIsNone(dog2.pk)
+        self.assertTrue(dog2.owner.pk)
+        with self.assertRaises(ValueError):
+            dog2.friends_with
+
+    def test_create_one_to_one(self):
+        lonely_person = mommy.prepare(models.LonelyPerson, _save_related=True)
+
+        self.assertIsNone(lonely_person.pk)
+        self.assertTrue(lonely_person.only_friend.pk)
 
 
 class MommyCreatesAssociatedModels(TestCase):
@@ -439,3 +476,17 @@ else:
                 'ipv46_field': random_gen.gen_ipv46(),
             }
             self.assertTrue(DummyGenericIPAddressFieldForm(form_data).is_valid())
+
+
+class MommyAllowsSaveParameters(TestCase):
+
+    def setUp(self):
+        self.owner = mommy.make(models.Person)
+
+    def test_allows_save_kwargs_on_mommy_make(self):
+        dog = mommy.make(models.ModelWithOverridedSave, _save_kwargs={'owner': self.owner})
+        self.assertEqual(self.owner, dog.owner)
+
+        dog1, dog2 = mommy.make(models.ModelWithOverridedSave, _save_kwargs={'owner': self.owner}, _quantity=2)
+        self.assertEqual(self.owner, dog1.owner)
+        self.assertEqual(self.owner, dog2.owner)
