@@ -14,59 +14,15 @@ else:
     from django.contrib.contenttypes.generic import GenericRelation
 
 from django.db.models.base import ModelBase
-from django.db.models.fields.proxy import OrderWrt
-from django.core.exceptions import ValidationError
-from django.core.validators import validate_ipv4_address
-from django.db import models
-
+from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, AutoField, BooleanField
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
 else:
     from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
-
-try:
-    from django.db.models import BigIntegerField
-except ImportError:
-    BigIntegerField = models.IntegerField
-
-try:
-    from django.db.models import GenericIPAddressField
-except ImportError:
-    GenericIPAddressField = models.IPAddressField
-
-try:
-    from django.db.models import BinaryField
-except ImportError:
-    BinaryField = None
-
-try:
-    from django.db.models import DurationField
-except ImportError:
-    DurationField = None
-
-try:
-    from django.db.models import UUIDField
-except ImportError:
-    UUIDField = None
-
-try:
-    from django.contrib.postgres.fields import ArrayField
-except ImportError:
-    ArrayField = None
-
-try:
-    from django.contrib.postgres.fields import JSONField
-except ImportError:
-    JSONField = None
-
-try:
-    from django.core.validators import validate_ipv6_address, validate_ipv46_address
-except ImportError:
-    def validate_ipv6_address(v):
-        raise ValidationError()
-    validate_ipv46_address = validate_ipv6_address
+from django.db.models.fields.proxy import OrderWrt
 
 from . import generators
+from . import random_gen
 from .exceptions import (ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty,
                          CustomMommyNotFound, InvalidCustomMommy)
 from .utils import import_from_str, import_if_str
@@ -77,15 +33,6 @@ recipes = None
 # FIXME: use pkg_resource
 mock_file_jpeg = join(dirname(__file__), 'mock-img.jpeg')
 mock_file_txt = join(dirname(__file__), 'mock_file.txt')
-
-
-#TODO: improve related models handling
-def _fk_model(field):
-    try:
-        return ('model', field.related_model)
-    except AttributeError:
-        return ('model', field.related.parent_model)
-foreign_key_required = [_fk_model]
 
 MAX_MANY_QUANTITY = 5
 
@@ -127,8 +74,6 @@ def prepare(model, _quantity=None, _save_related=False, **attrs):
     else:
         return mommy.prepare(_save_related=_save_related, **attrs)
 
-make.prepare = prepare
-
 
 def _recipe(name):
     app, recipe_name = name.rsplit('.', 1)
@@ -140,58 +85,6 @@ def make_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
 
 def prepare_recipe(mommy_recipe_name, _quantity=None, _save_related=False, **new_attrs):
     return _recipe(mommy_recipe_name).prepare(_quantity=_quantity, _save_related=_save_related, **new_attrs)
-
-def __m2m_generator(model, **attrs):
-    return make(model, _quantity=MAX_MANY_QUANTITY, **attrs)
-
-make.required = foreign_key_required
-prepare.required = foreign_key_required
-__m2m_generator.required = foreign_key_required
-
-default_mapping = {
-    models.BooleanField: generators.gen_boolean,
-    models.IntegerField: generators.gen_integer,
-    models.BigIntegerField: generators.gen_integer,
-    models.SmallIntegerField: generators.gen_integer,
-
-    models.PositiveIntegerField: lambda: generators.gen_integer(0),
-    models.PositiveSmallIntegerField: lambda: generators.gen_integer(0),
-
-    models.FloatField: generators.gen_float,
-    models.DecimalField: generators.gen_decimal,
-
-    models.CharField: generators.gen_string,
-    models.TextField: generators.gen_text,
-    models.SlugField: generators.gen_slug,
-
-    models.ForeignKey: make,
-    models.OneToOneField: make,
-    models.ManyToManyField: __m2m_generator,
-
-    models.DateField: generators.gen_date,
-    models.DateTimeField: generators.gen_datetime,
-    models.TimeField: generators.gen_time,
-
-    models.URLField: generators.gen_url,
-    models.EmailField: generators.gen_email,
-    models.IPAddressField: generators.gen_ipv4,
-    models.FileField: generators.gen_file_field,
-    models.ImageField: generators.gen_image_field,
-
-    ContentType: generators.gen_content_type,
-}
-
-if BinaryField:
-    default_mapping[BinaryField] = generators.gen_byte_string
-if DurationField:
-    default_mapping[DurationField] = generators.gen_interval
-if UUIDField:
-    default_mapping[UUIDField] = generators.gen_uuid
-if ArrayField:
-    default_mapping[ArrayField] = generators.gen_array
-if JSONField:
-    default_mapping[JSONField] = generators.gen_json
-
 
 class ModelFinder(object):
     '''
@@ -316,6 +209,10 @@ class Mommy(object):
     def __init__(self, model, make_m2m=False):
         self.make_m2m = make_m2m
         self.m2m_dict = {}
+        self.iterator_attrs = {}
+        self.model_attrs = {}
+        self.rel_attrs = {}
+        self.rel_fields = []
 
         if isinstance(model, ModelBase):
             self.model = model
@@ -325,7 +222,7 @@ class Mommy(object):
         self.init_type_mapping()
 
     def init_type_mapping(self):
-        self.type_mapping = default_mapping.copy()
+        self.type_mapping = generators.get_type_mapping()
         generators_from_settings = getattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', {})
         for k, v in generators_from_settings.items():
             field_class = import_if_str(k)
@@ -347,53 +244,28 @@ class Mommy(object):
 
     def _make(self, commit=True, commit_related=True, _save_kwargs=None, **attrs):
         _save_kwargs = _save_kwargs or {}
-        fill_in_optional = attrs.pop('_fill_optional', False)
-        is_rel_field = lambda x: '__' in x
-        iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
-        model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
-        self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
-        self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
 
+        self._clean_attrs(attrs)
         for field in self.get_fields():
-            # check for fill optional argument
-            if isinstance(fill_in_optional, bool):
-                field.fill_optional = fill_in_optional
-            else:
-                field.fill_optional = field.name in fill_in_optional
-
-            # Skip links to parent so parent is not created twice.
-            if isinstance(field, models.OneToOneField) and field.rel.parent_link:
+            if self._skip_field(field):
                 continue
 
-            field_value_not_defined = field.name not in model_attrs
-
-            if isinstance(field, (models.AutoField, GenericRelation, OrderWrt)):
-                continue
-
-            if all([field.name not in model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
-                # Django is quirky in that BooleanFields are always "blank", but have no default default.
-                if not field.fill_optional and (not issubclass(field.__class__, models.Field) or field.has_default() or (field.blank and not isinstance(field, models.BooleanField))):
-                    continue
-
-            if isinstance(field, models.ManyToManyField):
-                if field.name not in model_attrs:
+            if isinstance(field, ManyToManyField):
+                if field.name not in self.model_attrs:
                     self.m2m_dict[field.name] = self.m2m_value(field)
                 else:
-                    self.m2m_dict[field.name] = model_attrs.pop(field.name)
-            elif field_value_not_defined:
-                if field.name not in self.rel_fields and (field.null and not field.fill_optional):
-                    continue
-                else:
-                    model_attrs[field.name] = self.generate_value(field, commit_related)
-            elif callable(model_attrs[field.name]):
-                model_attrs[field.name] = model_attrs[field.name]()
-            elif field.name in iterator_attrs:
+                    self.m2m_dict[field.name] = self.model_attrs.pop(field.name)
+            elif field.name not in self.model_attrs:
+                self.model_attrs[field.name] = self.generate_value(field, commit_related)
+            elif callable(self.model_attrs[field.name]):
+                self.model_attrs[field.name] = self.model_attrs[field.name]()
+            elif field.name in self.iterator_attrs:
                 try:
-                    model_attrs[field.name] = advance_iterator(iterator_attrs[field.name])
+                    self.model_attrs[field.name] = advance_iterator(self.iterator_attrs[field.name])
                 except StopIteration:
                     raise RecipeIteratorEmpty('{0} iterator is empty.'.format(field.name))
 
-        return self.instance(model_attrs, _commit=commit, _save_kwargs=_save_kwargs)
+        return self.instance(self.model_attrs, _commit=commit, _save_kwargs=_save_kwargs)
 
     def m2m_value(self, field):
         if field.name in self.rel_fields:
@@ -416,6 +288,39 @@ class Mommy(object):
             self._handle_one_to_many(instance, one_to_many_keys)
             self._handle_m2m(instance)
         return instance
+
+    def _clean_attrs(self, attrs):
+        self.fill_in_optional = attrs.pop('_fill_optional', False)
+        is_rel_field = lambda x: '__' in x
+        self.iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
+        self.model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
+        self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
+        self.rel_fields = [x.split('__')[0] for x in self.rel_attrs.keys() if is_rel_field(x)]
+
+    def _skip_field(self, field):
+        # check for fill optional argument
+        if isinstance(self.fill_in_optional, bool):
+            field.fill_optional = self.fill_in_optional
+        else:
+            field.fill_optional = field.name in self.fill_in_optional
+
+        # Skip links to parent so parent is not created twice.
+        if isinstance(field, OneToOneField) and field.rel.parent_link:
+            return True
+
+        if isinstance(field, (AutoField, GenericRelation, OrderWrt)):
+            return True
+
+        if all([field.name not in self.model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
+            # Django is quirky in that BooleanFields are always "blank", but have no default default.
+            if not field.fill_optional and (not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not isinstance(field, BooleanField))):
+                return True
+
+        if field.name not in self.model_attrs:
+            if field.name not in self.rel_fields and (field.null and not field.fill_optional):
+                return True
+
+        return False
 
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
@@ -444,32 +349,6 @@ class Mommy(object):
                     }
                     make(through_model, **base_kwargs)
 
-    def _ip_generator(self, field):
-        protocol = getattr(field, 'protocol', '').lower()
-
-        if not protocol:
-            field_validator = field.default_validators[0]
-            dummy_ipv4 = '1.1.1.1'
-            dummy_ipv6 = 'FE80::0202:B3FF:FE1E:8329'
-            try:
-                field_validator(dummy_ipv4)
-                field_validator(dummy_ipv6)
-                generator = generators.gen_ipv46
-            except ValidationError:
-                try:
-                    field_validator(dummy_ipv4)
-                    generator = generators.gen_ipv4
-                except ValidationError:
-                    generator = generators.gen_ipv6
-        elif protocol == 'ipv4':
-            generator = generators.gen_ipv4
-        elif protocol == 'ipv6':
-            generator = generators.gen_ipv6
-        else:
-            generator = generators.gen_ipv46
-
-        return generator
-
     def generate_value(self, field, commit=True):
         '''
         Calls the generator associated with a field passing all required args.
@@ -487,13 +366,11 @@ class Mommy(object):
         if field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
-            generator = generators.gen_from_choices(field.choices)
-        elif isinstance(field, models.ForeignKey) and issubclass(field.rel.to, ContentType):
+            generator = random_gen.gen_from_choices(field.choices)
+        elif isinstance(field, ForeignKey) and issubclass(field.rel.to, ContentType):
             generator = self.type_mapping[ContentType]
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
-        elif isinstance(field, GenericIPAddressField):
-            generator = self._ip_generator(field)
         else:
             raise TypeError('%s is not supported by mommy.' % field.__class__)
 

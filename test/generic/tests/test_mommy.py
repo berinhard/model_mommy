@@ -8,7 +8,7 @@ from django.db.models import Manager
 from django.db.models.signals import m2m_changed
 
 from model_mommy import mommy
-from model_mommy import generators
+from model_mommy import random_gen
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime as datetime
 
@@ -462,7 +462,7 @@ if VERSION < (1, 4):
     class MommyGeneratesIPAdresses(TestCase):
         def test_create_model_with_valid_ipv4(self):
             form_data = {
-                'ipv4_field': generators.gen_ipv4(),
+                'ipv4_field': random_gen.gen_ipv4(),
             }
             self.assertTrue(DummyIPAddressFieldForm(form_data).is_valid())
 else:
@@ -471,9 +471,9 @@ else:
     class MommyGeneratesIPAdresses(TestCase):
         def test_create_model_with_valid_ips(self):
             form_data = {
-                'ipv4_field': generators.gen_ipv4(),
-                'ipv6_field': generators.gen_ipv6(),
-                'ipv46_field': generators.gen_ipv46(),
+                'ipv4_field': random_gen.gen_ipv4(),
+                'ipv6_field': random_gen.gen_ipv6(),
+                'ipv46_field': random_gen.gen_ipv46(),
             }
             self.assertTrue(DummyGenericIPAddressFieldForm(form_data).is_valid())
 
