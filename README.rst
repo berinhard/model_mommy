@@ -32,3 +32,10 @@ Usage and Info
 ==============
 
 *     http://model-mommy.readthedocs.org/
+
+
+Maintainers
+===========
+
+*     [Vanderson Mota (creator)](https://github.com/vandersonmota/)
+*     [Bernardo Fontes](https://github.com/berinhard/)

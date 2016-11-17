@@ -325,6 +325,29 @@ class MommyCreatesAssociatedModels(TestCase):
 
         self.assertEqual(person.dog_set.count(), 2)
 
+    def test_field_lookup_for_related_field(self):
+        person = mommy.make(
+            models.Person,
+            one_related__name='Foo',
+            fk_related__name='Bar',
+        )
+
+        self.assertTrue(person.pk)
+        self.assertTrue(person.one_related.pk)
+        self.assertTrue(1, person.fk_related.count())
+        self.assertEqual('Foo', person.one_related.name)
+        self.assertEqual('Bar', person.fk_related.get().name)
+
+    def test_field_lookup_for_related_field_does_not_work_with_prepare(self):
+        person = mommy.prepare(
+            models.Person,
+            one_related__name='Foo',
+            fk_related__name='Bar',
+        )
+
+        self.assertFalse(person.pk)
+        self.assertEqual(0, models.RelatedNamesModel.objects.count())
+
 
 class HandlingUnsupportedModels(TestCase):
     def test_unsupported_model_raises_an_explanatory_exception(self):

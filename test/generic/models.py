@@ -125,6 +125,12 @@ class LonelyPerson(models.Model):
     only_friend = models.OneToOneField(Person)
 
 
+class RelatedNamesModel(models.Model):
+    name = models.CharField(max_length=256)
+    one_to_one = models.OneToOneField(Person, related_name='one_related')
+    foreign_key = models.ForeignKey(Person, related_name='fk_related')
+
+
 class ModelWithOverridedSave(Dog):
 
     def save(self, *args, **kwargs):

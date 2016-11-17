@@ -242,6 +242,12 @@ class Mommy(object):
     def get_fields(self):
         return self.model._meta.fields + self.model._meta.many_to_many
 
+    def get_related(self):
+        if django.VERSION[:2] <= (1, 7):
+            return self.model._meta.get_all_related_objects()
+        else:
+            return [r for r in self.model._meta.related_objects if not r.many_to_many]
+
     def _make(self, commit=True, commit_related=True, _save_kwargs=None, **attrs):
         _save_kwargs = _save_kwargs or {}
 
@@ -265,7 +271,12 @@ class Mommy(object):
                 except StopIteration:
                     raise RecipeIteratorEmpty('{0} iterator is empty.'.format(field.name))
 
-        return self.instance(self.model_attrs, _commit=commit, _save_kwargs=_save_kwargs)
+        instance = self.instance(self.model_attrs, _commit=commit, _save_kwargs=_save_kwargs)
+        if commit:
+            for related in self.get_related():
+                self.create_by_related_name(instance, related)
+
+        return instance
 
     def m2m_value(self, field):
         if field.name in self.rel_fields:
@@ -288,6 +299,17 @@ class Mommy(object):
             self._handle_one_to_many(instance, one_to_many_keys)
             self._handle_m2m(instance)
         return instance
+
+    def create_by_related_name(self, instance, related):
+        rel_name = related.get_accessor_name()
+        if rel_name not in self.rel_fields:
+            return
+
+        kwargs = filter_rel_attrs(rel_name, **self.rel_attrs)
+        kwargs[related.field.name] = instance
+        kwargs['model'] = related.field.model
+
+        make(**kwargs)
 
     def _clean_attrs(self, attrs):
         self.fill_in_optional = attrs.pop('_fill_optional', False)
