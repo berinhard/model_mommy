@@ -54,20 +54,19 @@ Custom fields
 -------------
 
 Model-mommy allows you to define generators methods for your custom fields or overrides its default generators.
-This could be achieved by specifing a dict on settings with keys defining the fields and values the generator functions.
+This could be achieved by specifing the field and generator function for the `generators.set` function.
 Both can be the real python objects imported in settings or just specified as import path string.
 
 Examples:
 
 .. code-block:: python
 
-    # on your settings.py file:
+    from mommy import generators
+
     def gen_func():
         return 'value'
 
-    MOMMY_CUSTOM_FIELDS_GEN = {
-        'test.generic.fields.CustomField': gen_func,
-    }
+    generators.set('test.generic.fields.CustomField', gen_func)
 
 .. code-block:: python
 
@@ -75,13 +74,13 @@ Examples:
     def gen_func():
         return 'value'
 
-    # in your settings.py file:
-    MOMMY_CUSTOM_FIELDS_GEN = {
-        'test.generic.fields.CustomField': 'code.path.gen_func',
-    }
+    # in your tests.py file:
+    from mommy import generators
+
+    generatos.set('test.generic.fields.CustomField', 'code.path.gen_func')
 
 Customizing Mommy
--------------
+-----------------
 
 In some rare cases, you might need to customize the way Mommy behaves.
 This can be achieved by creating a new class and specifying it in your settings files. It is likely that you will want to extend Mommy, however the minimum requirement is that the custom class have `make` and `prepare` functions.

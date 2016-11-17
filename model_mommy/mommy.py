@@ -371,6 +371,8 @@ class Mommy(object):
             generator = self.type_mapping[ContentType]
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
+        elif generators.get(field.__class__):
+            generator = generators.get(field.__class__)
         else:
             raise TypeError('%s is not supported by mommy.' % field.__class__)
 
