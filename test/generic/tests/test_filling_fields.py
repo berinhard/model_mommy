@@ -372,14 +372,14 @@ class FillingCustomFields(TestCase):
         self.assertRaises(TypeError, mommy.make, models.CustomFieldWithoutGeneratorModel)
 
     def test_uses_generator_defined_on_settings_for_custom_field(self):
-        """Should user the function defined in settings as a generator"""
+        """Should use the function defined in settings as a generator"""
         generator_dict = {'test.generic.fields.CustomFieldWithGenerator': gen_value_string}
         setattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', generator_dict)
         obj = mommy.make(models.CustomFieldWithGeneratorModel)
         self.assertEqual("value", obj.custom_value)
 
     def test_uses_generator_defined_as_string_on_settings_for_custom_field(self):
-        """Should import and use the function defined in the import path defined in settings"""
+        """Should import and use the function present in the import path defined in settings"""
         generator_dict = {'test.generic.fields.CustomFieldWithGenerator':
                                 'test.generic.generators.gen_value_string'}
         setattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', generator_dict)

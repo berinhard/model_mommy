@@ -1,12 +1,10 @@
-import django
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import (
     CharField, EmailField, SlugField, TextField, URLField,
     DateField, DateTimeField, TimeField,
-    AutoField, IntegerField, SmallIntegerField,
-    PositiveIntegerField, PositiveSmallIntegerField,
-    BooleanField, DecimalField, FloatField,
-    FileField, ImageField, Field, IPAddressField,
+    IntegerField, SmallIntegerField, PositiveIntegerField,
+    PositiveSmallIntegerField, BooleanField, DecimalField,
+    FloatField, FileField, ImageField, IPAddressField,
     ForeignKey, ManyToManyField, OneToOneField)
 
 from model_mommy.utils import import_if_str
