@@ -243,7 +243,10 @@ class Mommy(object):
         return self.model._meta.fields + self.model._meta.many_to_many
 
     def get_related(self):
-        return [r for r in self.model._meta.related_objects if not r.many_to_many]
+        if django.VERSION[:2] <= (1, 7):
+            return self.model._meta.get_all_related_objects()
+        else:
+            return [r for r in self.model._meta.related_objects if not r.many_to_many]
 
     def _make(self, commit=True, commit_related=True, _save_kwargs=None, **attrs):
         _save_kwargs = _save_kwargs or {}
@@ -298,10 +301,11 @@ class Mommy(object):
         return instance
 
     def create_by_related_name(self, instance, related):
-        if related.name not in self.rel_fields:
+        rel_name = related.get_accessor_name()
+        if rel_name not in self.rel_fields:
             return
 
-        kwargs = filter_rel_attrs(related.name, **self.rel_attrs)
+        kwargs = filter_rel_attrs(rel_name, **self.rel_attrs)
         kwargs[related.field.name] = instance
         kwargs['model'] = related.field.model
 
