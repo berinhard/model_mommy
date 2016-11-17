@@ -10,11 +10,11 @@ You can override this behavior by:
 .. code-block:: python
 
     # from "Basic Usage" page, assume all fields either null=True or blank=True
-    from .models import Kid  
+    from .models import Kid
     from model_mommy import mommy
 
     kid = mommy.make(Kid, happy=True, bio='Happy kid')
-    
+
 2. Passing `_fill_optional` with a list of fields to fill with random data
 
 .. code-block:: python
@@ -54,20 +54,19 @@ Custom fields
 -------------
 
 Model-mommy allows you to define generators methods for your custom fields or overrides its default generators.
-This could be achieved by specifing a dict on settings with keys defining the fields and values the generator functions.
+This could be achieved by specifing the field and generator function for the `generators.add` function.
 Both can be the real python objects imported in settings or just specified as import path string.
 
 Examples:
 
 .. code-block:: python
 
-    # on your settings.py file:
+    from model_mommy import mommy
+
     def gen_func():
         return 'value'
 
-    MOMMY_CUSTOM_FIELDS_GEN = {
-        'test.generic.fields.CustomField': gen_func,
-    }
+    mommy.generators.add('test.generic.fields.CustomField', gen_func)
 
 .. code-block:: python
 
@@ -75,13 +74,13 @@ Examples:
     def gen_func():
         return 'value'
 
-    # in your settings.py file:
-    MOMMY_CUSTOM_FIELDS_GEN = {
-        'test.generic.fields.CustomField': 'code.path.gen_func',
-    }
+    # in your tests.py file:
+    from model_mommy import mommy
+
+    mommy.generatos.add('test.generic.fields.CustomField', 'code.path.gen_func')
 
 Customizing Mommy
--------------
+-----------------
 
 In some rare cases, you might need to customize the way Mommy behaves.
 This can be achieved by creating a new class and specifying it in your settings files. It is likely that you will want to extend Mommy, however the minimum requirement is that the custom class have `make` and `prepare` functions.
@@ -102,3 +101,23 @@ Examples:
 
     # in your settings.py file:
     MOMMY_CUSTOM_CLASS = 'code.path.CustomMommy'
+
+Save method custom parameters
+-----------------------------
+
+If you have overwritten the `save` method for a model, you can pass custom parameters to it using model mommy. Example:
+
+.. code-block:: python
+
+    class ProjectWithCustomSave(models.Model)
+        # some model fields
+        created_by = models.ForeignKey(settings.AUTH_USER_MODEL)
+
+        def save(self, user, *args, **kwargs):
+            self.created_by = user
+            return super(ProjectWithCustomSave, self).save(*args, **kwargs)
+
+    #with model mommy:
+    user = mommy.make(settings.AUTH_USER_MODEL)
+    project = mommy.make(ProjectWithCustomSave, _save_kwargs={'user': user})
+    assert user == project.user

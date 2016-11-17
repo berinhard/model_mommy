@@ -203,7 +203,7 @@ File: test_model.py ::
                 age=6
             )
 
-Related objects attributes are also reachable:
+Related objects attributes are also reachable by their name or related names:
 
 File: test_model.py ::
 
@@ -235,6 +235,7 @@ File: test_model.py ::
                 owner__name='Bob'
             )
 
+
 Non persistent objects
 ----------------------
 
@@ -246,7 +247,17 @@ If you don't need a persisted object, *Mommy* can handle this for you as well:
 
     kid = mommy.prepare('family.Kid')
 
-It works like `make`, but it doesn't persist the instance.
+It works like `make`, but it doesn't persist the instance neither the related instances.
+
+If you want to persist only the related instances but not your model, you can use the `_save_related` parameter for it:
+
+.. code-block:: python
+
+    from model_mommy import mommy
+
+    dog = mommy.prepare('family.Dog', _save_related=True)
+    assert dog.id is None
+    assert bool(dog.owner.id) is True
 
 More than one instance
 ----------------------
