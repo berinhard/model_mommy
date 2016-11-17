@@ -61,12 +61,12 @@ Examples:
 
 .. code-block:: python
 
-    from mommy import generators
+    from model_mommy import mommy
 
     def gen_func():
         return 'value'
 
-    generators.set('test.generic.fields.CustomField', gen_func)
+    mommy.generators.add('test.generic.fields.CustomField', gen_func)
 
 .. code-block:: python
 
@@ -75,9 +75,9 @@ Examples:
         return 'value'
 
     # in your tests.py file:
-    from mommy import generators
+    from model_mommy import mommy
 
-    generatos.set('test.generic.fields.CustomField', 'code.path.gen_func')
+    mommy.generatos.add('test.generic.fields.CustomField', 'code.path.gen_func')
 
 Customizing Mommy
 -----------------

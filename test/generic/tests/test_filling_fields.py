@@ -13,7 +13,7 @@ from django.core.files.images import ImageFile
 
 from six import text_type, string_types, binary_type
 
-from model_mommy import mommy, generators
+from model_mommy import mommy
 from model_mommy.random_gen import gen_related
 from test.generic import models
 from test.generic.generators import gen_value_string
@@ -365,7 +365,7 @@ class FillingImageFileField(TestCase):
 class FillingCustomFields(TestCase):
     def tearDown(self):
         delattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN')
-        generators.add('test.generic.fields.CustomFieldWithGenerator', None)
+        mommy.generators.add('test.generic.fields.CustomFieldWithGenerator', None)
 
     def test_raises_unsupported_field_for_custom_field(self):
         """Should raise an exception if a generator is not provided for a custom field"""
@@ -395,13 +395,13 @@ class FillingCustomFields(TestCase):
 
     def test_uses_generator_defined_as_string_for_custom_field(self):
         """Should import and use the generator function used in the add method"""
-        generators.add('test.generic.fields.CustomFieldWithGenerator', 'test.generic.generators.gen_value_string')
+        mommy.generators.add('test.generic.fields.CustomFieldWithGenerator', 'test.generic.generators.gen_value_string')
         obj = mommy.make(models.CustomFieldWithGeneratorModel)
         self.assertEqual("value", obj.custom_value)
 
     def test_uses_generator_function_for_custom_foreignkey(self):
         """Should use the generator function passed as a value for the add method"""
-        generators.add('test.generic.fields.CustomForeignKey', gen_related)
+        mommy.generators.add('test.generic.fields.CustomForeignKey', gen_related)
         obj = mommy.make(models.CustomForeignKeyWithGeneratorModel, custom_fk__email="a@b.com")
         self.assertEqual('a@b.com', obj.custom_fk.email)
 
