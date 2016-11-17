@@ -54,7 +54,7 @@ Custom fields
 -------------
 
 Model-mommy allows you to define generators methods for your custom fields or overrides its default generators.
-This could be achieved by specifing the field and generator function for the `generators.set` function.
+This could be achieved by specifing the field and generator function for the `generators.add` function.
 Both can be the real python objects imported in settings or just specified as import path string.
 
 Examples:
