@@ -269,8 +269,9 @@ class Mommy(object):
                     raise RecipeIteratorEmpty('{0} iterator is empty.'.format(field.name))
 
         instance = self.instance(self.model_attrs, _commit=commit, _save_kwargs=_save_kwargs)
-        for related in self.get_related():
-            self.create_by_related_name(instance, related)
+        if commit:
+            for related in self.get_related():
+                self.create_by_related_name(instance, related)
 
         return instance
 
