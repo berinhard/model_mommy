@@ -203,7 +203,7 @@ File: test_model.py ::
                 age=6
             )
 
-Related objects attributes are also reachable:
+Related objects attributes are also reachable by their name or related names:
 
 File: test_model.py ::
 
@@ -234,6 +234,7 @@ File: test_model.py ::
                 'family.Dog',
                 owner__name='Bob'
             )
+
 
 Non persistent objects
 ----------------------
