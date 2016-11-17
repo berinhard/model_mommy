@@ -364,7 +364,8 @@ class FillingImageFileField(TestCase):
 
 class FillingCustomFields(TestCase):
     def tearDown(self):
-        delattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN')
+        if hasattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN'):
+            delattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN')
         mommy.generators.add('test.generic.fields.CustomFieldWithGenerator', None)
 
     def test_raises_unsupported_field_for_custom_field(self):
