@@ -2,3 +2,4 @@
 mock>=1.0.1
 sphinx
 django-test-without-migrations==0.4
+wheel
