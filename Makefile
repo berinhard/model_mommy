@@ -5,5 +5,8 @@ help:
 test:
 	@python runtests.py
 
-.PHONY: test
+release:
+	@python setup.py sdist bdist_wheel upload
+
+.PHONY: test release
 
