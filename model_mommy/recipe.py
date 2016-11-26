@@ -32,6 +32,7 @@ class Recipe(object):
         self._iterator_backups = {}
 
     def _mapping(self, new_attrs):
+        _save_related = new_attrs.get('_save_related', True)
         rel_fields_attrs = dict((k, v) for k, v in new_attrs.items() if '__' in k)
         new_attrs = dict((k, v) for k, v in new_attrs.items() if not '__' in k)
         mapping = self.attr_mapping.copy()
@@ -53,7 +54,10 @@ class Recipe(object):
                     if key.startswith('%s__' % k):
                         a[key] = rel_fields_attrs.pop(key)
                 recipe_attrs = mommy.filter_rel_attrs(k, **a)
-                mapping[k] = v.recipe.make(**recipe_attrs)
+                if _save_related:
+                    mapping[k] = v.recipe.make(**recipe_attrs)
+                else:
+                    mapping[k] = v.recipe.prepare(**recipe_attrs)
             elif isinstance(v, related):
                 mapping[k] = v.make()
         mapping.update(new_attrs)
@@ -64,7 +68,9 @@ class Recipe(object):
         return mommy.make(self.model, **self._mapping(attrs))
 
     def prepare(self, **attrs):
-        return mommy.prepare(self.model, **self._mapping(attrs))
+        defaults = {'_save_related': False}
+        defaults.update(attrs)
+        return mommy.prepare(self.model, **self._mapping(defaults))
 
     def extend(self, **attrs):
         attr_mapping = self.attr_mapping.copy()
@@ -156,4 +162,3 @@ class related(object):
          Persists objects to m2m relation
         """
         return [m.make() for m in self.related]
-
