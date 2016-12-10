@@ -8,7 +8,7 @@ from decimal import Decimal
 from django.test import TestCase
 from datetime import timedelta
 from model_mommy import mommy
-from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
+from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey, related
 from model_mommy.timezone import now, tz_aware
 from model_mommy.exceptions import InvalidQuantityException, RecipeIteratorEmpty
 from test.generic.models import TEST_TIME, Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
@@ -175,7 +175,12 @@ class TestExecutingRecipes(TestCase):
         dog = mommy.prepare_recipe('test.generic.dog')
         self.assertEqual(dog.breed, 'Pug')
         self.assertIsInstance(dog.owner, Person)
-        self.assertNotEqual(dog.owner.id, None)
+        self.assertIsNone(dog.owner.id)
+
+        dog = mommy.prepare_recipe('test.generic.dog', _save_related=True)
+        self.assertEqual(dog.breed, 'Pug')
+        self.assertIsInstance(dog.owner, Person)
+        self.assertIsNotNone(dog.owner.id)
 
     def test_model_with_foreign_key_as_str(self):
         dog = mommy.make_recipe('test.generic.other_dog')
@@ -186,7 +191,7 @@ class TestExecutingRecipes(TestCase):
         dog = mommy.prepare_recipe('test.generic.other_dog')
         self.assertEqual(dog.breed, 'Basset')
         self.assertIsInstance(dog.owner, Person)
-        self.assertNotEqual(dog.owner.id, None)
+        self.assertIsNone(dog.owner.id)
 
     def test_model_with_foreign_key_as_unicode(self):
         dog = mommy.make_recipe('test.generic.other_dog_unicode')
@@ -197,7 +202,7 @@ class TestExecutingRecipes(TestCase):
         dog = mommy.prepare_recipe('test.generic.other_dog_unicode')
         self.assertEqual(dog.breed, 'Basset')
         self.assertIsInstance(dog.owner, Person)
-        self.assertNotEqual(dog.owner.id, None)
+        self.assertIsNone(dog.owner.id)
 
     def test_make_recipe(self):
         person = mommy.make_recipe('test.generic.person')
@@ -243,6 +248,16 @@ class TestExecutingRecipes(TestCase):
             InvalidQuantityException,
             mommy.make_recipe, 'test.generic.person', _quantity=-1
         )
+
+    def test_prepare_recipe_with_foreign_key(self):
+        person_recipe = Recipe(Person, name='John Doe')
+        dog_recipe = Recipe(Dog,
+            owner=foreign_key(person_recipe),
+        )
+        dog = dog_recipe.prepare()
+
+        self.assertIsNone(dog.id)
+        self.assertIsNone(dog.owner.id)
 
     def test_prepare_recipe_with_quantity_parameter(self):
         people = mommy.prepare_recipe('test.generic.person', _quantity=3)
@@ -336,7 +351,6 @@ class ForeignKeyTestCase(TestCase):
           using query lookup syntax
         """
         dog = mommy.prepare_recipe('test.generic.dog', owner__name='James')
-        self.assertEqual(Person.objects.count(), 1)
         self.assertEqual(dog.owner.name, 'James')
 
     def test_do_query_lookup_empty_recipes(self):
