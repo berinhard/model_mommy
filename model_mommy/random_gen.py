@@ -213,6 +213,9 @@ def gen_json():
     return {}
 
 
+def gen_hstore():
+    return {}
+
 def _fk_model(field):
     try:
         return ('model', field.related_model)

@@ -49,6 +49,7 @@ Currently supported fields
 * ForeignKey, OneToOneField, ManyToManyField (even with through model)
 * DateField, DateTimeField, TimeField
 * FileField, ImageField
+* JSONField, ArrayField, HStoreField
 
 Custom fields
 -------------

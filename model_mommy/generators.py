@@ -44,6 +44,11 @@ try:
 except ImportError:
     JSONField = None
 
+try:
+    from django.contrib.postgres.fields import HStoreField
+except ImportError:
+    HStoreField = None
+
 from . import random_gen
 default_mapping = {
     ForeignKey: random_gen.gen_related,
@@ -89,6 +94,8 @@ if ArrayField:
     default_mapping[ArrayField] = random_gen.gen_array
 if JSONField:
     default_mapping[JSONField] = random_gen.gen_json
+if HStoreField:
+    default_mapping[HStoreField] = random_gen.gen_hstore
 
 
 def get_type_mapping():
