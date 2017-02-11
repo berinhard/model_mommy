@@ -96,6 +96,13 @@ class Person(models.Model):
         # New at Django 1.9
         pass
 
+    try:
+        from django.contrib.postgres.fields import HStoreField
+        hstore_data = HStoreField()
+    except ImportError:
+        # New at Django 1.8
+        pass
+
     #backward compatibilty with Django 1.1
     try:
         wanted_games_qtd = models.BigIntegerField()
