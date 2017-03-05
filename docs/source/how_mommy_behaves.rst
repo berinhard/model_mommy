@@ -78,7 +78,7 @@ Examples:
     # in your tests.py file:
     from model_mommy import mommy
 
-    mommy.generatos.add('test.generic.fields.CustomField', 'code.path.gen_func')
+    mommy.generators.add('test.generic.fields.CustomField', 'code.path.gen_func')
 
 Customizing Mommy
 -----------------
