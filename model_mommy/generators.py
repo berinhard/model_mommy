@@ -5,7 +5,7 @@ from django.db.models import (
     IntegerField, SmallIntegerField, PositiveIntegerField,
     PositiveSmallIntegerField, BooleanField, DecimalField,
     FloatField, FileField, ImageField, IPAddressField,
-    ForeignKey, ManyToManyField, OneToOneField)
+    ForeignKey, ManyToManyField, OneToOneField, NullBooleanField)
 
 from model_mommy.utils import import_if_str
 
@@ -56,6 +56,7 @@ default_mapping = {
     ManyToManyField: random_gen.gen_m2m,
 
     BooleanField: random_gen.gen_boolean,
+    NullBooleanField: random_gen.gen_null_boolean,
     IntegerField: random_gen.gen_integer,
     BigIntegerField: random_gen.gen_integer,
     SmallIntegerField: random_gen.gen_integer,

@@ -125,6 +125,10 @@ def gen_boolean():
     return choice((True, False))
 
 
+def gen_null_boolean():
+    return choice((True, False, None))
+
+
 def gen_url():
     return str('http://www.%s.com/' % gen_string(30))
 
