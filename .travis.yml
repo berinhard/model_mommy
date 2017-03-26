@@ -10,6 +10,7 @@ env:
   - DJANGO=django18
   - DJANGO=django19
   - DJANGO=django110
+  - DJANGO=django111
 matrix:
   exclude:
     - python: "3.5"
