@@ -15,7 +15,6 @@ import warnings
 from decimal import Decimal
 from os.path import abspath, join, dirname
 from random import randint, choice, random
-from django import VERSION
 from django.core.files.base import ContentFile
 from django.core.exceptions import ValidationError
 import six
@@ -35,10 +34,7 @@ MAX_LENGTH = 300
 MAX_INT = 10000
 
 def get_content_file(content, name):
-    if VERSION < (1, 4):
-        return ContentFile(content)
-    else:
-        return ContentFile(content, name=name)
+    return ContentFile(content, name=name)
 
 def gen_file_field():
     name = 'mock_file.txt'

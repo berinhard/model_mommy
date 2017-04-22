@@ -5,18 +5,10 @@ python:
   - "3.4"
   - "3.5"
 env:
-  - DJANGO=django16
-  - DJANGO=django17
   - DJANGO=django18
   - DJANGO=django19
   - DJANGO=django110
   - DJANGO=django111
-matrix:
-  exclude:
-    - python: "3.5"
-      env: DJANGO=django16
-    - python: "3.5"
-      env: DJANGO=django17
 before_install:
   - sudo apt-get update && sudo apt-get build-dep python-imaging
 install:

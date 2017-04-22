@@ -7,15 +7,11 @@
 from decimal import Decimal
 from tempfile import gettempdir
 
-from django import VERSION
 from django.db import models
 from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
-if VERSION >= (1, 7):
-    from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
-else:
-    from django.contrib.contenttypes.generic import GenericRelation, GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
 from .fields import *
 from model_mommy.timezone import smart_datetime as datetime
@@ -303,11 +299,7 @@ class CastMember(models.Model):
     movie = models.ForeignKey(Movie, related_name='cast_members')
     person = models.ForeignKey(Person)
 
-if VERSION < (1, 4):
-    class DummyIPAddressFieldModel(models.Model):
-        ipv4_field = models.IPAddressField()  # Deprecated in Django 1.7
-else:
-    class DummyGenericIPAddressFieldModel(models.Model):
-        ipv4_field = models.GenericIPAddressField(protocol='IPv4')
-        ipv6_field = models.GenericIPAddressField(protocol='IPv6')
-        ipv46_field = models.GenericIPAddressField(protocol='both')
+class DummyGenericIPAddressFieldModel(models.Model):
+    ipv4_field = models.GenericIPAddressField(protocol='IPv4')
+    ipv6_field = models.GenericIPAddressField(protocol='IPv6')
+    ipv46_field = models.GenericIPAddressField(protocol='both')

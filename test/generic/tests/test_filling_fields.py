@@ -337,9 +337,7 @@ class FillingFileField(TestCase):
         import time
         path = "%s/%s/mock_file.txt" % (gettempdir(), time.strftime('%Y/%m/%d'))
 
-        from django import VERSION
-        if VERSION[1] >= 4:
-            self.assertEqual(abspath(self.dummy.file_field.path), abspath(path))
+        self.assertEqual(abspath(self.dummy.file_field.path), abspath(path))
 
     def tearDown(self):
         self.dummy.file_field.delete()
@@ -361,12 +359,10 @@ class FillingImageFileField(TestCase):
             import time
             path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
 
-            from django import VERSION
-            if VERSION[1] >= 4:
-                # These require the file to exist in earlier versions of Django
-                self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
-                self.assertTrue(self.dummy.image_field.width)
-                self.assertTrue(self.dummy.image_field.height)
+            # These require the file to exist in earlier versions of Django
+            self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
+            self.assertTrue(self.dummy.image_field.width)
+            self.assertTrue(self.dummy.image_field.height)
 
     def tearDown(self):
         self.dummy.image_field.delete()

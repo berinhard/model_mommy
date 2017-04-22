@@ -35,6 +35,7 @@ def configure_settings(options):
             SITE_ID=1,
             TEST_RUNNER='django.test.simple.DjangoTestSuiteRunner',
             TEST_ROOT=join(dirname(__file__), 'test', 'generic', 'tests'),
+            MIDDLEWARE_CLASSES=(),
         )
         if getattr(options, 'USE_POSTGRESQL', False):
             params['DATABASES'] = {
@@ -45,11 +46,6 @@ def configure_settings(options):
                     'USER': 'postgres',
                 }
             }
-
-        if django.VERSION >= (1, 7):
-            params.update(
-                MIDDLEWARE_CLASSES=tuple()
-            )
 
         # Force the use of timezone aware datetime and change Django's warning to
         # be treated as errors.
@@ -63,25 +59,24 @@ def configure_settings(options):
 
     return settings
 
-if django.VERSION >= (1, 8):
-    # We only need this if HstoreFields are a possibility
-    from django.db.backends.signals import connection_created
-    from django.test.runner import DiscoverRunner
+# We only need this if HstoreFields are a possibility
+from django.db.backends.signals import connection_created
+from django.test.runner import DiscoverRunner
 
-    def create_hstore(sender, **kwargs):
-        conn = kwargs.get('connection')
-        if conn is not None:
-            cursor = conn.cursor()
-            cursor.execute('CREATE EXTENSION IF NOT EXISTS HSTORE')
+def create_hstore(sender, **kwargs):
+    conn = kwargs.get('connection')
+    if conn is not None:
+        cursor = conn.cursor()
+        cursor.execute('CREATE EXTENSION IF NOT EXISTS HSTORE')
 
-    class PostgresRunner(DiscoverRunner):
-        """Create HStore extension before test database is created"""
+class PostgresRunner(DiscoverRunner):
+    """Create HStore extension before test database is created"""
 
-        def setup_databases(self):
-            connection_created.connect(create_hstore)
-            result = super(PostgresRunner, self).setup_databases()
-            connection_created.disconnect(create_hstore)
-            return result
+    def setup_databases(self):
+        connection_created.connect(create_hstore)
+        result = super(PostgresRunner, self).setup_databases()
+        connection_created.disconnect(create_hstore)
+        return result
 
 
 def get_runner(settings):
@@ -89,37 +84,29 @@ def get_runner(settings):
     Asks Django for the TestRunner defined in settings or the default one.
     '''
     from django.test.utils import get_runner
-    if getattr(options, 'USE_POSTGRESQL', False) and django.VERSION >= (1, 8):
+    if getattr(options, 'USE_POSTGRESQL', False):
         setattr(settings, 'INSTALLED_APPS',
                 ['django.contrib.postgres']
                 + list(getattr(settings, 'INSTALLED_APPS')))
-    if django.VERSION >= (1, 7):
-        #  I suspect this will not be necessary in next release after 1.7.0a1:
-        #  See https://code.djangoproject.com/ticket/21831
-        setattr(settings, 'INSTALLED_APPS',
-                ['django.contrib.auth']
-                + list(getattr(settings, 'INSTALLED_APPS')))
-        from test_without_migrations.management.commands.test import DisableMigrations
-        setattr(settings, 'MIGRATION_MODULES', DisableMigrations())
+    setattr(settings, 'INSTALLED_APPS',
+            ['django.contrib.auth']
+            + list(getattr(settings, 'INSTALLED_APPS')))
+    from test_without_migrations.management.commands.test import DisableMigrations
+    setattr(settings, 'MIGRATION_MODULES', DisableMigrations())
     TestRunner = get_runner(settings)
     return TestRunner(verbosity=1, interactive=True, failfast=False)
 
 
 def runtests(options=None, labels=None):
     settings = configure_settings(options)
-    if django.VERSION >= (1, 8):
-        if getattr(options, 'USE_POSTGRESQL', False):
-            settings.TEST_RUNNER = 'runtests.PostgresRunner'
-        else:
-            settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
-        if not labels:
-            labels = ['test.generic']
+    if getattr(options, 'USE_POSTGRESQL', False):
+        settings.TEST_RUNNER = 'runtests.PostgresRunner'
     else:
-        if not labels:
-            labels = ['generic']
+        settings.TEST_RUNNER = 'django.test.runner.DiscoverRunner'
+    if not labels:
+        labels = ['test.generic']
     runner = get_runner(settings)
-    if django.VERSION >= (1, 7):
-        django.setup()
+    django.setup()
     sys.exit(runner.run_tests(labels))
 
 

@@ -5,13 +5,9 @@ import django
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-if django.VERSION >= (1, 7):
-    from django.apps import apps
-    get_model = apps.get_model
-    from django.contrib.contenttypes.fields import GenericRelation
-else:
-    from django.db.models.loading import get_model, cache
-    from django.contrib.contenttypes.generic import GenericRelation
+from django.apps import apps
+get_model = apps.get_model
+from django.contrib.contenttypes.fields import GenericRelation
 
 from django.db.models.base import ModelBase
 from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, AutoField, BooleanField
@@ -106,8 +102,7 @@ class ModelFinder(object):
                 model = get_model(app_label, model_name)
             else:
                 model = self.get_model_by_name(name)
-        except LookupError:  # Django 1.7.0a1 throws an exception
-            # Lower djangos just fail silently
+        except LookupError:
             model = None
 
         if not model:
@@ -140,10 +135,7 @@ class ModelFinder(object):
         unique_models = {}
         ambiguous_models = []
 
-        if django.VERSION >= (1, 7):
-            all_models = apps.all_models
-        else:
-            all_models = cache.app_models
+        all_models = apps.all_models
 
         for app_model in all_models.values():
             for name, model in app_model.items():
@@ -243,10 +235,7 @@ class Mommy(object):
         return self.model._meta.fields + self.model._meta.many_to_many
 
     def get_related(self):
-        if django.VERSION[:2] <= (1, 7):
-            return self.model._meta.get_all_related_objects()
-        else:
-            return [r for r in self.model._meta.related_objects if not r.many_to_many]
+        return [r for r in self.model._meta.related_objects if not r.many_to_many]
 
     def _make(self, commit=True, commit_related=True, _save_kwargs=None, **attrs):
         _save_kwargs = _save_kwargs or {}
