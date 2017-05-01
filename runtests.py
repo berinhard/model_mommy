@@ -91,7 +91,7 @@ def get_runner(settings):
     setattr(settings, 'INSTALLED_APPS',
             ['django.contrib.auth']
             + list(getattr(settings, 'INSTALLED_APPS')))
-    from test_without_migrations.management.commands.test import DisableMigrations
+    from test_without_migrations.management.commands._base import DisableMigrations
     setattr(settings, 'MIGRATION_MODULES', DisableMigrations())
     TestRunner = get_runner(settings)
     return TestRunner(verbosity=1, interactive=True, failfast=False)
