@@ -11,7 +11,7 @@ setuptools.setup(
     include_package_data=True,  # declarations in MANIFEST.in
     install_requires=open(join(dirname(__file__), 'requirements.txt')).readlines(),
     tests_require=[
-        'django>=1.6,<1.11',
+        'django>=1.6,<=1.11',
         'pil',
         'tox',
         'mock'
