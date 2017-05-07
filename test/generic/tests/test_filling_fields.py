@@ -331,8 +331,11 @@ class FillingFileField(TestCase):
         path = mommy.mock_file_txt
         self.fixture_txt_file = File(open(path))
 
+    def tearDown(self):
+        self.dummy.file_field.delete()
+
     def test_filling_file_field(self):
-        self.dummy = mommy.make(models.DummyFileFieldModel)
+        self.dummy = mommy.make(models.DummyFileFieldModel, _create_files=True)
         field = models.DummyFileFieldModel._meta.get_field('file_field')
         self.assertIsInstance(field, django_models.FileField)
         import time
@@ -340,8 +343,10 @@ class FillingFileField(TestCase):
 
         self.assertEqual(abspath(self.dummy.file_field.path), abspath(path))
 
-    def tearDown(self):
-        self.dummy.file_field.delete()
+    def test_does_not_create_file_if_not_flagged(self):
+        self.dummy = mommy.make(models.DummyFileFieldModel)
+        with self.assertRaises(ValueError):
+            self.dummy.file_field.path  # Django raises ValueError if file does not exist
 
 
 @skipUnless(models.has_pil, "PIL is required to test ImageField")
@@ -365,6 +370,12 @@ class FillingImageFileField(TestCase):
         self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
         self.assertTrue(self.dummy.image_field.width)
         self.assertTrue(self.dummy.image_field.height)
+
+    def test_does_not_create_file_if_not_flagged(self):
+        self.dummy = mommy.make(models.DummyImageFieldModel)
+        with self.assertRaises(ValueError):
+            self.dummy.image_field.path  # Django raises ValueError if file does not exist
+
 
 class FillingCustomFields(TestCase):
     def tearDown(self):
