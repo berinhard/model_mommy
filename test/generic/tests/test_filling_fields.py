@@ -360,7 +360,7 @@ class FillingImageFileField(TestCase):
         self.dummy.image_field.delete()
 
     def test_filling_image_file_field(self):
-        self.dummy = mommy.make(models.DummyImageFieldModel)
+        self.dummy = mommy.make(models.DummyImageFieldModel, _create_files=True)
         field = models.DummyImageFieldModel._meta.get_field('image_field')
         self.assertIsInstance(field, django_models.ImageField)
         import time
