@@ -369,10 +369,12 @@ class FillingImageFileField(TestCase):
 
 
 class FillingCustomFields(TestCase):
+
     def tearDown(self):
         if hasattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN'):
             delattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN')
         mommy.generators.add('test.generic.fields.CustomFieldWithGenerator', None)
+        mommy.generators.add('django.db.models.fields.CharField', None)
 
     def test_raises_unsupported_field_for_custom_field(self):
         """Should raise an exception if a generator is not provided for a custom field"""
@@ -411,6 +413,15 @@ class FillingCustomFields(TestCase):
         mommy.generators.add('test.generic.fields.CustomForeignKey', gen_related)
         obj = mommy.make(models.CustomForeignKeyWithGeneratorModel, custom_fk__email="a@b.com")
         self.assertEqual('a@b.com', obj.custom_fk.email)
+
+    def test_can_override_django_default_field_functions_genereator(self):
+        def gen_char():
+            return 'Some value'
+        mommy.generators.add('django.db.models.fields.CharField', gen_char)
+
+        person = mommy.make(models.Person)
+
+        self.assertEqual('Some value', person.name)
 
 
 class FillingAutoFields(TestCase):
