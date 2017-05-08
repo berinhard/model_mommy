@@ -8,3 +8,4 @@ Because of the changes of model_mommy's API, the following methods are deprecate
   * `mommy.make_many` -> should use the method `mommy.make` with the `_quantity` parameter instead
   * `mommy.make_many_from_recipe` -> should use the method `mommy.make_recipe` with the `_quantity` parameter instead
   * `MOMMY_CUSTOM_FIELDS_GEN` -> should use the method `mommy.generators.add` instead
+  * model_mommy does not create file automagically anymore. To enable it, you have to pass the parameter `_create_files` to `mommy.make` or `mommy.make_recipe` method.
