@@ -63,11 +63,13 @@ def configure_settings(options):
 from django.db.backends.signals import connection_created
 from django.test.runner import DiscoverRunner
 
+
 def create_hstore(sender, **kwargs):
     conn = kwargs.get('connection')
     if conn is not None:
         cursor = conn.cursor()
         cursor.execute('CREATE EXTENSION IF NOT EXISTS HSTORE')
+
 
 class PostgresRunner(DiscoverRunner):
     """Create HStore extension before test database is created"""
