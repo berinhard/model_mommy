@@ -8,14 +8,10 @@ With a simple and powerful API you can create many objects with a single line of
 .. image:: https://travis-ci.org/vandersonmota/model_mommy.png?branch=master
     :target: https://travis-ci.org/vandersonmota/model_mommy
     :alt: Test Status
-
-.. image:: https://pypip.in/v/model_mommy/badge.png
-    :target: https://crate.io/packages/model_mommy/
+    
+.. image:: https://badge.fury.io/py/model_mommy.svg
+    :target: https://badge.fury.io/py/model_mommy
     :alt: Latest PyPI version
-
-.. image:: https://pypip.in/d/model_mommy/badge.png
-    :target: https://crate.io/packages/model_mommy/
-    :alt: Number of PyPI downloads
 
 .. image:: https://img.shields.io/gratipay/vandersonmota.svg?style=social&label=Donate
     :target: https://www.gratipay.com/vandersonmota
