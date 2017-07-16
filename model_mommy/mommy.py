@@ -320,7 +320,7 @@ class Mommy(object):
             return True
 
         # Skip links to parent so parent is not created twice.
-        if isinstance(field, OneToOneField) and field.rel.parent_link:
+        if isinstance(field, OneToOneField) and self._remote_field(field).parent_link:
             return True
 
         if isinstance(field, (AutoField, GenericRelation, OrderWrt)):
@@ -364,6 +364,11 @@ class Mommy(object):
                     }
                     make(through_model, **base_kwargs)
 
+    def _remote_field(self, field):
+        if django.VERSION >= (1, 9):
+            return field.remote_field
+        return field.rel
+
     def generate_value(self, field, commit=True):
         '''
         Calls the generator associated with a field passing all required args.
@@ -382,7 +387,7 @@ class Mommy(object):
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
             generator = random_gen.gen_from_choices(field.choices)
-        elif isinstance(field, ForeignKey) and issubclass(field.rel.to, ContentType):
+        elif isinstance(field, ForeignKey) and issubclass(self._remote_field(field).to, ContentType):
             generator = self.type_mapping[ContentType]
         elif generators.get(field.__class__):
             generator = generators.get(field.__class__)
