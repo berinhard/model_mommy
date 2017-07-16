@@ -5,16 +5,12 @@ import django
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-if django.VERSION >= (1, 7):
-    from django.apps import apps
-    get_model = apps.get_model
-    from django.contrib.contenttypes.fields import GenericRelation
-else:
-    from django.db.models.loading import get_model, cache
-    from django.contrib.contenttypes.generic import GenericRelation
+from django.apps import apps
+get_model = apps.get_model
+from django.contrib.contenttypes.fields import GenericRelation
 
 from django.db.models.base import ModelBase
-from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, AutoField, BooleanField
+from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, AutoField, BooleanField, FileField
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
 else:
@@ -41,14 +37,14 @@ def _valid_quantity(quantity):
     return quantity is not None and (not isinstance(quantity, int) or quantity < 1)
 
 
-def make(model, _quantity=None, make_m2m=False, _save_kwargs=None, **attrs):
+def make(model, _quantity=None, make_m2m=False, _save_kwargs=None, _create_files=False, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
     """
     _save_kwargs = _save_kwargs or {}
-    mommy = Mommy.create(model, make_m2m=make_m2m)
+    mommy = Mommy.create(model, make_m2m=make_m2m, create_files=_create_files)
     if _valid_quantity(_quantity):
         raise InvalidQuantityException
 
@@ -106,8 +102,7 @@ class ModelFinder(object):
                 model = get_model(app_label, model_name)
             else:
                 model = self.get_model_by_name(name)
-        except LookupError:  # Django 1.7.0a1 throws an exception
-            # Lower djangos just fail silently
+        except LookupError:
             model = None
 
         if not model:
@@ -140,10 +135,7 @@ class ModelFinder(object):
         unique_models = {}
         ambiguous_models = []
 
-        if django.VERSION >= (1, 7):
-            all_models = apps.all_models
-        else:
-            all_models = cache.app_models
+        all_models = apps.all_models
 
         for app_model in all_models.values():
             for name, model in app_model.items():
@@ -199,15 +191,16 @@ class Mommy(object):
     finder = ModelFinder()
 
     @classmethod
-    def create(cls, model, make_m2m=False):
+    def create(cls, model, make_m2m=False, create_files=False):
         """
         Factory which creates the mommy class defined by the MOMMY_CUSTOM_CLASS setting
         """
         mommy_class = _custom_mommy_class() or cls
-        return mommy_class(model, make_m2m)
+        return mommy_class(model, make_m2m, create_files)
 
-    def __init__(self, model, make_m2m=False):
+    def __init__(self, model, make_m2m=False, create_files=False):
         self.make_m2m = make_m2m
+        self.create_files = create_files
         self.m2m_dict = {}
         self.iterator_attrs = {}
         self.model_attrs = {}
@@ -243,10 +236,7 @@ class Mommy(object):
         return self.model._meta.fields + self.model._meta.many_to_many
 
     def get_related(self):
-        if django.VERSION[:2] <= (1, 7):
-            return self.model._meta.get_all_related_objects()
-        else:
-            return [r for r in self.model._meta.related_objects if not r.many_to_many]
+        return [r for r in self.model._meta.related_objects if not r.many_to_many]
 
     def _make(self, commit=True, commit_related=True, _save_kwargs=None, **attrs):
         _save_kwargs = _save_kwargs or {}
@@ -326,8 +316,11 @@ class Mommy(object):
         else:
             field.fill_optional = field.name in self.fill_in_optional
 
+        if isinstance(field, FileField) and not self.create_files:
+            return True
+
         # Skip links to parent so parent is not created twice.
-        if isinstance(field, OneToOneField) and field.rel.parent_link:
+        if isinstance(field, OneToOneField) and self._remote_field(field).parent_link:
             return True
 
         if isinstance(field, (AutoField, GenericRelation, OrderWrt)):
@@ -371,6 +364,11 @@ class Mommy(object):
                     }
                     make(through_model, **base_kwargs)
 
+    def _remote_field(self, field):
+        if django.VERSION >= (1, 9):
+            return field.remote_field
+        return field.rel
+
     def generate_value(self, field, commit=True):
         '''
         Calls the generator associated with a field passing all required args.
@@ -389,12 +387,12 @@ class Mommy(object):
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
             generator = random_gen.gen_from_choices(field.choices)
-        elif isinstance(field, ForeignKey) and issubclass(field.rel.to, ContentType):
+        elif isinstance(field, ForeignKey) and issubclass(self._remote_field(field).to, ContentType):
             generator = self.type_mapping[ContentType]
-        elif field.__class__ in self.type_mapping:
-            generator = self.type_mapping[field.__class__]
         elif generators.get(field.__class__):
             generator = generators.get(field.__class__)
+        elif field.__class__ in self.type_mapping:
+            generator = self.type_mapping[field.__class__]
         else:
             raise TypeError('%s is not supported by mommy.' % field.__class__)
 

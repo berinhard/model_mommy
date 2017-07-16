@@ -3,6 +3,7 @@ from decimal import Decimal
 from os.path import abspath
 from tempfile import gettempdir
 
+from unittest import skipUnless
 from django.test import TestCase
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -330,53 +331,59 @@ class FillingFileField(TestCase):
         path = mommy.mock_file_txt
         self.fixture_txt_file = File(open(path))
 
+    def tearDown(self):
+        self.dummy.file_field.delete()
+
     def test_filling_file_field(self):
-        self.dummy = mommy.make(models.DummyFileFieldModel)
+        self.dummy = mommy.make(models.DummyFileFieldModel, _create_files=True)
         field = models.DummyFileFieldModel._meta.get_field('file_field')
         self.assertIsInstance(field, django_models.FileField)
         import time
         path = "%s/%s/mock_file.txt" % (gettempdir(), time.strftime('%Y/%m/%d'))
 
-        from django import VERSION
-        if VERSION[1] >= 4:
-            self.assertEqual(abspath(self.dummy.file_field.path), abspath(path))
+        self.assertEqual(abspath(self.dummy.file_field.path), abspath(path))
 
-    def tearDown(self):
-        self.dummy.file_field.delete()
+    def test_does_not_create_file_if_not_flagged(self):
+        self.dummy = mommy.make(models.DummyFileFieldModel)
+        with self.assertRaises(ValueError):
+            self.dummy.file_field.path  # Django raises ValueError if file does not exist
 
 
-# skipUnless not available in Django 1.2
-# @skipUnless(has_pil, "PIL is required to test ImageField")
+@skipUnless(models.has_pil, "PIL is required to test ImageField")
 class FillingImageFileField(TestCase):
 
     def setUp(self):
         path = mommy.mock_file_jpeg
         self.fixture_img_file = ImageFile(open(path))
 
-    if models.has_pil:
-        def test_filling_image_file_field(self):
-            self.dummy = mommy.make(models.DummyImageFieldModel)
-            field = models.DummyImageFieldModel._meta.get_field('image_field')
-            self.assertIsInstance(field, django_models.ImageField)
-            import time
-            path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
-
-            from django import VERSION
-            if VERSION[1] >= 4:
-                # These require the file to exist in earlier versions of Django
-                self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
-                self.assertTrue(self.dummy.image_field.width)
-                self.assertTrue(self.dummy.image_field.height)
-
     def tearDown(self):
         self.dummy.image_field.delete()
 
+    def test_filling_image_file_field(self):
+        self.dummy = mommy.make(models.DummyImageFieldModel, _create_files=True)
+        field = models.DummyImageFieldModel._meta.get_field('image_field')
+        self.assertIsInstance(field, django_models.ImageField)
+        import time
+        path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
+
+        # These require the file to exist in earlier versions of Django
+        self.assertEqual(abspath(self.dummy.image_field.path), abspath(path))
+        self.assertTrue(self.dummy.image_field.width)
+        self.assertTrue(self.dummy.image_field.height)
+
+    def test_does_not_create_file_if_not_flagged(self):
+        self.dummy = mommy.make(models.DummyImageFieldModel)
+        with self.assertRaises(ValueError):
+            self.dummy.image_field.path  # Django raises ValueError if file does not exist
+
 
 class FillingCustomFields(TestCase):
+
     def tearDown(self):
         if hasattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN'):
             delattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN')
         mommy.generators.add('test.generic.fields.CustomFieldWithGenerator', None)
+        mommy.generators.add('django.db.models.fields.CharField', None)
 
     def test_raises_unsupported_field_for_custom_field(self):
         """Should raise an exception if a generator is not provided for a custom field"""
@@ -415,6 +422,15 @@ class FillingCustomFields(TestCase):
         mommy.generators.add('test.generic.fields.CustomForeignKey', gen_related)
         obj = mommy.make(models.CustomForeignKeyWithGeneratorModel, custom_fk__email="a@b.com")
         self.assertEqual('a@b.com', obj.custom_fk.email)
+
+    def test_can_override_django_default_field_functions_genereator(self):
+        def gen_char():
+            return 'Some value'
+        mommy.generators.add('django.db.models.fields.CharField', gen_char)
+
+        person = mommy.make(models.Person)
+
+        self.assertEqual('Some value', person.name)
 
 
 class FillingAutoFields(TestCase):

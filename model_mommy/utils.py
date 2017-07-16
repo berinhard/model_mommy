@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-import django
-if django.VERSION >= (1, 7):
-    import importlib
-else:
-    from django.utils import importlib
+import importlib
 
 from six import string_types
 

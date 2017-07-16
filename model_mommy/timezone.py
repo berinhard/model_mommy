@@ -5,7 +5,6 @@ https://docs.djangoproject.com/en/1.4/topics/i18n/timezones/
 '''
 
 from datetime import datetime
-from django import VERSION
 from django.conf import settings
 
 try:
@@ -20,7 +19,7 @@ def smart_datetime(*args):
 
 def tz_aware(d):
     value = d
-    if VERSION >= (1, 4) and settings.USE_TZ:
+    if settings.USE_TZ:
         value = d.replace(tzinfo=utc)
 
     return value

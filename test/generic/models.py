@@ -7,15 +7,11 @@
 from decimal import Decimal
 from tempfile import gettempdir
 
-from django import VERSION
 from django.db import models
 from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
-if VERSION >= (1, 7):
-    from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
-else:
-    from django.contrib.contenttypes.generic import GenericRelation, GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
 from .fields import *
 from model_mommy.timezone import smart_datetime as datetime
@@ -45,15 +41,17 @@ TEST_TIME = base_datetime.datetime(2014, 7, 21, 15, 39, 58, 457698)
 class ModelWithImpostorField(models.Model):
     pass
 
+
 class Profile(models.Model):
     email = models.EmailField()
 
+
 class User(models.Model):
-    profile = models.ForeignKey(Profile, blank=True, null=True)
+    profile = models.ForeignKey(Profile, blank=True, null=True, on_delete=models.CASCADE)
 
 
 class PaymentBill(models.Model):
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     value = models.FloatField()
 
 
@@ -120,7 +118,7 @@ class Dog(models.Model):
     class Meta:
         order_with_respect_to = 'owner'
 
-    owner = models.ForeignKey('Person')
+    owner = models.ForeignKey('Person', on_delete=models.CASCADE)
     breed = models.CharField(max_length=50)
     created = models.DateTimeField(auto_now_add=True)
     friends_with = models.ManyToManyField('Dog')
@@ -129,13 +127,13 @@ class GuardDog(Dog):
     pass
 
 class LonelyPerson(models.Model):
-    only_friend = models.OneToOneField(Person)
+    only_friend = models.OneToOneField(Person, on_delete=models.CASCADE)
 
 
 class RelatedNamesModel(models.Model):
     name = models.CharField(max_length=256)
-    one_to_one = models.OneToOneField(Person, related_name='one_related')
-    foreign_key = models.ForeignKey(Person, related_name='fk_related')
+    one_to_one = models.OneToOneField(Person, related_name='one_related', on_delete=models.CASCADE)
+    foreign_key = models.ForeignKey(Person, related_name='fk_related', on_delete=models.CASCADE)
 
 
 class ModelWithOverridedSave(Dog):
@@ -147,6 +145,7 @@ class ModelWithOverridedSave(Dog):
 
 class Classroom(models.Model):
     students = models.ManyToManyField(Person, null=True)
+    active = models.NullBooleanField()
 
 
 class Store(models.Model):
@@ -195,7 +194,7 @@ class DummyEmailModel(models.Model):
 
 
 class DummyGenericForeignKeyModel(models.Model):
-    content_type = models.ForeignKey(ContentType)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey('content_type', 'object_id')
 
@@ -205,7 +204,7 @@ class DummyGenericRelationModel(models.Model):
 
 
 class DummyNullFieldsModel(models.Model):
-    null_foreign_key = models.ForeignKey('DummyBlankFieldsModel', null=True)
+    null_foreign_key = models.ForeignKey('DummyBlankFieldsModel', null=True, on_delete=models.CASCADE)
     null_integer_field = models.IntegerField(null=True)
 
 
@@ -258,8 +257,9 @@ class School(models.Model):
 
 class SchoolEnrollment(models.Model):
     start_date = models.DateField(auto_now_add=True)
-    school = models.ForeignKey(School)
-    student = models.ForeignKey(Person)
+    school = models.ForeignKey(School, on_delete=models.CASCADE)
+    student = models.ForeignKey(Person, on_delete=models.CASCADE)
+
 
 class NonAbstractPerson(Person):
     dummy_count = models.IntegerField()
@@ -274,7 +274,7 @@ class CustomFieldWithoutGeneratorModel(models.Model):
 
 
 class CustomForeignKeyWithGeneratorModel(models.Model):
-    custom_fk = CustomForeignKey(Profile, blank=True, null=True)
+    custom_fk = CustomForeignKey(Profile, blank=True, null=True, on_delete=models.CASCADE)
 
 
 class DummyUniqueIntegerFieldModel(models.Model):
@@ -289,24 +289,22 @@ class ModelWithNext(models.Model):
 
 
 class BaseModelForNext(models.Model):
-    fk = models.ForeignKey(ModelWithNext)
+    fk = models.ForeignKey(ModelWithNext, on_delete=models.CASCADE)
 
 
 class BaseModelForList(models.Model):
     fk = FakeListField()
 
+
 class Movie(models.Model):
     title = models.CharField(max_length=30)
 
-class CastMember(models.Model):
-    movie = models.ForeignKey(Movie, related_name='cast_members')
-    person = models.ForeignKey(Person)
 
-if VERSION < (1, 4):
-    class DummyIPAddressFieldModel(models.Model):
-        ipv4_field = models.IPAddressField()  # Deprecated in Django 1.7
-else:
-    class DummyGenericIPAddressFieldModel(models.Model):
-        ipv4_field = models.GenericIPAddressField(protocol='IPv4')
-        ipv6_field = models.GenericIPAddressField(protocol='IPv6')
-        ipv46_field = models.GenericIPAddressField(protocol='both')
+class CastMember(models.Model):
+    movie = models.ForeignKey(Movie, related_name='cast_members', on_delete=models.CASCADE)
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+
+class DummyGenericIPAddressFieldModel(models.Model):
+    ipv4_field = models.GenericIPAddressField(protocol='IPv4')
+    ipv6_field = models.GenericIPAddressField(protocol='IPv6')
+    ipv46_field = models.GenericIPAddressField(protocol='both')

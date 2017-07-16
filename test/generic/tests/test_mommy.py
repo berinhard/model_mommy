@@ -2,7 +2,6 @@
 from mock import patch
 from decimal import Decimal
 
-from django import VERSION
 from django.test import TestCase
 from django.db.models import Manager
 from django.db.models.signals import m2m_changed
@@ -479,26 +478,16 @@ class MommyHandlesModelWithList(TestCase):
         self.assertTrue(instance.id)
         self.assertEqual(["foo"], instance.fk)
 
-if VERSION < (1, 4):
-    from test.generic.forms import DummyIPAddressFieldForm
+from test.generic.forms import DummyGenericIPAddressFieldForm
 
-    class MommyGeneratesIPAdresses(TestCase):
-        def test_create_model_with_valid_ipv4(self):
-            form_data = {
-                'ipv4_field': random_gen.gen_ipv4(),
-            }
-            self.assertTrue(DummyIPAddressFieldForm(form_data).is_valid())
-else:
-    from test.generic.forms import DummyGenericIPAddressFieldForm
-
-    class MommyGeneratesIPAdresses(TestCase):
-        def test_create_model_with_valid_ips(self):
-            form_data = {
-                'ipv4_field': random_gen.gen_ipv4(),
-                'ipv6_field': random_gen.gen_ipv6(),
-                'ipv46_field': random_gen.gen_ipv46(),
-            }
-            self.assertTrue(DummyGenericIPAddressFieldForm(form_data).is_valid())
+class MommyGeneratesIPAdresses(TestCase):
+    def test_create_model_with_valid_ips(self):
+        form_data = {
+            'ipv4_field': random_gen.gen_ipv4(),
+            'ipv6_field': random_gen.gen_ipv6(),
+            'ipv46_field': random_gen.gen_ipv46(),
+        }
+        self.assertTrue(DummyGenericIPAddressFieldForm(form_data).is_valid())
 
 
 class MommyAllowsSaveParameters(TestCase):
