@@ -1,3 +1,7 @@
+Next
+----
+- Drops support for Django < 1.8
+
 1.3.2
 -----
 - Fix bug in save related keyword
