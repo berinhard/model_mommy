@@ -275,7 +275,7 @@ You can also provide an optional `increment_by` argument which will modify incre
 .. code-block:: python
 
 
-    from datetime import datetime, timedelta
+    from datetime import date, timedelta
     from model_mommy.recipe import Recipe, seq
     from family.models import Person
 
@@ -284,7 +284,7 @@ You can also provide an optional `increment_by` argument which will modify incre
         age = seq(15, increment_by=3)
         height_ft = seq(5.5, increment_by=.25)
         # assume today's date is 21/07/2014
-        appointment = seq(datetime.date(2014, 7, 21), timedelta(days=1))
+        appointment = seq(date(2014, 7, 21), timedelta(days=1))
     )
 
     p = mommy.make_recipe('myapp.person')
