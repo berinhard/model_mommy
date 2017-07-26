@@ -33,5 +33,5 @@ Usage and Info
 Maintainers
 ===========
 
-*     [Vanderson Mota (creator)](https://github.com/vandersonmota/)
-*     [Bernardo Fontes](https://github.com/berinhard/)
+*     Vanderson Mota (creator) - https://github.com/vandersonmota/
+*     Bernardo Fontes - https://github.com/berinhard/
