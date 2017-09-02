@@ -11,6 +11,8 @@ env:
   - DJANGO=django111
 before_install:
   - sudo apt-get update && sudo apt-get build-dep python-imaging
+  - sudo apt-get install -y postgresql-9.5-postgis-2.3
+  - sudo service postgresql restart
 install:
  - pip install tox
 addons:
