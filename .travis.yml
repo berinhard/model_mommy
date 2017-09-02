@@ -1,5 +1,6 @@
 sudo: true
 language: python
+dist: trusty
 python:
   - "2.7"
   - "3.5"
@@ -11,12 +12,14 @@ env:
   - DJANGO=django111
 before_install:
   - sudo apt-get update && sudo apt-get build-dep python-imaging
-  - sudo apt-get install -y postgresql-9.5-postgis-2.3
   - sudo service postgresql restart
 install:
  - pip install tox
 addons:
-  postgresql: "9.4"
+  postgresql: "9.6"
+  apt:
+    packages:
+    - postgresql-9.6-postgis-2.3
 services:
   - postgresql
 before_script:
