@@ -1,6 +1,12 @@
 Next
 ----
+TODO
+
+1.4.0
+----
 - Drops support for Django < 1.8
+- Fix deprecation warnings for Django 1.11
+- Avoid touching the DB on prepare()
 
 1.3.2
 -----
