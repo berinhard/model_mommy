@@ -387,7 +387,7 @@ class Mommy(object):
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
             generator = random_gen.gen_from_choices(field.choices)
-        elif isinstance(field, ForeignKey) and issubclass(self._remote_field(field).to, ContentType):
+        elif isinstance(field, ForeignKey) and issubclass(self._remote_field(field).model, ContentType):
             generator = self.type_mapping[ContentType]
         elif generators.get(field.__class__):
             generator = generators.get(field.__class__)
