@@ -101,7 +101,7 @@ class Person(models.Model):
         # New at Django 1.8
         pass
 
-    #backward compatibilty with Django 1.1
+    #backward compatibility with Django 1.1
     try:
         wanted_games_qtd = models.BigIntegerField()
     except AttributeError:
