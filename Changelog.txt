@@ -7,6 +7,8 @@ TODO
 - Drops support for Django < 1.8
 - Fix deprecation warnings for Django 1.11
 - Avoid touching the DB on prepare()
+- Flag `_create_files=True` needed to create ImageFieldFile in ImageFields,
+otherwise you'll get a `<ImageFieldFile: None>`
 
 1.3.2
 -----
