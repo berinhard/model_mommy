@@ -2,8 +2,12 @@ Next
 ----
 TODO
 
+1.5.0
+-----
+- Allow usage with Models which include a model attribute
+
 1.4.0
-----
+-----
 - Drops support for Django < 1.8
 - Fix deprecation warnings for Django 1.11
 - Avoid touching the DB on prepare()
