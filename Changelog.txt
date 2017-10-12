@@ -2,8 +2,8 @@ Next
 ----
 TODO
 
-1.5.0
------
+Development
+-----------
 - Allow usage with Models which include a model attribute
 
 1.4.0
