@@ -96,13 +96,13 @@ class MommyRepeatedCreatesSimpleModel(TestCase):
 
     def test_make_raises_correct_exception_if_invalid_quantity(self):
         self.assertRaises(
-            InvalidQuantityException, mommy.make, model=models.Person, _quantity="hi"
+            InvalidQuantityException, mommy.make, _model=models.Person, _quantity="hi"
         )
         self.assertRaises(
-            InvalidQuantityException, mommy.make, model=models.Person, _quantity=-1
+            InvalidQuantityException, mommy.make, _model=models.Person, _quantity=-1
         )
         self.assertRaises(
-            InvalidQuantityException, mommy.make, model=models.Person, _quantity=0
+            InvalidQuantityException, mommy.make, _model=models.Person, _quantity=0
         )
 
     def test_prepare_should_create_objects_respecting_quantity_parameter(self):
@@ -115,13 +115,13 @@ class MommyRepeatedCreatesSimpleModel(TestCase):
 
     def test_prepare_raises_correct_exception_if_invalid_quantity(self):
         self.assertRaises(
-            InvalidQuantityException, mommy.prepare, model=models.Person, _quantity="hi"
+            InvalidQuantityException, mommy.prepare, _model=models.Person, _quantity="hi"
         )
         self.assertRaises(
-            InvalidQuantityException, mommy.prepare, model=models.Person, _quantity=-1
+            InvalidQuantityException, mommy.prepare, _model=models.Person, _quantity=-1
         )
         self.assertRaises(
-            InvalidQuantityException, mommy.prepare, model=models.Person, _quantity=0
+            InvalidQuantityException, mommy.prepare, _model=models.Person, _quantity=0
         )
 
 
