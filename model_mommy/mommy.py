@@ -252,7 +252,8 @@ class Mommy(object):
                 else:
                     self.m2m_dict[field.name] = self.model_attrs.pop(field.name)
             elif field.name not in self.model_attrs:
-                self.model_attrs[field.name] = self.generate_value(field, commit_related)
+                if not isinstance(field, ForeignKey) or '{0}_id'.format(field.name) not in self.model_attrs:
+                    self.model_attrs[field.name] = self.generate_value(field, commit_related)
             elif callable(self.model_attrs[field.name]):
                 self.model_attrs[field.name] = self.model_attrs[field.name]()
             elif field.name in self.iterator_attrs:
