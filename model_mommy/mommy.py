@@ -37,14 +37,14 @@ def _valid_quantity(quantity):
     return quantity is not None and (not isinstance(quantity, int) or quantity < 1)
 
 
-def make(model, _quantity=None, make_m2m=False, _save_kwargs=None, _create_files=False, **attrs):
+def make(_model, _quantity=None, make_m2m=False, _save_kwargs=None, _create_files=False, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
     """
     _save_kwargs = _save_kwargs or {}
-    mommy = Mommy.create(model, make_m2m=make_m2m, create_files=_create_files)
+    mommy = Mommy.create(_model, make_m2m=make_m2m, create_files=_create_files)
     if _valid_quantity(_quantity):
         raise InvalidQuantityException
 
@@ -54,14 +54,14 @@ def make(model, _quantity=None, make_m2m=False, _save_kwargs=None, _create_files
         return mommy.make(_save_kwargs=_save_kwargs, **attrs)
 
 
-def prepare(model, _quantity=None, _save_related=False, **attrs):
+def prepare(_model, _quantity=None, _save_related=False, **attrs):
     """
     Creates BUT DOESN'T persist an instance from a given model its
     associated models.
     It fill the fields with random values or you can specify
     which fields you want to define its values by yourself.
     """
-    mommy = Mommy.create(model)
+    mommy = Mommy.create(_model)
     if _valid_quantity(_quantity):
         raise InvalidQuantityException
 
@@ -191,14 +191,14 @@ class Mommy(object):
     finder = ModelFinder()
 
     @classmethod
-    def create(cls, model, make_m2m=False, create_files=False):
+    def create(cls, _model, make_m2m=False, create_files=False):
         """
         Factory which creates the mommy class defined by the MOMMY_CUSTOM_CLASS setting
         """
         mommy_class = _custom_mommy_class() or cls
-        return mommy_class(model, make_m2m, create_files)
+        return mommy_class(_model, make_m2m, create_files)
 
-    def __init__(self, model, make_m2m=False, create_files=False):
+    def __init__(self, _model, make_m2m=False, create_files=False):
         self.make_m2m = make_m2m
         self.create_files = create_files
         self.m2m_dict = {}
@@ -207,10 +207,10 @@ class Mommy(object):
         self.rel_attrs = {}
         self.rel_fields = []
 
-        if isinstance(model, ModelBase):
-            self.model = model
+        if isinstance(_model, ModelBase):
+            self.model = _model
         else:
-            self.model = self.finder.get_model(model)
+            self.model = self.finder.get_model(_model)
 
         self.init_type_mapping()
 
@@ -297,7 +297,7 @@ class Mommy(object):
 
         kwargs = filter_rel_attrs(rel_name, **self.rel_attrs)
         kwargs[related.field.name] = instance
-        kwargs['model'] = related.field.model
+        kwargs['_model'] = related.field.model
 
         make(**kwargs)
 
@@ -387,7 +387,7 @@ class Mommy(object):
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
             generator = random_gen.gen_from_choices(field.choices)
-        elif isinstance(field, ForeignKey) and issubclass(self._remote_field(field).to, ContentType):
+        elif isinstance(field, ForeignKey) and issubclass(self._remote_field(field).model, ContentType):
             generator = self.type_mapping[ContentType]
         elif generators.get(field.__class__):
             generator = generators.get(field.__class__)

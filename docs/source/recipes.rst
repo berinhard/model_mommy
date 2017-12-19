@@ -5,8 +5,11 @@ If you're not comfortable with random data or even you just want to
 improve the semantics of the generated data, there's hope for you.
 
 You can define a recipe, which is a set of rules to generate data
-for your models. Create a module called mommy_recipes.py at your app's
-root directory: ::
+for your models. 
+
+It's also possible to store the Recipes in a module called *mommy_recipes.py*
+at your app's root directory. This recipes can later be used with the
+`make_recipe` function: ::
 
     fixtures/
     migrations/
@@ -42,12 +45,8 @@ File: mommy_recipes.py ::
 
 File: test_model.py ::
 
-    # -*- coding:utf-8 -*-
-
-    #Core Django imports
     from django.test import TestCase
 
-    #Third-party app imports
     from model_mommy import mommy
     from model_mommy.recipe import Recipe, foreign_key
 
@@ -55,15 +54,10 @@ File: test_model.py ::
     from .models import Person, Contact
 
     class PersonTestModel(TestCase):
-        """
-        Class to test the model
-        Person
-        """
+        """Class to test the model Person"""
 
         def setUp(self):
-            """
-            Set up all the tests
-            """
+            # Load the recipe 'person' from 'family/mommy_recipes.py'
             self.person_one = mommy.make_recipe(
                 'family.person'
             )
@@ -80,9 +74,7 @@ File: test_model.py ::
             )
     
             def test_kind_contact_create_instance(self):
-                """
-                True if create instance
-                """
+                """True if create instance"""
                 contact = self.contact.make()
                 self.assertIsInstance(contact, Contact)
 

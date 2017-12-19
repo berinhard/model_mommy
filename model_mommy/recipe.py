@@ -25,9 +25,9 @@ except TypeError:
 finder = mommy.ModelFinder()
 
 class Recipe(object):
-    def __init__(self, model, **attrs):
+    def __init__(self, _model, **attrs):
         self.attr_mapping = attrs
-        self.model = model
+        self._model = _model
         # _iterator_backups will hold values of the form (backup_iterator, usable_iterator).
         self._iterator_backups = {}
 
@@ -41,10 +41,10 @@ class Recipe(object):
             if new_attrs.get(k):
                 continue
             elif mommy.is_iterator(v):
-                if isinstance(self.model, string_types):
-                    m = finder.get_model(self.model)
+                if isinstance(self._model, string_types):
+                    m = finder.get_model(self._model)
                 else:
-                    m = self.model
+                    m = self._model
                 if k not in self._iterator_backups or m.objects.count() == 0:
                     self._iterator_backups[k] = itertools.tee(self._iterator_backups.get(k, [v])[0])
                 mapping[k] = self._iterator_backups[k][1]
@@ -65,17 +65,17 @@ class Recipe(object):
         return mapping
 
     def make(self, **attrs):
-        return mommy.make(self.model, **self._mapping(attrs))
+        return mommy.make(self._model, **self._mapping(attrs))
 
     def prepare(self, **attrs):
         defaults = {'_save_related': False}
         defaults.update(attrs)
-        return mommy.prepare(self.model, **self._mapping(defaults))
+        return mommy.prepare(self._model, **self._mapping(defaults))
 
     def extend(self, **attrs):
         attr_mapping = self.attr_mapping.copy()
         attr_mapping.update(attrs)
-        return Recipe(self.model, **attr_mapping)
+        return Recipe(self._model, **attr_mapping)
 
 
 class RecipeForeignKey(object):
@@ -97,7 +97,7 @@ class RecipeForeignKey(object):
 
 def foreign_key(recipe):
     """
-      Returns the callable, so that the associated model
+      Returns the callable, so that the associated _model
       will not be created during the recipe definition.
     """
     return RecipeForeignKey(recipe)

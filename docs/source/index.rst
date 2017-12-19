@@ -17,6 +17,11 @@ Examples of contributions include:
 * Bug reports
 
 
+Compatibility
+=============
+
+model_mommy supports Django >= 1.8
+
 Install
 =======
 
