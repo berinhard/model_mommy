@@ -238,7 +238,7 @@ File: test_model.py ::
 Creating Files
 --------------
 
-Mommy does not creates files for FileField types. If you need to have the files created, you can pass the flag `_create_files=True` (defaults to `False`) to either `mommy.make` or `mommy.make_receipe`.
+Mommy does not creates files for FileField types. If you need to have the files created, you can pass the flag `_create_files=True` (defaults to `False`) to either `mommy.make` or `mommy.make_recipe`.
 
 **Important**: Mommy does not do any kind of file clean up, so it's up to you to delete the files created by it.
 
