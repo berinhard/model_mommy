@@ -4,7 +4,11 @@ TODO
 
 Development
 -----------
+
+1.5.0
+-----
 - Allow usage with Models which include a model attribute
+- Support Django 2.0
 
 1.4.0
 -----
