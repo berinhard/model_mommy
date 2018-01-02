@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from __future__ import absolute_import
+
 #######################################
 # TESTING PURPOSE ONLY MODELS!!       #
 # DO NOT ADD THE APP TO INSTALLED_APPS#
@@ -18,7 +20,7 @@ from django.core.files.storage import FileSystemStorage
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
-from fields import CustomFieldWithGenerator, CustomFieldWithoutGenerator, FakeListField, CustomForeignKey
+from .fields import CustomFieldWithGenerator, CustomFieldWithoutGenerator, FakeListField, CustomForeignKey
 
 from model_mommy.timezone import smart_datetime as datetime
 import datetime as base_datetime

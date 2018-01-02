@@ -308,22 +308,19 @@ def gen_polygon():
 
 
 def gen_multi_point():
-    return 'MULTIPOINT (({}), ({}))'.format(
-        gen_coords(),
+    return 'MULTIPOINT (({}))'.format(
         gen_coords(),
     )
 
 
 def gen_multi_line_string():
-    return 'MULTILINESTRING ({}, {})'.format(
-        _gen_line_string_without_prefix(),
+    return 'MULTILINESTRING ({})'.format(
         _gen_line_string_without_prefix(),
     )
 
 
 def gen_multi_polygon():
-    return 'MULTIPOLYGON ({}, {})'.format(
-        _gen_polygon_without_prefix(),
+    return 'MULTIPOLYGON ({})'.format(
         _gen_polygon_without_prefix(),
     )
 

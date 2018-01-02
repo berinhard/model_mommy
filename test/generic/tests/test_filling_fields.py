@@ -446,26 +446,29 @@ class FillingAutoFields(TestCase):
 @skipUnless(MOMMY_GIS, "GIS support required for GIS fields")
 class GisFieldsFilling(FieldFillingTestCase):
 
+    def assertGeomValid(self, geom):
+        self.assertTrue(geom.valid, geom.valid_reason)
+
     def test_fill_PointField_valid(self):
-        self.assertTrue(self.person.point.valid)
+        self.assertGeomValid(self.person.point)
 
     def test_fill_LineStringField_valid(self):
-        self.assertTrue(self.person.line_string.valid)
+        self.assertGeomValid(self.person.line_string)
 
     def test_fill_PolygonField_valid(self):
-        self.assertTrue(self.person.polygon.valid)
+        self.assertGeomValid(self.person.polygon)
 
     def test_fill_MultiPointField_valid(self):
-        self.assertTrue(self.person.multi_point.valid)
+        self.assertGeomValid(self.person.multi_point)
 
     def test_fill_MultiLineStringField_valid(self):
-        self.assertTrue(self.person.multi_line_string.valid)
+        self.assertGeomValid(self.person.multi_line_string)
 
     def test_fill_MultiPolygonField_valid(self):
-        self.assertTrue(self.person.multi_polygon.valid)
+        self.assertGeomValid(self.person.multi_polygon)
 
     def test_fill_GeometryField_valid(self):
-        self.assertTrue(self.person.geom.valid)
+        self.assertGeomValid(self.person.geom)
 
     def test_fill_GeometryCollectionField_valid(self):
-        self.assertTrue(self.person.geom_collection.valid)
+        self.assertGeomValid(self.person.geom_collection)
