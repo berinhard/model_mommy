@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 
 #######################################
 # TESTING PURPOSE ONLY MODELS!!       #
@@ -7,13 +7,19 @@
 from decimal import Decimal
 from tempfile import gettempdir
 
-from django.db import models
+from model_mommy.gis import MOMMY_GIS
+
+if MOMMY_GIS:
+    from django.contrib.gis.db import models
+else:
+    from django.db import models
 from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
-from .fields import *
+from fields import CustomFieldWithGenerator, CustomFieldWithoutGenerator, FakeListField, CustomForeignKey
+
 from model_mommy.timezone import smart_datetime as datetime
 import datetime as base_datetime
 
@@ -101,7 +107,7 @@ class Person(models.Model):
         # New at Django 1.8
         pass
 
-    #backward compatibility with Django 1.1
+    # backward compatibility with Django 1.1
     try:
         wanted_games_qtd = models.BigIntegerField()
     except AttributeError:
@@ -112,9 +118,18 @@ class Person(models.Model):
     except AttributeError:
         pass
 
+    if MOMMY_GIS:
+        geom = models.GeometryField()
+        point = models.PointField()
+        line_string = models.LineStringField()
+        polygon = models.PolygonField()
+        multi_point = models.MultiPointField()
+        multi_line_string = models.MultiLineStringField()
+        multi_polygon = models.MultiPolygonField()
+        geom_collection = models.GeometryCollectionField()
+
 
 class Dog(models.Model):
-
     class Meta:
         order_with_respect_to = 'owner'
 
@@ -123,8 +138,10 @@ class Dog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     friends_with = models.ManyToManyField('Dog')
 
+
 class GuardDog(Dog):
     pass
+
 
 class LonelyPerson(models.Model):
     only_friend = models.OneToOneField(Person, on_delete=models.CASCADE)
@@ -153,8 +170,10 @@ class Store(models.Model):
     employees = models.ManyToManyField(Person, related_name='employers')
     suppliers = models.ManyToManyField(Person, related_name='suppliers', blank=True, null=True)
 
+
 class DummyEmptyModel(models.Model):
     pass
+
 
 class DummyIntModel(models.Model):
     int_field = models.IntegerField()
@@ -212,6 +231,7 @@ class DummyBlankFieldsModel(models.Model):
     blank_char_field = models.CharField(max_length=50, blank=True)
     blank_text_field = models.TextField(max_length=300, blank=True)
 
+
 class DummyDefaultFieldsModel(models.Model):
     default_id = models.AutoField(primary_key=True)
     default_char_field = models.CharField(max_length=50, default='default')
@@ -246,12 +266,13 @@ class DummyMultipleInheritanceModel(DummyDefaultFieldsModel, Person):
     my_id = models.AutoField(primary_key=True)
     my_dummy_field = models.IntegerField()
 
+
 class Ambiguous(models.Model):
     name = models.CharField(max_length=20)
 
 
 class School(models.Model):
-    name = models.CharField(max_length = 10)
+    name = models.CharField(max_length=10)
     students = models.ManyToManyField(Person, through='SchoolEnrollment')
 
 
@@ -303,6 +324,7 @@ class Movie(models.Model):
 class CastMember(models.Model):
     movie = models.ForeignKey(Movie, related_name='cast_members', on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
+
 
 class DummyGenericIPAddressFieldModel(models.Model):
     ipv4_field = models.GenericIPAddressField(protocol='IPv4')

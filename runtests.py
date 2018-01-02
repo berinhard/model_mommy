@@ -1,16 +1,20 @@
 #!/usr/bin/env python
 
-from os.path import dirname, join
 import sys
-from optparse import OptionParser
 import warnings
+from optparse import OptionParser
+from os.path import dirname, join
+
 import django
+
 
 def parse_args():
     parser = OptionParser()
     parser.add_option('--use-tz', dest='USE_TZ', action='store_true')
     parser.add_option('--postgresql', dest='USE_POSTGRESQL', action='store_true')
+    parser.add_option('--postgis', dest='USE_POSTGIS', action='store_true')
     return parser.parse_args()
+
 
 def configure_settings(options):
     from django.conf import settings
@@ -25,7 +29,7 @@ def configure_settings(options):
                     'NAME': ':memory:',
                 }
             },
-            INSTALLED_APPS = (
+            INSTALLED_APPS=(
                 'test.generic',
                 'django.contrib.contenttypes',
                 'test_without_migrations',
@@ -38,9 +42,13 @@ def configure_settings(options):
             MIDDLEWARE_CLASSES=(),
         )
         if getattr(options, 'USE_POSTGRESQL', False):
+            if getattr(options, 'USE_POSTGIS', False):
+                engine = 'django.contrib.gis.db.backends.postgis'
+            else:
+                engine = 'django.db.backends.postgresql_psycopg2'
             params['DATABASES'] = {
                 'default': {
-                    'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                    'ENGINE': engine,
                     'NAME': 'model_mommy',
                     'TEST_NAME': 'test_model_mommy',
                     'USER': 'postgres',
@@ -58,6 +66,7 @@ def configure_settings(options):
         settings.configure(**params)
 
     return settings
+
 
 # We only need this if HstoreFields are a possibility
 from django.db.backends.signals import connection_created
@@ -86,13 +95,13 @@ def get_runner(settings):
     Asks Django for the TestRunner defined in settings or the default one.
     '''
     from django.test.utils import get_runner
+    extra_apps = []
     if getattr(options, 'USE_POSTGRESQL', False):
-        setattr(settings, 'INSTALLED_APPS',
-                ['django.contrib.postgres']
-                + list(getattr(settings, 'INSTALLED_APPS')))
-    setattr(settings, 'INSTALLED_APPS',
-            ['django.contrib.auth']
-            + list(getattr(settings, 'INSTALLED_APPS')))
+        extra_apps.append('django.contrib.postgres')
+    if getattr(options, 'USE_POSTGIS', False):
+        extra_apps.append('django.contrib.gis')
+    extra_apps.append('django.contrib.auth')
+    setattr(settings, 'INSTALLED_APPS', extra_apps + list(getattr(settings, 'INSTALLED_APPS')))
     from test_without_migrations.management.commands._base import DisableMigrations
     setattr(settings, 'MIGRATION_MODULES', DisableMigrations())
     TestRunner = get_runner(settings)
@@ -114,4 +123,6 @@ def runtests(options=None, labels=None):
 
 if __name__ == '__main__':
     options, labels = parse_args()
+    if getattr(options, 'USE_POSTGIS', False):
+        setattr(options, 'USE_POSTGRESQL', True)
     runtests(options, labels)

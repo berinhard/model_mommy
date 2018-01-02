@@ -7,7 +7,8 @@ from django.db.models import (
     FloatField, FileField, ImageField, IPAddressField,
     ForeignKey, ManyToManyField, OneToOneField, NullBooleanField)
 
-from model_mommy.utils import import_if_str
+from .gis import default_gis_mapping
+from .utils import import_if_str
 
 try:
     from django.db.models import BigIntegerField
@@ -50,6 +51,7 @@ except ImportError:
     HStoreField = None
 
 from . import random_gen
+
 default_mapping = {
     ForeignKey: random_gen.gen_related,
     OneToOneField: random_gen.gen_related,
@@ -97,6 +99,9 @@ if JSONField:
     default_mapping[JSONField] = random_gen.gen_json
 if HStoreField:
     default_mapping[HStoreField] = random_gen.gen_hstore
+
+# Add GIS fields
+default_mapping.update(default_gis_mapping)
 
 
 def get_type_mapping():

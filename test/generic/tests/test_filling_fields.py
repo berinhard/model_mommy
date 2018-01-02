@@ -2,19 +2,19 @@ from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 from os.path import abspath
 from tempfile import gettempdir
-
 from unittest import skipUnless
-from django.test import TestCase
+
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
-from django.db import models as django_models
 from django.core.files import File
 from django.core.files.images import ImageFile
-
+from django.db import models as django_models
+from django.test import TestCase
 from six import text_type, string_types, binary_type
 
 from model_mommy import mommy
+from model_mommy.gis import MOMMY_GIS
 from model_mommy.random_gen import gen_related
 from test.generic import models
 from test.generic.generators import gen_value_string
@@ -60,13 +60,15 @@ except ImportError:
     HStoreField = None
 
 from django.core.validators import validate_ipv4_address
+
 try:
     from django.core.validators import validate_ipv6_address, validate_ipv46_address
 except ImportError:
     def validate_ipv6_address(v):
         raise ValidationError()
-    validate_ipv46_address = validate_ipv6_address
 
+
+    validate_ipv46_address = validate_ipv6_address
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
@@ -193,7 +195,6 @@ class TimeFieldsFilling(FieldFillingTestCase):
 
 
 class UUIDFieldsFilling(FieldFillingTestCase):
-
     if UUIDField:
         def test_fill_UUIDField_with_uuid_object(self):
             import uuid
@@ -205,23 +206,22 @@ class UUIDFieldsFilling(FieldFillingTestCase):
 
 
 class ArrayFieldsFilling(FieldFillingTestCase):
-
     if ArrayField:
         def test_fill_ArrayField_with_empty_array(self):
             self.assertEqual(self.person.acquaintances, [])
 
 
 class JSONFieldsFilling(FieldFillingTestCase):
-
     if JSONField:
         def test_fill_JSONField_with_empty_dict(self):
             self.assertEqual(self.person.data, {})
 
-class HStoreFieldsFilling(FieldFillingTestCase):
 
+class HStoreFieldsFilling(FieldFillingTestCase):
     if HStoreField:
         def test_fill_HStoreField_with_empty_dict(self):
             self.assertEqual(self.person.hstore_data, {})
+
 
 class FillingIntFields(TestCase):
 
@@ -399,7 +399,7 @@ class FillingCustomFields(TestCase):
     def test_uses_generator_defined_as_string_on_settings_for_custom_field(self):
         """Should import and use the function present in the import path defined in settings"""
         generator_dict = {'test.generic.fields.CustomFieldWithGenerator':
-                                'test.generic.generators.gen_value_string'}
+                              'test.generic.generators.gen_value_string'}
         setattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', generator_dict)
         obj = mommy.make(models.CustomFieldWithGeneratorModel)
         self.assertEqual("value", obj.custom_value)
@@ -426,6 +426,7 @@ class FillingCustomFields(TestCase):
     def test_can_override_django_default_field_functions_genereator(self):
         def gen_char():
             return 'Some value'
+
         mommy.generators.add('django.db.models.fields.CharField', gen_char)
 
         person = mommy.make(models.Person)
@@ -440,3 +441,31 @@ class FillingAutoFields(TestCase):
         field = models.DummyEmptyModel._meta.get_field('id')
         self.assertIsInstance(field, django_models.AutoField)
         self.assertIsInstance(obj.id, int)
+
+
+@skipUnless(MOMMY_GIS, "GIS support required for GIS fields")
+class GisFieldsFilling(FieldFillingTestCase):
+
+    def test_fill_PointField_valid(self):
+        self.assertTrue(self.person.point.valid)
+
+    def test_fill_LineStringField_valid(self):
+        self.assertTrue(self.person.line_string.valid)
+
+    def test_fill_PolygonField_valid(self):
+        self.assertTrue(self.person.polygon.valid)
+
+    def test_fill_MultiPointField_valid(self):
+        self.assertTrue(self.person.multi_point.valid)
+
+    def test_fill_MultiLineStringField_valid(self):
+        self.assertTrue(self.person.multi_line_string.valid)
+
+    def test_fill_MultiPolygonField_valid(self):
+        self.assertTrue(self.person.multi_polygon.valid)
+
+    def test_fill_GeometryField_valid(self):
+        self.assertTrue(self.person.geom.valid)
+
+    def test_fill_GeometryCollectionField_valid(self):
+        self.assertTrue(self.person.geom_collection.valid)
