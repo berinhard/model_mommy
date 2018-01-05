@@ -4,6 +4,7 @@ TODO
 
 Development
 -----------
+- Support to GIS fields
 
 1.5.0
 -----
