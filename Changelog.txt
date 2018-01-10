@@ -4,7 +4,7 @@ TODO
 
 Development
 -----------
-- Support to GIS fields
+- Support for GIS fields when `django.contrib.gis` is installed
 
 1.5.0
 -----
