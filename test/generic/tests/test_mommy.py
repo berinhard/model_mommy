@@ -177,6 +177,26 @@ class MommyCreatesAssociatedModels(TestCase):
         person_count = models.Person.objects.count()
         mommy.make(models.GuardDog)
         self.assertEqual(models.Person.objects.count(), person_count + 1)
+    
+    def test_foreign_key_on_parent_is_not_created(self):
+        '''
+        Foreign key on parent doesn't get created using owner
+        '''
+        owner = mommy.make(models.Person)
+        person_count = models.Person.objects.count()
+        dog = mommy.make(models.GuardDog, owner=owner)
+        self.assertEqual(models.Person.objects.count(), person_count)
+        self.assertEqual(dog.owner, owner)
+    
+    def test_foreign_key_on_parent_id_is_not_created(self):
+        '''
+        Foreign key on parent doesn't get created using owner_id
+        '''
+        owner = mommy.make(models.Person)
+        person_count = models.Person.objects.count()
+        dog = mommy.make(models.GuardDog, owner_id=owner.id)
+        self.assertEqual(models.Person.objects.count(), person_count)
+        self.assertEqual(models.GuardDog.objects.get(pk=dog.pk).owner, owner)
 
     def test_auto_now_add_on_parent_should_work(self):
         '''

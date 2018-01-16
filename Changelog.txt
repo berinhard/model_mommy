@@ -5,6 +5,11 @@ TODO
 Development
 -----------
 
+1.5.1
+-----
+- Support for GIS fields when `django.contrib.gis` is installed
+- Do not create refrence if FK is specified with id (<name>_id)
+
 1.5.0
 -----
 - Allow usage with Models which include a model attribute
