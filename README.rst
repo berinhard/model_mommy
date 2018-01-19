@@ -8,7 +8,7 @@ With a simple and powerful API you can create many objects with a single line of
 .. image:: https://travis-ci.org/vandersonmota/model_mommy.svg?branch=master
     :target: https://travis-ci.org/vandersonmota/model_mommy
     :alt: Test Status
-    
+
 .. image:: https://badge.fury.io/py/model_mommy.svg
     :target: https://badge.fury.io/py/model_mommy
     :alt: Latest PyPI version
@@ -33,5 +33,10 @@ Usage and Info
 Maintainers
 ===========
 
-*     Vanderson Mota (creator) - https://github.com/vandersonmota/
 *     Bernardo Fontes - https://github.com/berinhard/
+
+
+Creator
+=======
+
+*     Vanderson Mota - https://github.com/vandersonmota/
