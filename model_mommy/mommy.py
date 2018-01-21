@@ -342,7 +342,7 @@ class Mommy(object):
         for k, v in attrs.items():
             if django.VERSION >= (1, 9):
                 manager = getattr(instance, k)
-                manager.set(v, bulk=False, clear=True)
+                manager.set(v, clear=True)
             else:
                 setattr(instance, k, v)
 
