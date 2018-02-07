@@ -14,7 +14,7 @@ from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, 
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
 else:
-    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
+    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor
 from django.db.models.fields.proxy import OrderWrt
 
 from . import generators
@@ -280,7 +280,10 @@ class Mommy(object):
         one_to_many_keys = {}
         for k in tuple(attrs.keys()):
             field = getattr(self.model, k, None)
-            if isinstance(field, ForeignRelatedObjectsDescriptor):
+            related_objects_descriptors = (ForeignRelatedObjectsDescriptor,)
+            if django.VERSION < (1, 9): # in django 1.8, these two additional classes weren't subclasses of ForeignRelatedObjectsDescriptor
+                related_objects_descriptors = (ForeignRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor)
+            if isinstance(field, related_objects_descriptors):
                 one_to_many_keys[k] = attrs.pop(k)
 
         instance = self.model(**attrs)
@@ -342,7 +345,7 @@ class Mommy(object):
         for k, v in attrs.items():
             if django.VERSION >= (1, 9):
                 manager = getattr(instance, k)
-                manager.set(v, bulk=False, clear=True)
+                manager.set(v, clear=True)
             else:
                 setattr(instance, k, v)
 

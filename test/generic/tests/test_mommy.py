@@ -216,6 +216,12 @@ class MommyCreatesAssociatedModels(TestCase):
         for person in models.Person.objects.all():
             self.assertEqual(person.name, 'john')
 
+    def test_access_related_name_of_m2m(self):
+        try:
+            mommy.make(models.Person, classroom_set=[mommy.make(models.Classroom)])
+        except TypeError:
+            self.fail('type error raised')
+
     def test_prepare_fk(self):
         dog = mommy.prepare(models.Dog)
         self.assertIsInstance(dog, models.Dog)
