@@ -100,7 +100,7 @@ Look:
 
 File: mommy_recipes.py ::
 
-    company_recipe = Recipe(Company, name='WidgetCo'
+    company_recipe = Recipe(Company, name='WidgetCo')
 
 File: test_model.py ::
 
