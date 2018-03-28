@@ -75,7 +75,7 @@ class Recipe(object):
     def extend(self, **attrs):
         attr_mapping = self.attr_mapping.copy()
         attr_mapping.update(attrs)
-        return Recipe(self._model, **attr_mapping)
+        return type(self)(self._model, **attr_mapping)
 
 
 class RecipeForeignKey(object):
