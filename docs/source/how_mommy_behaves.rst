@@ -51,6 +51,10 @@ Currently supported fields
 * FileField, ImageField
 * JSONField, ArrayField, HStoreField
 
+Require ``django.contrib.gis`` in ``INSTALLED_APPS``:
+
+* GeometryField, PointField, LineStringField, PolygonField, MultiPointField, MultiLineStringField, MultiPolygonField, GeometryCollectionField
+
 Custom fields
 -------------
 
