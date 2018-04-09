@@ -71,6 +71,18 @@ extended_dog = dog.extend(
     breed = 'Super basset',
 )
 
+
+class SmallDogRecipe(Recipe):
+    pass
+
+
+small_dog = SmallDogRecipe(Dog)
+
+
+pug = small_dog.extend(
+    breed='Pug',
+)
+
 other_dog_unicode = Recipe(Dog,
     breed = 'Basset',
     owner = foreign_key(u('person'))
