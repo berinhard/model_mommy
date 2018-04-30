@@ -50,6 +50,11 @@ try:
 except ImportError:
     HStoreField = None
 
+try:
+    from django.contrib.postgres.fields.citext import CICharField
+except ImportError:
+    CICharField = None
+
 from . import random_gen
 
 default_mapping = {
@@ -99,6 +104,8 @@ if JSONField:
     default_mapping[JSONField] = random_gen.gen_json
 if HStoreField:
     default_mapping[HStoreField] = random_gen.gen_hstore
+if CICharField:
+    default_mapping[CICharField] = random_gen.gen_string
 
 # Add GIS fields
 default_mapping.update(default_gis_mapping)
