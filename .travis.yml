@@ -32,6 +32,7 @@ services:
 before_script:
   - psql -U postgres -c "create extension postgis"
   - psql -U postgres -c "create extension hstore"
+  - psql -U postgres -c "create extension citext"
   - psql -c 'create database model_mommy;' -U postgres
   - psql -c 'create database model_mommy_test;' -U postgres
 script:
