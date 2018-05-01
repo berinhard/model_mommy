@@ -58,7 +58,7 @@ default_mapping = {
     ManyToManyField: random_gen.gen_m2m,
 
     BooleanField: random_gen.gen_boolean,
-    NullBooleanField: random_gen.gen_null_boolean,
+    NullBooleanField: random_gen.gen_boolean,
     IntegerField: random_gen.gen_integer,
     BigIntegerField: random_gen.gen_integer,
     SmallIntegerField: random_gen.gen_integer,
