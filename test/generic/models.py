@@ -116,9 +116,10 @@ class Person(models.Model):
         wanted_games_qtd = models.IntegerField()
 
     try:
-        from django.contrib.postgres.fields.citext import CICharField, CIEmailField
+        from django.contrib.postgres.fields.citext import CICharField, CIEmailField, CITextField
         ci_char = CICharField(max_length=30)
         ci_email = CIEmailField()
+        ci_text = CITextField()
     except ImportError:
         # New at Django 1.11
         pass
