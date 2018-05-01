@@ -4,6 +4,8 @@ TODO
 
 Development
 -----------
+- Support for Postgres' CI fields types
+- NullBooleanField using gen_boolean generator
 
 1.5.1
 -----
