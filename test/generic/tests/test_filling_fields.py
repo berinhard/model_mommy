@@ -60,9 +60,10 @@ except ImportError:
     HStoreField = None
 
 try:
-    from django.contrib.postgres.fields.citext import CICharField
+    from django.contrib.postgres.fields.citext import CICharField, CIEmailField
 except ImportError:
     CICharField = None
+    CIEmailField = None
 
 from django.core.validators import validate_ipv4_address
 
@@ -149,6 +150,12 @@ class CIStringFieldsFilling(FieldFillingTestCase):
 
             self.assertIsInstance(self.person.ci_char, text_type)
             self.assertEqual(len(self.person.ci_char), ci_char_field.max_length)
+
+    if CIEmailField:
+        def test_filling_CIEmailField(self):
+            ci_email_field = models.Person._meta.get_field('ci_email')
+            self.assertIsInstance(ci_email_field, CIEmailField)
+            self.assertIsInstance(self.person.ci_email, string_types)
 
 
 class BinaryFieldsFilling(FieldFillingTestCase):

@@ -51,9 +51,10 @@ except ImportError:
     HStoreField = None
 
 try:
-    from django.contrib.postgres.fields.citext import CICharField
+    from django.contrib.postgres.fields.citext import CICharField, CIEmailField
 except ImportError:
     CICharField = None
+    CIEmailField = None
 
 from . import random_gen
 
@@ -106,6 +107,8 @@ if HStoreField:
     default_mapping[HStoreField] = random_gen.gen_hstore
 if CICharField:
     default_mapping[CICharField] = random_gen.gen_string
+if CIEmailField:
+    default_mapping[CIEmailField] = random_gen.gen_email
 
 # Add GIS fields
 default_mapping.update(default_gis_mapping)
