@@ -17,8 +17,6 @@ from os.path import abspath, join, dirname
 from random import randint, choice, random, uniform
 
 import six
-from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
 
 from model_mommy.timezone import now
 
@@ -35,6 +33,7 @@ MAX_INT = 10000
 
 
 def get_content_file(content, name):
+    from django.core.files.base import ContentFile
     return ContentFile(content, name=name)
 
 
@@ -156,6 +155,7 @@ def gen_ipv46():
 
 
 def gen_ip(protocol, default_validators):
+    from django.core.exceptions import ValidationError
     protocol = (protocol or '').lower()
 
     if not protocol:
