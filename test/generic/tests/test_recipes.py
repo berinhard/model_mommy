@@ -182,6 +182,13 @@ class TestExecutingRecipes(TestCase):
         self.assertIsInstance(dog.owner, Person)
         self.assertIsNotNone(dog.owner.id)
 
+        dogs = mommy.make_recipe('test.generic.dog', _quantity=2)
+        owner = dogs[0].owner
+        for dog in dogs:
+            self.assertEqual(dog.breed, 'Pug')
+            self.assertEqual(dog.owner, owner)
+
+
     def test_model_with_foreign_key_as_str(self):
         dog = mommy.make_recipe('test.generic.other_dog')
         self.assertEqual(dog.breed, 'Basset')
