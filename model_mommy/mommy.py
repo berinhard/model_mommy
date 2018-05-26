@@ -233,7 +233,8 @@ class Mommy(object):
             '_save_kwargs':_save_kwargs,
             '_refresh_after_create': _refresh_after_create,
         }
-        return self._make(**params, **attrs)
+        params.update(attrs)
+        return self._make(**params)
 
     def prepare(self, _save_related=False, **attrs):
         """Creates, but does not persist, an instance of the model
