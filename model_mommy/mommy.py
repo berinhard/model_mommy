@@ -14,7 +14,7 @@ from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, 
 if django.VERSION >= (1, 9):
     from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
 else:
-    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
+    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor
 from django.db.models.fields.proxy import OrderWrt
 
 from . import generators
@@ -37,7 +37,7 @@ def _valid_quantity(quantity):
     return quantity is not None and (not isinstance(quantity, int) or quantity < 1)
 
 
-def make(_model, _quantity=None, make_m2m=False, _save_kwargs=None, _create_files=False, **attrs):
+def make(_model, _quantity=None, make_m2m=False, _save_kwargs=None, _refresh_after_create=False, _create_files=False, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
     It fill the fields with random values or you can specify
@@ -49,9 +49,11 @@ def make(_model, _quantity=None, make_m2m=False, _save_kwargs=None, _create_file
         raise InvalidQuantityException
 
     if _quantity:
-        return [mommy.make(_save_kwargs=_save_kwargs, **attrs) for i in range(_quantity)]
-    else:
-        return mommy.make(_save_kwargs=_save_kwargs, **attrs)
+        return [
+            mommy.make(_save_kwargs=_save_kwargs, _refresh_after_create=_refresh_after_create, **attrs)
+            for _ in range(_quantity)
+        ]
+    return mommy.make(_save_kwargs=_save_kwargs, _refresh_after_create=_refresh_after_create, **attrs)
 
 
 def prepare(_model, _quantity=None, _save_related=False, **attrs):
@@ -222,14 +224,21 @@ class Mommy(object):
             generator = import_if_str(v)
             self.type_mapping[field_class] = generator
 
-    def make(self, _save_kwargs=None, **attrs):
-        '''Creates and persists an instance of the model
-        associated with Mommy instance.'''
-        return self._make(commit=True, commit_related=True, _save_kwargs=_save_kwargs, **attrs)
+    def make(self, _save_kwargs=None, _refresh_after_create=False,**attrs):
+        """Creates and persists an instance of the model associated
+        with Mommy instance."""
+        params = {
+            'commit': True,
+            'commit_related': True,
+            '_save_kwargs':_save_kwargs,
+            '_refresh_after_create': _refresh_after_create,
+        }
+        params.update(attrs)
+        return self._make(**params)
 
     def prepare(self, _save_related=False, **attrs):
-        '''Creates, but does not persist, an instance of the model
-        associated with Mommy instance.'''
+        """Creates, but does not persist, an instance of the model
+        associated with Mommy instance."""
         return self._make(commit=False, commit_related=_save_related, **attrs)
 
     def get_fields(self):
@@ -238,7 +247,7 @@ class Mommy(object):
     def get_related(self):
         return [r for r in self.model._meta.related_objects if not r.many_to_many]
 
-    def _make(self, commit=True, commit_related=True, _save_kwargs=None, **attrs):
+    def _make(self, commit=True, commit_related=True, _save_kwargs=None, _refresh_after_create=False, **attrs):
         _save_kwargs = _save_kwargs or {}
 
         self._clean_attrs(attrs)
@@ -267,6 +276,9 @@ class Mommy(object):
             for related in self.get_related():
                 self.create_by_related_name(instance, related)
 
+        if _refresh_after_create:
+            instance.refresh_from_db()
+
         return instance
 
     def m2m_value(self, field):
@@ -280,7 +292,10 @@ class Mommy(object):
         one_to_many_keys = {}
         for k in tuple(attrs.keys()):
             field = getattr(self.model, k, None)
-            if isinstance(field, ForeignRelatedObjectsDescriptor):
+            related_objects_descriptors = (ForeignRelatedObjectsDescriptor,)
+            if django.VERSION < (1, 9): # in django 1.8, these two additional classes weren't subclasses of ForeignRelatedObjectsDescriptor
+                related_objects_descriptors = (ForeignRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor)
+            if isinstance(field, related_objects_descriptors):
                 one_to_many_keys[k] = attrs.pop(k)
 
         instance = self.model(**attrs)
@@ -342,7 +357,7 @@ class Mommy(object):
         for k, v in attrs.items():
             if django.VERSION >= (1, 9):
                 manager = getattr(instance, k)
-                manager.set(v, bulk=False, clear=True)
+                manager.set(v, clear=True)
             else:
                 setattr(instance, k, v)
 

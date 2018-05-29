@@ -163,6 +163,7 @@ class TestDefiningRecipes(TestCase):
         except AttributeError as e:
             self.fail('%s' %e)
 
+
 class TestExecutingRecipes(TestCase):
     """
       Tests for calling recipes defined in mommy_recipes.py
@@ -182,6 +183,12 @@ class TestExecutingRecipes(TestCase):
         self.assertEqual(dog.breed, 'Pug')
         self.assertIsInstance(dog.owner, Person)
         self.assertIsNotNone(dog.owner.id)
+
+        dogs = mommy.make_recipe('test.generic.dog', _quantity=2)
+        owner = dogs[0].owner
+        for dog in dogs:
+            self.assertEqual(dog.breed, 'Pug')
+            self.assertEqual(dog.owner, owner)
 
     def test_model_with_foreign_key_as_str(self):
         dog = mommy.make_recipe('test.generic.other_dog')
