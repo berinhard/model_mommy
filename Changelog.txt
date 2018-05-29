@@ -4,6 +4,9 @@ TODO
 
 Development
 -----------
+
+1.6.0
+-----
 - Support for Postgres' CI fields types
 - NullBooleanField using gen_boolean generator
 - Remove dependency with Django from model_mommy.random_gen module

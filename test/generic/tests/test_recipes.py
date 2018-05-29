@@ -12,6 +12,7 @@ from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey, related
 from model_mommy.timezone import now, tz_aware
 from model_mommy.exceptions import InvalidQuantityException, RecipeIteratorEmpty
 from test.generic.models import TEST_TIME, Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
+from test.generic.mommy_recipes import SmallDogRecipe, pug
 
 
 class TestDefiningRecipes(TestCase):
@@ -229,6 +230,9 @@ class TestExecutingRecipes(TestCase):
         # No side effects happened due to extension
         base_dog = mommy.make_recipe('test.generic.dog')
         self.assertEqual(base_dog.breed, 'Pug')
+
+    def test_extended_recipe_type(self):
+        self.assertIsInstance(pug, SmallDogRecipe)
 
     def test_save_related_instances_on_prepare_recipe(self):
         dog = mommy.prepare_recipe('test.generic.homeless_dog')

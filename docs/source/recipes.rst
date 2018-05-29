@@ -73,10 +73,10 @@ File: test_model.py ::
                 tel='3333333eeeeR'
             )
     
-            def test_kind_contact_create_instance(self):
-                """True if create instance"""
-                contact = self.contact.make()
-                self.assertIsInstance(contact, Contact)
+        def test_kind_contact_create_instance(self):
+            """True if create instance"""
+            contact = self.contact.make()
+            self.assertIsInstance(contact, Contact)
 
 Or if you don't want a persisted instance: ::
 
@@ -100,7 +100,7 @@ Look:
 
 File: mommy_recipes.py ::
 
-    company_recipe = Recipe(Company, name='WidgetCo'
+    company_recipe = Recipe(Company, name='WidgetCo')
 
 File: test_model.py ::
 
