@@ -341,3 +341,14 @@ class DummyGenericIPAddressFieldModel(models.Model):
     ipv4_field = models.GenericIPAddressField(protocol='IPv4')
     ipv6_field = models.GenericIPAddressField(protocol='IPv6')
     ipv46_field = models.GenericIPAddressField(protocol='both')
+
+
+class AbstractModel(models.Model):
+    class Meta(object):
+        abstract=True
+
+    name = models.CharField(max_length=30)
+
+
+class SubclassOfAbstract(AbstractModel):
+    height = models.IntegerField()

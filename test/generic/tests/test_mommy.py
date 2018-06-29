@@ -81,6 +81,14 @@ class MommyCreatesSimpleModel(TestCase):
         self.assertEqual('bob', person.name)
         self.assertFalse(person.happy)
 
+    def test_abstract_model_subclass_creation(self):
+        instance = mommy.make(models.SubclassOfAbstract)
+        self.assertIsInstance(instance, models.SubclassOfAbstract)
+        self.assertIsInstance(instance, models.AbstractModel)
+        self.assertIsInstance(instance.name, type(u''))
+        self.assertEqual(len(instance.name), 30)
+        self.assertIsInstance(instance.height, int)
+
     def test_multiple_inheritance_creation(self):
         multiple = mommy.make(models.DummyMultipleInheritanceModel)
         self.assertIsInstance(multiple, models.DummyMultipleInheritanceModel)
