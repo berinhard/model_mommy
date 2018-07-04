@@ -261,6 +261,25 @@ Sometimes, you have a field with an unique value and using `make` can cause rand
 
 This will append a counter to strings to avoid uniqueness problems and it will sum the counter with numerical values.
 
+Sequences can be used not only for recipes, but with `mommy.make` as well:
+
+.. code-block:: python
+
+
+    # it can be imported directly from model_mommy
+    from model_mommy import seq
+    from model_mommy import mommy
+
+    p = mommy.make('Person', name=seq('Joe'))
+    p.name
+    >>> 'Joe1'
+
+    people = mommy.make('Person', name=seq('Chad'), _quantity=3)
+    for person in people:
+        print(person.name)
+    >>> 'Chad1'
+    >>> 'Chad2'
+    >>> 'Chad3'
 
 You can also provide an optional `increment_by` argument which will modify incrementing behaviour. This can be an integer, float, Decimal or timedelta.
 
