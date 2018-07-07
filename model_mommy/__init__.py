@@ -5,4 +5,4 @@ __author__ = 'Vanderson Mota'
 __license__ = 'Apache 2.0'
 
 
-from .recipe import seq
+from .utils import seq
