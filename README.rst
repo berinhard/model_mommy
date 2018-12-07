@@ -33,6 +33,8 @@ Usage and Info
 Maintainers
 ===========
 
+*     Ana Paula Gomes - https://github.com/anapaulagomes
+*     Rustem Saiargaliev - https://github.com/amureki
 *     Bernardo Fontes - https://github.com/berinhard/
 
 

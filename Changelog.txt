@@ -4,6 +4,8 @@ TODO
 
 Development
 -----------
+- Use default value for unknown field types
+- Enable seq method to be imported directly from model_mommy
 
 1.6.0
 -----

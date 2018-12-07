@@ -393,6 +393,8 @@ class Mommy(object):
             generator = generators.get(field.__class__)
         elif field.__class__ in self.type_mapping:
             generator = self.type_mapping[field.__class__]
+        elif field.has_default():
+            return field.default
         else:
             raise TypeError('%s is not supported by mommy.' % field.__class__)
 

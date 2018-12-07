@@ -32,6 +32,15 @@ class TestDefiningRecipes(TestCase):
           **self.recipe_attrs
         )
 
+    def test_import_seq_from_mommy(self):
+        """
+            Import seq method directly from mommy module
+        """
+        try:
+            from model_mommy import seq
+        except ImportError:
+            self.fail('{} raised'.format(ImportError.__name__))
+
     def test_flat_model_make_recipe_with_the_correct_attributes(self):
         """
           A 'flat model' means a model without associations, like

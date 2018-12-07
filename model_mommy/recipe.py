@@ -1,11 +1,13 @@
 import inspect
 import itertools
 from . import mommy
-from .timezone import tz_aware
 from .exceptions import RecipeNotFound
 
+# Enable seq to be imported from recipes
+from .utils import seq
+
 from six import string_types
-import datetime
+
 
 
 finder = mommy.ModelFinder()
@@ -88,34 +90,6 @@ def foreign_key(recipe):
       will not be created during the recipe definition.
     """
     return RecipeForeignKey(recipe)
-
-
-def _total_secs(td):
-    return td.total_seconds()
-
-
-def seq(value, increment_by=1):
-    if type(value) in [datetime.datetime, datetime.date,  datetime.time]:
-        if type(value) is datetime.date:
-            date = datetime.datetime.combine(value, datetime.datetime.now().time())
-        elif type(value) is datetime.time:
-            date = datetime.datetime.combine(datetime.date.today(), value)
-        else:
-            date = value
-        # convert to epoch time
-        start = _total_secs((date - datetime.datetime(1970, 1, 1)))
-        increment_by = _total_secs(increment_by)
-        for n in itertools.count(increment_by, increment_by):
-            series_date = tz_aware(datetime.datetime.utcfromtimestamp(start + n))
-            if type(value) is datetime.time:
-                yield series_date.time()
-            elif type(value) is datetime.date:
-                yield series_date.date()
-            else:
-                yield series_date
-    else:
-        for n in itertools.count(increment_by, increment_by):
-            yield value + type(value)(n)
 
 
 class related(object):
