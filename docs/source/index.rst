@@ -20,7 +20,7 @@ Examples of contributions include:
 Compatibility
 =============
 
-model_mommy supports Django >= 1.8
+model_mommy supports Django >= 1.11
 
 Install
 =======
