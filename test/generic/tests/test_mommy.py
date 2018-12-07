@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*-
 import datetime
 
-from mock import patch
 from decimal import Decimal
 
 from django.test import TestCase
@@ -15,6 +14,8 @@ from model_mommy.timezone import smart_datetime
 
 from test.generic import models
 from test.generic.forms import DummyGenericIPAddressFieldForm
+
+from unittest.mock import patch
 
 
 class ModelFinderTest(TestCase):
