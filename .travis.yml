@@ -2,7 +2,6 @@ sudo: true
 language: python
 dist: trusty
 python:
-  - "2.7"
   - "3.5"
   - "3.6"
 env:
@@ -11,11 +10,6 @@ env:
   - DJANGO=django110
   - DJANGO=django111
   - DJANGO=django20
-
-matrix:
-  exclude:
-    - python: "2.7"
-      env: DJANGO=django20
 
 before_install:
   - sudo apt-get update && sudo apt-get build-dep python-imaging

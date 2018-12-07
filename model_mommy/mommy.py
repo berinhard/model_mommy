@@ -22,7 +22,7 @@ from . import random_gen
 from .exceptions import (ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty,
                          CustomMommyNotFound, InvalidCustomMommy)
 from .utils import import_from_str, import_if_str
-from six import string_types, advance_iterator, PY3
+from six import string_types, advance_iterator
 
 recipes = None
 
@@ -155,10 +155,7 @@ def is_iterator(value):
     if not hasattr(value, '__iter__'):
         return False
 
-    if PY3:
-        return hasattr(value, '__next__')
-    else:
-        return hasattr(value, 'next')
+    return hasattr(value, '__next__')
 
 
 def _custom_mommy_class():
