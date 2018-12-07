@@ -1,7 +1,6 @@
 #coding: utf-8
 
 import itertools
-import django
 from random import choice
 from mock import patch
 from decimal import Decimal

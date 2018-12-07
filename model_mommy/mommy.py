@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, join
 
-import django
-
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.apps import apps
@@ -11,10 +9,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 
 from django.db.models.base import ModelBase
 from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, AutoField, BooleanField, FileField
-if django.VERSION >= (1, 9):
-    from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
-else:
-    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor
+from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
 from django.db.models.fields.proxy import OrderWrt
 
 from . import generators
@@ -337,11 +332,8 @@ class Mommy(object):
 
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
-            if django.VERSION >= (1, 9):
-                manager = getattr(instance, k)
-                manager.set(v, bulk=False, clear=True)
-            else:
-                setattr(instance, k, v)
+            manager = getattr(instance, k)
+            manager.set(v, bulk=False, clear=True)
 
     def _handle_m2m(self, instance):
         for key, values in self.m2m_dict.items():
@@ -363,9 +355,7 @@ class Mommy(object):
                     make(through_model, **base_kwargs)
 
     def _remote_field(self, field):
-        if django.VERSION >= (1, 9):
-            return field.remote_field
-        return field.rel
+        return field.remote_field
 
     def generate_value(self, field, commit=True):
         '''
