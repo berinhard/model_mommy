@@ -116,6 +116,15 @@ class Person(models.Model):
         wanted_games_qtd = models.IntegerField()
 
     try:
+        from django.contrib.postgres.fields.citext import CICharField, CIEmailField, CITextField
+        ci_char = CICharField(max_length=30)
+        ci_email = CIEmailField()
+        ci_text = CITextField()
+    except ImportError:
+        # New at Django 1.11
+        pass
+
+    try:
         duration_of_sleep = models.DurationField()
     except AttributeError:
         pass
@@ -332,3 +341,14 @@ class DummyGenericIPAddressFieldModel(models.Model):
     ipv4_field = models.GenericIPAddressField(protocol='IPv4')
     ipv6_field = models.GenericIPAddressField(protocol='IPv6')
     ipv46_field = models.GenericIPAddressField(protocol='both')
+
+
+class AbstractModel(models.Model):
+    class Meta(object):
+        abstract=True
+
+    name = models.CharField(max_length=30)
+
+
+class SubclassOfAbstract(AbstractModel):
+    height = models.IntegerField()

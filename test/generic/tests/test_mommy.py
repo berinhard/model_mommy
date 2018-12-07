@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+import datetime
+
 from mock import patch
 from decimal import Decimal
 
@@ -9,9 +11,10 @@ from django.db.models.signals import m2m_changed
 from model_mommy import mommy
 from model_mommy import random_gen
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
-from model_mommy.timezone import smart_datetime as datetime
+from model_mommy.timezone import smart_datetime
 
 from test.generic import models
+from test.generic.forms import DummyGenericIPAddressFieldForm
 
 
 class ModelFinderTest(TestCase):
@@ -77,6 +80,14 @@ class MommyCreatesSimpleModel(TestCase):
         self.assertIsInstance(person, models.NonAbstractPerson)
         self.assertEqual('bob', person.name)
         self.assertFalse(person.happy)
+
+    def test_abstract_model_subclass_creation(self):
+        instance = mommy.make(models.SubclassOfAbstract)
+        self.assertIsInstance(instance, models.SubclassOfAbstract)
+        self.assertIsInstance(instance, models.AbstractModel)
+        self.assertIsInstance(instance.name, type(u''))
+        self.assertEqual(len(instance.name), 30)
+        self.assertIsInstance(instance.height, int)
 
     def test_multiple_inheritance_creation(self):
         multiple = mommy.make(models.DummyMultipleInheritanceModel)
@@ -215,6 +226,12 @@ class MommyCreatesAssociatedModels(TestCase):
         mommy.make(models.GuardDog, owner__name='john')
         for person in models.Person.objects.all():
             self.assertEqual(person.name, 'john')
+
+    def test_access_related_name_of_m2m(self):
+        try:
+            mommy.make(models.Person, classroom_set=[mommy.make(models.Classroom)])
+        except TypeError:
+            self.fail('type error raised')
 
     def test_prepare_fk(self):
         dog = mommy.prepare(models.Dog)
@@ -468,7 +485,7 @@ class SkipDefaultsTestCase(TestCase):
         self.assertEqual(dummy.default_int_field, 123)
         self.assertEqual(dummy.default_float_field, 123.0)
         self.assertEqual(dummy.default_date_field, '2012-01-01')
-        self.assertEqual(dummy.default_date_time_field, datetime(2012, 1, 1))
+        self.assertEqual(dummy.default_date_time_field, smart_datetime(2012, 1, 1))
         self.assertEqual(dummy.default_time_field, '00:00:00')
         self.assertEqual(dummy.default_decimal_field, Decimal('0'))
         self.assertEqual(dummy.default_email_field, 'foo@bar.org')
@@ -498,7 +515,6 @@ class MommyHandlesModelWithList(TestCase):
         self.assertTrue(instance.id)
         self.assertEqual(["foo"], instance.fk)
 
-from test.generic.forms import DummyGenericIPAddressFieldForm
 
 class MommyGeneratesIPAdresses(TestCase):
     def test_create_model_with_valid_ips(self):
@@ -511,7 +527,6 @@ class MommyGeneratesIPAdresses(TestCase):
 
 
 class MommyAllowsSaveParameters(TestCase):
-
     def setUp(self):
         self.owner = mommy.make(models.Person)
 
@@ -522,3 +537,22 @@ class MommyAllowsSaveParameters(TestCase):
         dog1, dog2 = mommy.make(models.ModelWithOverridedSave, _save_kwargs={'owner': self.owner}, _quantity=2)
         self.assertEqual(self.owner, dog1.owner)
         self.assertEqual(self.owner, dog2.owner)
+
+
+class MommyAutomaticallyRefreshFromDB(TestCase):
+    def test_refresh_from_db_if_true(self):
+        person = mommy.make(models.Person, birthday='2017-02-01', _refresh_after_create=True)
+
+        self.assertEqual(person.birthday, datetime.date(2017, 2, 1))
+
+    def test_do_not_refresh_from_db_if_false(self):
+        person = mommy.make(models.Person, birthday='2017-02-01', _refresh_after_create=False)
+
+        self.assertEqual(person.birthday, '2017-02-01')
+        self.assertNotEqual(person.birthday, datetime.date(2017, 2, 1))
+
+    def test_do_not_refresh_from_db_by_default(self):
+        person = mommy.make(models.Person, birthday='2017-02-01')
+
+        self.assertEqual(person.birthday, '2017-02-01')
+        self.assertNotEqual(person.birthday, datetime.date(2017, 2, 1))

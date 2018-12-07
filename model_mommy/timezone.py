@@ -5,9 +5,9 @@ https://docs.djangoproject.com/en/1.4/topics/i18n/timezones/
 '''
 
 from datetime import datetime
-from django.conf import settings
 
 try:
+    from django.conf import settings
     from django.utils.timezone import now, utc
 except ImportError:
     now = lambda: datetime.now()

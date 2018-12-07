@@ -51,7 +51,8 @@ def configure_settings(options):
                     'ENGINE': engine,
                     'NAME': 'model_mommy',
                     'TEST_NAME': 'test_model_mommy',
-                    'USER': 'postgres',
+                    'USER': '',
+                    'PASSWORD': '',
                 }
             }
 
