@@ -4,10 +4,15 @@ dist: trusty
 python:
   - "3.5"
   - "3.6"
+matrix:
+  include:
+    - python: 3.7
+      dist: xenial
+      sudo: true
 env:
   - DJANGO=django111
   - DJANGO=django20
-
+  - DJANGO=django21
 before_install:
   - sudo apt-get update && sudo apt-get build-dep python-imaging
   - sudo service postgresql restart
