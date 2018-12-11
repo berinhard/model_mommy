@@ -1,30 +1,24 @@
 sudo: true
 language: python
-dist: trusty
+dist: xenial
 python:
-  - "2.7"
   - "3.5"
   - "3.6"
+  - "3.7"
 env:
-  - DJANGO=django18
-  - DJANGO=django19
-  - DJANGO=django110
   - DJANGO=django111
   - DJANGO=django20
-matrix:
-  exclude:
-    - python: "2.7"
-      env: DJANGO=django20
+  - DJANGO=django21
 before_install:
   - sudo apt-get update && sudo apt-get build-dep python-imaging
   - sudo service postgresql restart
 install:
- - pip install tox
+  - pip install tox
 addons:
   postgresql: "9.6"
   apt:
     packages:
-    - postgresql-9.6-postgis-2.3
+    - postgresql-9.6-postgis-2.4
 services:
   - postgresql
 before_script:

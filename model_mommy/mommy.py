@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from os.path import dirname, join
 
-import django
-
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.apps import apps
@@ -11,10 +9,7 @@ from django.contrib.contenttypes.fields import GenericRelation
 
 from django.db.models.base import ModelBase
 from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, AutoField, BooleanField, FileField
-if django.VERSION >= (1, 9):
-    from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
-else:
-    from django.db.models.fields.related import ForeignRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor
+from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
 from django.db.models.fields.proxy import OrderWrt
 
 from . import generators
@@ -22,7 +17,7 @@ from . import random_gen
 from .exceptions import (ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty,
                          CustomMommyNotFound, InvalidCustomMommy)
 from .utils import import_from_str, import_if_str
-from six import string_types, advance_iterator, PY3
+from six import string_types, advance_iterator
 
 recipes = None
 
@@ -157,10 +152,7 @@ def is_iterator(value):
     if not hasattr(value, '__iter__'):
         return False
 
-    if PY3:
-        return hasattr(value, '__next__')
-    else:
-        return hasattr(value, 'next')
+    return hasattr(value, '__next__')
 
 
 def _custom_mommy_class():
@@ -292,10 +284,7 @@ class Mommy(object):
         one_to_many_keys = {}
         for k in tuple(attrs.keys()):
             field = getattr(self.model, k, None)
-            related_objects_descriptors = (ForeignRelatedObjectsDescriptor,)
-            if django.VERSION < (1, 9): # in django 1.8, these two additional classes weren't subclasses of ForeignRelatedObjectsDescriptor
-                related_objects_descriptors = (ForeignRelatedObjectsDescriptor, ManyRelatedObjectsDescriptor, ReverseManyRelatedObjectsDescriptor)
-            if isinstance(field, related_objects_descriptors):
+            if isinstance(field, ForeignRelatedObjectsDescriptor):
                 one_to_many_keys[k] = attrs.pop(k)
 
         instance = self.model(**attrs)
@@ -355,11 +344,8 @@ class Mommy(object):
 
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
-            if django.VERSION >= (1, 9):
-                manager = getattr(instance, k)
-                manager.set(v, clear=True)
-            else:
-                setattr(instance, k, v)
+            manager = getattr(instance, k)
+            manager.set(v, clear=True)
 
     def _handle_m2m(self, instance):
         for key, values in self.m2m_dict.items():
@@ -381,9 +367,7 @@ class Mommy(object):
                     make(through_model, **base_kwargs)
 
     def _remote_field(self, field):
-        if django.VERSION >= (1, 9):
-            return field.remote_field
-        return field.rel
+        return field.remote_field
 
     def generate_value(self, field, commit=True):
         '''

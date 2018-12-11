@@ -1,10 +1,10 @@
 #coding: utf-8
 
 import itertools
-import django
 from random import choice
-from mock import patch
 from decimal import Decimal
+from unittest.mock import patch
+
 from django.test import TestCase
 from datetime import timedelta
 from model_mommy import mommy

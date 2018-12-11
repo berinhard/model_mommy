@@ -1,14 +1,14 @@
-#coding: utf-8
-from functools import wraps
 import inspect
 import itertools
 from . import mommy
-from .exceptions import RecipeNotFound, RecipeIteratorEmpty
+from .exceptions import RecipeNotFound
 
 # Enable seq to be imported from recipes
 from .utils import seq
 
 from six import string_types
+
+
 
 finder = mommy.ModelFinder()
 

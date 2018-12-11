@@ -314,10 +314,6 @@ You can also provide an optional `increment_by` argument which will modify incre
     p.appointment
     >>> datetime.date(2014, 7, 23)
 
-.. note::
-
-    If your Python's interpreter version is 2.6.x or earlier then `increment_by` is not available for you. `seq` will simply ignore this argument.
-
 Overriding recipe definitions
 -----------------------------
 

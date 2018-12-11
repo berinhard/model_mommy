@@ -16,15 +16,8 @@ from decimal import Decimal
 from os.path import abspath, join, dirname
 from random import randint, choice, random, uniform
 
-import six
-
 from model_mommy.timezone import now
 
-# Map unicode to str in Python 2.x since bytes can be used
-try:
-    str = unicode
-except NameError:
-    pass
 
 MAX_LENGTH = 300
 # Using sys.maxint here breaks a bunch of tests when running against a
@@ -187,10 +180,7 @@ gen_ip.required = ['protocol', 'default_validators']
 
 def gen_byte_string(max_length=16):
     generator = (randint(0, 255) for x in range(max_length))
-    if six.PY2:
-        return "".join(map(chr, generator))
-    elif six.PY3:
-        return bytes(generator)
+    return bytes(generator)
 
 
 def gen_interval(interval_key='milliseconds'):
