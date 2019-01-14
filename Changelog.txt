@@ -6,13 +6,14 @@ Development
 -----------
 - Use default value for unknown field types
 - Enable seq method to be imported directly from model_mommy
+- Stick to Django's roadmap (https://www.djangoproject.com/download/)
 
 1.6.0
 -----
 - Support for Postgres' CI fields types
 - NullBooleanField using gen_boolean generator
 - Remove dependency with Django from model_mommy.random_gen module
-- New paramenter `_refresh_after_create` added to `model_mommy.make` method (defaults to `False`)
+- New parameter `_refresh_after_create` added to `model_mommy.make` method (defaults to `False`)
 
 1.5.1
 -----
