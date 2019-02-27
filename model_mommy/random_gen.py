@@ -1,4 +1,3 @@
-# -*- coding:utf-8 -*-
 """
 Generators are callables that return a value used to populate a field.
 
@@ -77,7 +76,9 @@ def gen_float():
 
 
 def gen_decimal(max_digits, decimal_places):
-    num_as_str = lambda x: ''.join([str(randint(0, 9)) for i in range(x)])
+    def num_as_str(x):
+        return ''.join([str(randint(0, 9)) for i in range(x)])
+
     if decimal_places:
         return Decimal("%s.%s" % (num_as_str(max_digits - decimal_places - 1),
                                   num_as_str(decimal_places)))

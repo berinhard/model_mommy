@@ -1,5 +1,4 @@
-#coding: utf-8
-from .test_mommy import *
-from .test_extending_mommy import *
-from .test_filling_fields import *
-from .test_recipes import *
+from .test_mommy import *  # NoQA
+from .test_extending_mommy import *  # NoQA
+from .test_filling_fields import *  # NoQA
+from .test_recipes import *  # NoQA

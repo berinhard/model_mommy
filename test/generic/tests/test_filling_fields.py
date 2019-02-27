@@ -6,7 +6,6 @@ from unittest import skipUnless
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.core.files.images import ImageFile
 from django.db import models as django_models
@@ -68,14 +67,8 @@ except ImportError:
 
 from django.core.validators import validate_ipv4_address
 
-try:
-    from django.core.validators import validate_ipv6_address, validate_ipv46_address
-except ImportError:
-    def validate_ipv6_address(v):
-        raise ValidationError()
+from django.core.validators import validate_ipv6_address, validate_ipv46_address
 
-
-    validate_ipv46_address = validate_ipv6_address
 
 __all__ = [
     'StringFieldsFilling', 'BooleanFieldsFilling', 'DateTimeFieldsFilling',
@@ -428,22 +421,29 @@ class FillingCustomFields(TestCase):
 
     def test_uses_generator_defined_as_string_on_settings_for_custom_field(self):
         """Should import and use the function present in the import path defined in settings"""
-        generator_dict = {'test.generic.fields.CustomFieldWithGenerator':
-                              'test.generic.generators.gen_value_string'}
+        generator_dict = {
+            'test.generic.fields.CustomFieldWithGenerator':
+                'test.generic.generators.gen_value_string'
+        }
         setattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', generator_dict)
         obj = mommy.make(models.CustomFieldWithGeneratorModel)
         self.assertEqual("value", obj.custom_value)
 
     def test_uses_generator_defined_on_settings_for_custom_foreignkey(self):
         """Should use the function defined in the import path for a foreign key field"""
-        generator_dict = {'test.generic.fields.CustomForeignKey': 'model_mommy.random_gen.gen_related'}
+        generator_dict = {
+            'test.generic.fields.CustomForeignKey': 'model_mommy.random_gen.gen_related'
+        }
         setattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', generator_dict)
         obj = mommy.make(models.CustomForeignKeyWithGeneratorModel, custom_fk__email="a@b.com")
         self.assertEqual('a@b.com', obj.custom_fk.email)
 
     def test_uses_generator_defined_as_string_for_custom_field(self):
         """Should import and use the generator function used in the add method"""
-        mommy.generators.add('test.generic.fields.CustomFieldWithGenerator', 'test.generic.generators.gen_value_string')
+        mommy.generators.add(
+            'test.generic.fields.CustomFieldWithGenerator',
+            'test.generic.generators.gen_value_string'
+        )
         obj = mommy.make(models.CustomFieldWithGeneratorModel)
         self.assertEqual("value", obj.custom_value)
 

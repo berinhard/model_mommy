@@ -1,23 +1,28 @@
-# -*- coding: utf-8 -*-
 from os.path import dirname, join
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.apps import apps
-get_model = apps.get_model
 from django.contrib.contenttypes.fields import GenericRelation
 
 from django.db.models.base import ModelBase
-from django.db.models import ForeignKey, ManyToManyField, OneToOneField, Field, AutoField, BooleanField, FileField
-from django.db.models.fields.related import ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
+from django.db.models import (
+    ForeignKey, ManyToManyField, OneToOneField, Field, AutoField, BooleanField, FileField
+)
+from django.db.models.fields.related import \
+    ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
 from django.db.models.fields.proxy import OrderWrt
 
 from . import generators
 from . import random_gen
-from .exceptions import (ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty,
-                         CustomMommyNotFound, InvalidCustomMommy)
+from .exceptions import (
+    ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty,
+    CustomMommyNotFound, InvalidCustomMommy
+)
 from .utils import import_from_str, import_if_str
 from six import string_types, advance_iterator
+
+get_model = apps.get_model
 
 recipes = None
 
@@ -32,7 +37,8 @@ def _valid_quantity(quantity):
     return quantity is not None and (not isinstance(quantity, int) or quantity < 1)
 
 
-def make(_model, _quantity=None, make_m2m=False, _save_kwargs=None, _refresh_after_create=False, _create_files=False, **attrs):
+def make(_model, _quantity=None, make_m2m=False, _save_kwargs=None, _refresh_after_create=False,
+         _create_files=False, **attrs):
     """
     Creates a persisted instance from a given model its associated models.
     It fill the fields with random values or you can specify
@@ -45,10 +51,18 @@ def make(_model, _quantity=None, make_m2m=False, _save_kwargs=None, _refresh_aft
 
     if _quantity:
         return [
-            mommy.make(_save_kwargs=_save_kwargs, _refresh_after_create=_refresh_after_create, **attrs)
+            mommy.make(
+                _save_kwargs=_save_kwargs,
+                _refresh_after_create=_refresh_after_create,
+                **attrs
+            )
             for _ in range(_quantity)
         ]
-    return mommy.make(_save_kwargs=_save_kwargs, _refresh_after_create=_refresh_after_create, **attrs)
+    return mommy.make(
+        _save_kwargs=_save_kwargs,
+        _refresh_after_create=_refresh_after_create,
+        **attrs
+    )
 
 
 def prepare(_model, _quantity=None, _save_related=False, **attrs):
@@ -76,8 +90,14 @@ def _recipe(name):
 def make_recipe(mommy_recipe_name, _quantity=None, **new_attrs):
     return _recipe(mommy_recipe_name).make(_quantity=_quantity, **new_attrs)
 
+
 def prepare_recipe(mommy_recipe_name, _quantity=None, _save_related=False, **new_attrs):
-    return _recipe(mommy_recipe_name).prepare(_quantity=_quantity, _save_related=_save_related, **new_attrs)
+    return _recipe(mommy_recipe_name).prepare(
+        _quantity=_quantity,
+        _save_related=_save_related,
+        **new_attrs
+    )
+
 
 class ModelFinder(object):
     '''
@@ -169,7 +189,9 @@ def _custom_mommy_class():
 
         for required_function_name in ['make', 'prepare']:
             if not hasattr(mommy_class, required_function_name):
-                raise InvalidCustomMommy('Custom Mommy classes must have a "%s" function' % required_function_name)
+                raise InvalidCustomMommy(
+                    'Custom Mommy classes must have a "%s" function' % required_function_name
+                )
 
         return mommy_class
     except ImportError:
@@ -216,13 +238,13 @@ class Mommy(object):
             generator = import_if_str(v)
             self.type_mapping[field_class] = generator
 
-    def make(self, _save_kwargs=None, _refresh_after_create=False,**attrs):
+    def make(self, _save_kwargs=None, _refresh_after_create=False, **attrs):
         """Creates and persists an instance of the model associated
         with Mommy instance."""
         params = {
             'commit': True,
             'commit_related': True,
-            '_save_kwargs':_save_kwargs,
+            '_save_kwargs': _save_kwargs,
             '_refresh_after_create': _refresh_after_create,
         }
         params.update(attrs)
@@ -239,7 +261,8 @@ class Mommy(object):
     def get_related(self):
         return [r for r in self.model._meta.related_objects if not r.many_to_many]
 
-    def _make(self, commit=True, commit_related=True, _save_kwargs=None, _refresh_after_create=False, **attrs):
+    def _make(self, commit=True, commit_related=True, _save_kwargs=None,
+              _refresh_after_create=False, **attrs):
         _save_kwargs = _save_kwargs or {}
 
         self._clean_attrs(attrs)
@@ -253,13 +276,16 @@ class Mommy(object):
                 else:
                     self.m2m_dict[field.name] = self.model_attrs.pop(field.name)
             elif field.name not in self.model_attrs:
-                if not isinstance(field, ForeignKey) or '{0}_id'.format(field.name) not in self.model_attrs:
+                if not isinstance(field, ForeignKey) or \
+                        '{0}_id'.format(field.name) not in self.model_attrs:
                     self.model_attrs[field.name] = self.generate_value(field, commit_related)
             elif callable(self.model_attrs[field.name]):
                 self.model_attrs[field.name] = self.model_attrs[field.name]()
             elif field.name in self.iterator_attrs:
                 try:
-                    self.model_attrs[field.name] = advance_iterator(self.iterator_attrs[field.name])
+                    self.model_attrs[field.name] = advance_iterator(
+                        self.iterator_attrs[field.name]
+                    )
                 except StopIteration:
                     raise RecipeIteratorEmpty('{0} iterator is empty.'.format(field.name))
 
@@ -307,8 +333,9 @@ class Mommy(object):
         make(**kwargs)
 
     def _clean_attrs(self, attrs):
+        def is_rel_field(x):
+            return '__' in x
         self.fill_in_optional = attrs.pop('_fill_optional', False)
-        is_rel_field = lambda x: '__' in x
         self.iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
         self.model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
         self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
@@ -331,9 +358,18 @@ class Mommy(object):
         if isinstance(field, (AutoField, GenericRelation, OrderWrt)):
             return True
 
-        if all([field.name not in self.model_attrs, field.name not in self.rel_fields, field.name not in self.attr_mapping]):
-            # Django is quirky in that BooleanFields are always "blank", but have no default default.
-            if not field.fill_optional and (not issubclass(field.__class__, Field) or field.has_default() or (field.blank and not isinstance(field, BooleanField))):
+        if all([
+            field.name not in self.model_attrs,
+            field.name not in self.rel_fields,
+            field.name not in self.attr_mapping
+        ]):
+            # Django is quirky in that BooleanFields are always "blank",
+            # but have no default default.
+            if not field.fill_optional and (
+                not issubclass(field.__class__, Field) or
+                field.has_default() or
+                (field.blank and not isinstance(field, BooleanField))
+            ):
                 return True
 
         if field.name not in self.model_attrs:
@@ -387,7 +423,8 @@ class Mommy(object):
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
             generator = random_gen.gen_from_choices(field.choices)
-        elif isinstance(field, ForeignKey) and issubclass(self._remote_field(field).model, ContentType):
+        elif isinstance(field, ForeignKey) and \
+                issubclass(self._remote_field(field).model, ContentType):
             generator = self.type_mapping[ContentType]
         elif generators.get(field.__class__):
             generator = generators.get(field.__class__)
@@ -417,7 +454,7 @@ def get_required_values(generator, field):
     If required value is a string, simply fetch the value from the field
     and return.
     '''
-    #FIXME: avoid abreviations
+    # FIXME: avoid abbreviations
     rt = {}
     if hasattr(generator, 'required'):
         for item in generator.required:

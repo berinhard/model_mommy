@@ -1,9 +1,8 @@
-# -*- coding:utf-8 -*-
 import datetime
 
 from decimal import Decimal
 
-from django.test import TestCase
+from django.test import TestCase, SimpleTestCase
 from django.db.models import Manager
 from django.db.models.signals import m2m_changed
 
@@ -94,7 +93,9 @@ class MommyCreatesSimpleModel(TestCase):
         multiple = mommy.make(models.DummyMultipleInheritanceModel)
         self.assertIsInstance(multiple, models.DummyMultipleInheritanceModel)
         self.assertTrue(models.Person.objects.filter(id=multiple.id))
-        self.assertTrue(models.DummyDefaultFieldsModel.objects.filter(default_id=multiple.default_id))
+        self.assertTrue(models.DummyDefaultFieldsModel.objects.filter(
+            default_id=multiple.default_id
+        ))
 
 
 class MommyRepeatedCreatesSimpleModel(TestCase):
@@ -184,12 +185,12 @@ class MommyCreatesAssociatedModels(TestCase):
     def test_foreign_key_on_parent_should_create_one_object(self):
         '''
         Foreign key on parent gets created twice. Once for
-        parent oject and another time for child object
+        parent object and another time for child object
         '''
         person_count = models.Person.objects.count()
         mommy.make(models.GuardDog)
         self.assertEqual(models.Person.objects.count(), person_count + 1)
-    
+
     def test_foreign_key_on_parent_is_not_created(self):
         '''
         Foreign key on parent doesn't get created using owner
@@ -199,7 +200,7 @@ class MommyCreatesAssociatedModels(TestCase):
         dog = mommy.make(models.GuardDog, owner=owner)
         self.assertEqual(models.Person.objects.count(), person_count)
         self.assertEqual(dog.owner, owner)
-    
+
     def test_foreign_key_on_parent_id_is_not_created(self):
         '''
         Foreign key on parent doesn't get created using owner_id
@@ -213,16 +214,17 @@ class MommyCreatesAssociatedModels(TestCase):
     def test_auto_now_add_on_parent_should_work(self):
         '''
         Foreign key on parent gets created twice. Once for
-        parent oject and another time for child object
+        parent object and another time for child object
         '''
         person_count = models.Person.objects.count()
         dog = mommy.make(models.GuardDog)
+        self.assertEqual(models.Person.objects.count(), person_count + 1)
         self.assertNotEqual(dog.created, None)
 
     def test_attrs_on_related_model_through_parent(self):
         '''
         Foreign key on parent gets created twice. Once for
-        parent oject and another time for child object
+        parent object and another time for child object
         '''
         mommy.make(models.GuardDog, owner__name='john')
         for person in models.Person.objects.all():
@@ -294,10 +296,12 @@ class MommyCreatesAssociatedModels(TestCase):
         self.assertEqual(classroom.students.count(), 0)
 
     def test_m2m_changed_signal_is_fired(self):
-        # Use object attrs instead of mocks for Django 1.4 compat
+        # TODO: Use object attrs instead of mocks for Django 1.4 compat
         self.m2m_changed_fired = False
+
         def test_m2m_changed(*args, **kwargs):
             self.m2m_changed_fired = True
+
         m2m_changed.connect(test_m2m_changed, dispatch_uid='test_m2m_changed')
         mommy.make(models.Store, make_m2m=True)
         self.assertTrue(self.m2m_changed_fired)
@@ -405,14 +409,12 @@ class HandlingContentTypeField(TestCase):
     def test_create_model_with_contenttype_field(self):
         dummy = mommy.make(models.DummyGenericForeignKeyModel)
         self.assertIsInstance(dummy, models.DummyGenericForeignKeyModel)
-try:
-    from django.test import SimpleTestCase
-    class HandlingContentTypeFieldNoQueries(SimpleTestCase):
-        def test_create_model_with_contenttype_field(self):
-            dummy = mommy.prepare(models.DummyGenericForeignKeyModel)
-            self.assertIsInstance(dummy, models.DummyGenericForeignKeyModel)
-except ImportError:
-    pass
+
+
+class HandlingContentTypeFieldNoQueries(SimpleTestCase):
+    def test_create_model_with_contenttype_field(self):
+        dummy = mommy.prepare(models.DummyGenericForeignKeyModel)
+        self.assertIsInstance(dummy, models.DummyGenericForeignKeyModel)
 
 
 class SkipNullsTestCase(TestCase):
@@ -450,7 +452,10 @@ class FillBlanksTestCase(TestCase):
         self.assertEqual(len(dummy.blank_char_field), 50)
 
     def test_fill_many_optional(self):
-        dummy = mommy.make(models.DummyBlankFieldsModel, _fill_optional=['blank_char_field', 'blank_text_field'])
+        dummy = mommy.make(
+            models.DummyBlankFieldsModel,
+            _fill_optional=['blank_char_field', 'blank_text_field']
+        )
         self.assertEqual(len(dummy.blank_text_field), 300)
 
     def test_fill_all_optional(self):
@@ -535,7 +540,11 @@ class MommyAllowsSaveParameters(TestCase):
         dog = mommy.make(models.ModelWithOverridedSave, _save_kwargs={'owner': self.owner})
         self.assertEqual(self.owner, dog.owner)
 
-        dog1, dog2 = mommy.make(models.ModelWithOverridedSave, _save_kwargs={'owner': self.owner}, _quantity=2)
+        dog1, dog2 = mommy.make(
+            models.ModelWithOverridedSave,
+            _save_kwargs={'owner': self.owner},
+            _quantity=2
+        )
         self.assertEqual(self.owner, dog1.owner)
         self.assertEqual(self.owner, dog2.owner)
 

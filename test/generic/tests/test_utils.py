@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.test import TestCase
 
 from model_mommy.utils import import_if_str

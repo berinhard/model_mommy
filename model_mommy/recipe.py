@@ -4,11 +4,9 @@ from . import mommy
 from .exceptions import RecipeNotFound
 
 # Enable seq to be imported from recipes
-from .utils import seq
+from .utils import seq  # NoQA
 
 from six import string_types
-
-
 
 finder = mommy.ModelFinder()
 
@@ -23,7 +21,7 @@ class Recipe(object):
     def _mapping(self, new_attrs):
         _save_related = new_attrs.get('_save_related', True)
         rel_fields_attrs = dict((k, v) for k, v in new_attrs.items() if '__' in k)
-        new_attrs = dict((k, v) for k, v in new_attrs.items() if not '__' in k)
+        new_attrs = dict((k, v) for k, v in new_attrs.items() if '__' not in k)
         mapping = self.attr_mapping.copy()
         for k, v in self.attr_mapping.items():
             # do not generate values if field value is provided
@@ -35,10 +33,12 @@ class Recipe(object):
                 else:
                     m = self._model
                 if k not in self._iterator_backups or m.objects.count() == 0:
-                    self._iterator_backups[k] = itertools.tee(self._iterator_backups.get(k, [v])[0])
+                    self._iterator_backups[k] = itertools.tee(
+                        self._iterator_backups.get(k, [v])[0]
+                    )
                 mapping[k] = self._iterator_backups[k][1]
             elif isinstance(v, RecipeForeignKey):
-                a={}
+                a = {}
                 for key, value in list(rel_fields_attrs.items()):
                     if key.startswith('%s__' % k):
                         a[key] = rel_fields_attrs.pop(key)

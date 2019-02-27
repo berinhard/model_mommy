@@ -1,37 +1,35 @@
-# coding: utf-8
-
-from __future__ import absolute_import
-
 #######################################
 # TESTING PURPOSE ONLY MODELS!!       #
 # DO NOT ADD THE APP TO INSTALLED_APPS#
 #######################################
+import datetime as base_datetime
 from decimal import Decimal
 from tempfile import gettempdir
 
 from model_mommy.gis import MOMMY_GIS
 
-if MOMMY_GIS:
-    from django.contrib.gis.db import models
-else:
-    from django.db import models
 from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
-from .fields import CustomFieldWithGenerator, CustomFieldWithoutGenerator, FakeListField, CustomForeignKey
-
+from .fields import (
+    CustomFieldWithGenerator, CustomFieldWithoutGenerator, FakeListField, CustomForeignKey
+)
 from model_mommy.timezone import smart_datetime as datetime
-import datetime as base_datetime
 
 # check whether or not PIL is installed
 try:
-    from PIL import ImageFile as PilImageFile
+    from PIL import ImageFile as PilImageFile  # NoQA
 except ImportError:
     has_pil = False
 else:
     has_pil = True
+
+if MOMMY_GIS:
+    from django.contrib.gis.db import models
+else:
+    from django.db import models
 
 GENDER_CH = [('M', 'male'), ('F', 'female')]
 
@@ -234,7 +232,11 @@ class DummyGenericRelationModel(models.Model):
 
 
 class DummyNullFieldsModel(models.Model):
-    null_foreign_key = models.ForeignKey('DummyBlankFieldsModel', null=True, on_delete=models.CASCADE)
+    null_foreign_key = models.ForeignKey(
+        'DummyBlankFieldsModel',
+        null=True,
+        on_delete=models.CASCADE
+    )
     null_integer_field = models.IntegerField(null=True)
 
 
@@ -345,7 +347,7 @@ class DummyGenericIPAddressFieldModel(models.Model):
 
 class AbstractModel(models.Model):
     class Meta(object):
-        abstract=True
+        abstract = True
 
     name = models.CharField(max_length=30)
 

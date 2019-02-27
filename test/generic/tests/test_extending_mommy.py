@@ -1,4 +1,3 @@
-from django.db.models.fields import BooleanField
 from django.test import TestCase
 
 from model_mommy import mommy
@@ -26,24 +25,28 @@ class SimpleExtendMommy(TestCase):
 class LessSimpleExtendMommy(TestCase):
 
     def test_unexistent_required_field(self):
-        gen_oposite = lambda x: not x
-        gen_oposite.required = ['house']
+        def gen_opposite(x):
+            return not x
+
+        gen_opposite.required = ['house']
 
         class SadPeopleMommy(mommy.Mommy):
-            attr_mapping = {'happy': gen_oposite}
+            attr_mapping = {'happy': gen_opposite}
 
         mom = SadPeopleMommy(Person)
         self.assertRaises(AttributeError, mom.make)
 
-    #TODO: put a better name
+    # TODO: put a better name
     def test_string_to_generator_required(self):
-        gen_oposite = lambda default: not default
-        gen_oposite.required = ['default']
+        def gen_opposite(default):
+            return not default
+
+        gen_opposite.required = ['default']
 
         class SadPeopleMommy(mommy.Mommy):
             attr_mapping = {
-                'happy': gen_oposite,
-                'unhappy': gen_oposite,
+                'happy': gen_opposite,
+                'unhappy': gen_opposite,
             }
 
         happy_field = Person._meta.get_field('happy')
@@ -54,7 +57,8 @@ class LessSimpleExtendMommy(TestCase):
         self.assertEqual(person.unhappy, not unhappy_field.default)
 
     def test_fail_pass_non_string_to_generator_required(self):
-        gen_age = lambda x: 10
+        def gen_age():
+            return 10
 
         class MyMommy(mommy.Mommy):
             attr_mapping = {'age': gen_age}
@@ -81,16 +85,20 @@ class LessSimpleExtendMommy(TestCase):
         gen_age.required = [True]
         self.assertRaises(ValueError, mom.make)
 
+
 class ClassWithoutMake(object):
     def prepare(self):
         pass
+
 
 class ClassWithoutPrepare(object):
     def make(self):
         pass
 
+
 class MommySubclass(mommy.Mommy):
     pass
+
 
 class MommyDuck(object):
     def __init__(*args, **kwargs):
@@ -101,6 +109,7 @@ class MommyDuck(object):
 
     def prepare(self):
         pass
+
 
 class CustomizeMommyClassViaSettings(TestCase):
     def class_to_import_string(self, class_to_convert):
@@ -116,7 +125,9 @@ class CustomizeMommyClassViaSettings(TestCase):
 
     def test_create_fail_on_missing_required_functions(self):
         for invalid_mommy_class in [ClassWithoutMake, ClassWithoutPrepare]:
-            with self.settings(MOMMY_CUSTOM_CLASS=self.class_to_import_string(invalid_mommy_class)):
+            with self.settings(
+                MOMMY_CUSTOM_CLASS=self.class_to_import_string(invalid_mommy_class)
+            ):
                 self.assertRaises(InvalidCustomMommy, mommy.Mommy.create, Person)
 
     def test_create_succeeds_with_valid_custom_mommy(self):

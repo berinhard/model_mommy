@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import importlib
 import datetime
 import itertools
@@ -6,6 +5,7 @@ import itertools
 from .timezone import tz_aware
 from six import string_types
 
+# TODO: remove this since Python 2 support was dropped
 # Python 2.6.x compatibility code
 itertools_count = itertools.count
 try:
@@ -43,6 +43,7 @@ def import_from_str(import_string):
     return getattr(module, field_name)
 
 
+# TODO: remove this since Python 2 support was dropped
 def _total_secs(td):
     """
     python 2.6 compatible timedelta total seconds calculation
@@ -52,7 +53,7 @@ def _total_secs(td):
     if hasattr(td, 'total_seconds'):
         return td.total_seconds()
     else:
-        #py26
+        # py26
         return (td.microseconds + (td.seconds + td.days * 24 * 3600) * 10**6) / 10.0**6
 
 

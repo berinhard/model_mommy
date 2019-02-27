@@ -1,5 +1,3 @@
-#coding: utf-8
-
 import itertools
 from random import choice
 from decimal import Decimal
@@ -8,7 +6,7 @@ from unittest.mock import patch
 from django.test import TestCase
 from datetime import timedelta
 from model_mommy import mommy
-from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey, related
+from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
 from model_mommy.timezone import now, tz_aware
 from model_mommy.exceptions import InvalidQuantityException, RecipeIteratorEmpty
 from test.generic.models import TEST_TIME, Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
@@ -38,7 +36,7 @@ class TestDefiningRecipes(TestCase):
             Import seq method directly from mommy module
         """
         try:
-            from model_mommy import seq
+            from model_mommy import seq  # NoQA
         except ImportError:
             self.fail('{} raised'.format(ImportError.__name__))
 
@@ -71,8 +69,9 @@ class TestDefiningRecipes(TestCase):
         self.assertEqual(person.id, None)
 
     def test_accepts_callable(self):
-        r = Recipe(DummyBlankFieldsModel,
-            blank_char_field = lambda: 'callable!!'
+        r = Recipe(
+            DummyBlankFieldsModel,
+            blank_char_field=lambda: 'callable!!'
         )
         value = r.make().blank_char_field
         self.assertEqual(value, 'callable!!')
@@ -80,9 +79,10 @@ class TestDefiningRecipes(TestCase):
     def test_always_calls_when_creating(self):
         with patch('test.generic.tests.test_recipes.choice') as choice_mock:
             choice.return_value = 'foo'
-            l = ['foo', 'bar', 'spam', 'eggs']
-            r = Recipe(DummyBlankFieldsModel,
-                blank_char_field = lambda: choice(l)
+            lst = ['foo', 'bar', 'spam', 'eggs']
+            r = Recipe(
+                DummyBlankFieldsModel,
+                blank_char_field=lambda: choice(lst)
             )
             r.make().blank_char_field
             r.make().blank_char_field
@@ -91,9 +91,10 @@ class TestDefiningRecipes(TestCase):
     def test_always_calls_with_quantity(self):
         with patch('test.generic.tests.test_recipes.choice') as choice_mock:
             choice.return_value = 'foo'
-            l = ['foo', 'bar', 'spam', 'eggs']
-            r = Recipe(DummyBlankFieldsModel,
-                blank_char_field = lambda: choice(l)
+            lst = ['foo', 'bar', 'spam', 'eggs']
+            r = Recipe(
+                DummyBlankFieldsModel,
+                blank_char_field=lambda: choice(lst)
             )
             r.make(_quantity=3)
             self.assertEqual(choice_mock.call_count, 3)
@@ -164,13 +165,14 @@ class TestDefiningRecipes(TestCase):
 
     def test_defining_recipes_str(self):
         from model_mommy.recipe import seq
-        p = Recipe('generic.Person',
+        p = Recipe(
+            'generic.Person',
             name=seq('foo')
         )
         try:
             p.make(_quantity=5)
         except AttributeError as e:
-            self.fail('%s' %e)
+            self.fail('%s' % e)
 
 
 class TestExecutingRecipes(TestCase):
@@ -253,7 +255,12 @@ class TestExecutingRecipes(TestCase):
         self.assertTrue(dog.owner.id)
 
     def test_make_recipe_with_quantity_parameter_respection_model_args(self):
-        people = mommy.make_recipe('test.generic.person', _quantity=3, name='Dennis Ritchie', age=70)
+        people = mommy.make_recipe(
+            'test.generic.person',
+            _quantity=3,
+            name='Dennis Ritchie',
+            age=70
+        )
         self.assertEqual(len(people), 3)
         for person in people:
             self.assertEqual(person.name, 'Dennis Ritchie')
@@ -271,7 +278,8 @@ class TestExecutingRecipes(TestCase):
 
     def test_prepare_recipe_with_foreign_key(self):
         person_recipe = Recipe(Person, name='John Doe')
-        dog_recipe = Recipe(Dog,
+        dog_recipe = Recipe(
+            Dog,
             owner=foreign_key(person_recipe),
         )
         dog = dog_recipe.prepare()
@@ -287,7 +295,12 @@ class TestExecutingRecipes(TestCase):
             self.assertEqual(person.id, None)
 
     def test_prepare_recipe_with_quantity_parameter_respection_model_args(self):
-        people = mommy.prepare_recipe('test.generic.person', _quantity=3, name='Dennis Ritchie', age=70)
+        people = mommy.prepare_recipe(
+            'test.generic.person',
+            _quantity=3,
+            name='Dennis Ritchie',
+            age=70
+        )
         self.assertEqual(len(people), 3)
         for person in people:
             self.assertEqual(person.name, 'Dennis Ritchie')
@@ -332,8 +345,9 @@ class TestExecutingRecipes(TestCase):
 
 class ForeignKeyTestCase(TestCase):
     def test_foreign_key_method_returns_a_recipe_foreign_key_object(self):
-        number_recipe = Recipe(DummyNumbersModel,
-            float_field = 1.6
+        number_recipe = Recipe(
+            DummyNumbersModel,
+            float_field=1.6
         )
         obj = foreign_key(number_recipe)
         self.assertIsInstance(obj, RecipeForeignKey)
@@ -463,7 +477,7 @@ class TestSequences(TestCase):
             self.assertEqual(dummy.value, 10 + i)
 
     def test_creates_unique_field_recipe_using_quantity_argument(self):
-        dummies= mommy.make_recipe('test.generic.dummy_unique_field', _quantity=3)
+        dummies = mommy.make_recipe('test.generic.dummy_unique_field', _quantity=3)
         self.assertEqual(11, dummies[0].value)
         self.assertEqual(12, dummies[1].value)
         self.assertEqual(13, dummies[2].value)
@@ -505,6 +519,7 @@ class TestSequences(TestCase):
         self.assertEqual(person.name, 'joe1')
         person = mommy.prepare_recipe('test.generic.serial_person')
         self.assertEqual(person.name, 'joe2')
+
 
 class TestIterators(TestCase):
 

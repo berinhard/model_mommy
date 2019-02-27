@@ -7,6 +7,10 @@ from os.path import dirname, join
 
 import django
 
+# We only need this if HstoreFields are a possibility
+from django.db.backends.signals import connection_created
+from django.test.runner import DiscoverRunner
+
 
 def parse_args():
     parser = OptionParser()
@@ -67,11 +71,6 @@ def configure_settings(options):
         settings.configure(**params)
 
     return settings
-
-
-# We only need this if HstoreFields are a possibility
-from django.db.backends.signals import connection_created
-from django.test.runner import DiscoverRunner
 
 
 def create_hstore(sender, **kwargs):
