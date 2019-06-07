@@ -236,6 +236,20 @@ class MommyCreatesAssociatedModels(TestCase):
         except TypeError:
             self.fail('type error raised')
 
+    def test_save_object_instances_when_handling_one_to_many_relations(self):
+        owner = mommy.make(models.Person)
+        dogs_set = mommy.prepare(
+            models.Dog,
+            owner=owner,
+            _quantity=2,
+        )
+        home = mommy.make(
+            models.Home,
+            owner=owner,
+            dogs=dogs_set,
+        )
+        self.assertEqual(home.dogs.count(), 2)
+
     def test_prepare_fk(self):
         dog = mommy.prepare(models.Dog)
         self.assertIsInstance(dog, models.Dog)
