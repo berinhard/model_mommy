@@ -1,6 +1,8 @@
 -r requirements.txt
-django-test-without-migrations==0.6
+pillow
 pre-commit
+pytest
+pytest-django
 sphinx
 tox
 wheel

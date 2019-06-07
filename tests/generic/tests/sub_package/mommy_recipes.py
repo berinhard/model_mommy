@@ -1,5 +1,5 @@
 from model_mommy.recipe import Recipe
-from test.generic.models import Person
+from tests.generic.models import Person
 
 from datetime import date, datetime
 

@@ -9,8 +9,8 @@ from model_mommy import mommy
 from model_mommy.recipe import Recipe, foreign_key, RecipeForeignKey
 from model_mommy.timezone import now, tz_aware
 from model_mommy.exceptions import InvalidQuantityException, RecipeIteratorEmpty
-from test.generic.models import TEST_TIME, Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
-from test.generic.mommy_recipes import SmallDogRecipe, pug
+from tests.generic.models import TEST_TIME, Person, DummyNumbersModel, DummyBlankFieldsModel, Dog
+from tests.generic.mommy_recipes import SmallDogRecipe, pug
 
 
 class TestDefiningRecipes(TestCase):
@@ -77,24 +77,24 @@ class TestDefiningRecipes(TestCase):
         self.assertEqual(value, 'callable!!')
 
     def test_always_calls_when_creating(self):
-        with patch('test.generic.tests.test_recipes.choice') as choice_mock:
-            choice.return_value = 'foo'
+        with patch('tests.test_recipes.choice') as choice_mock:
+            choice_mock.return_value = 'foo'
             lst = ['foo', 'bar', 'spam', 'eggs']
             r = Recipe(
                 DummyBlankFieldsModel,
-                blank_char_field=lambda: choice(lst)
+                blank_char_field=lambda: choice_mock(lst)
             )
             r.make().blank_char_field
             r.make().blank_char_field
             self.assertEqual(choice_mock.call_count, 2)
 
     def test_always_calls_with_quantity(self):
-        with patch('test.generic.tests.test_recipes.choice') as choice_mock:
-            choice.return_value = 'foo'
+        with patch('tests.test_recipes.choice') as choice_mock:
+            choice_mock.return_value = 'foo'
             lst = ['foo', 'bar', 'spam', 'eggs']
             r = Recipe(
                 DummyBlankFieldsModel,
-                blank_char_field=lambda: choice(lst)
+                blank_char_field=lambda: choice_mock(lst)
             )
             r.make(_quantity=3)
             self.assertEqual(choice_mock.call_count, 3)
@@ -180,83 +180,83 @@ class TestExecutingRecipes(TestCase):
       Tests for calling recipes defined in mommy_recipes.py
     """
     def test_model_with_foreign_key(self):
-        dog = mommy.make_recipe('test.generic.dog')
+        dog = mommy.make_recipe('tests.generic.dog')
         self.assertEqual(dog.breed, 'Pug')
         self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
-        dog = mommy.prepare_recipe('test.generic.dog')
+        dog = mommy.prepare_recipe('tests.generic.dog')
         self.assertEqual(dog.breed, 'Pug')
         self.assertIsInstance(dog.owner, Person)
         self.assertIsNone(dog.owner.id)
 
-        dog = mommy.prepare_recipe('test.generic.dog', _save_related=True)
+        dog = mommy.prepare_recipe('tests.generic.dog', _save_related=True)
         self.assertEqual(dog.breed, 'Pug')
         self.assertIsInstance(dog.owner, Person)
         self.assertIsNotNone(dog.owner.id)
 
-        dogs = mommy.make_recipe('test.generic.dog', _quantity=2)
+        dogs = mommy.make_recipe('tests.generic.dog', _quantity=2)
         owner = dogs[0].owner
         for dog in dogs:
             self.assertEqual(dog.breed, 'Pug')
             self.assertEqual(dog.owner, owner)
 
     def test_model_with_foreign_key_as_str(self):
-        dog = mommy.make_recipe('test.generic.other_dog')
+        dog = mommy.make_recipe('tests.generic.other_dog')
         self.assertEqual(dog.breed, 'Basset')
         self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
-        dog = mommy.prepare_recipe('test.generic.other_dog')
+        dog = mommy.prepare_recipe('tests.generic.other_dog')
         self.assertEqual(dog.breed, 'Basset')
         self.assertIsInstance(dog.owner, Person)
         self.assertIsNone(dog.owner.id)
 
     def test_model_with_foreign_key_as_unicode(self):
-        dog = mommy.make_recipe('test.generic.other_dog_unicode')
+        dog = mommy.make_recipe('tests.generic.other_dog_unicode')
         self.assertEqual(dog.breed, 'Basset')
         self.assertIsInstance(dog.owner, Person)
         self.assertNotEqual(dog.owner.id, None)
 
-        dog = mommy.prepare_recipe('test.generic.other_dog_unicode')
+        dog = mommy.prepare_recipe('tests.generic.other_dog_unicode')
         self.assertEqual(dog.breed, 'Basset')
         self.assertIsInstance(dog.owner, Person)
         self.assertIsNone(dog.owner.id)
 
     def test_make_recipe(self):
-        person = mommy.make_recipe('test.generic.person')
+        person = mommy.make_recipe('tests.generic.person')
         self.assertIsInstance(person, Person)
         self.assertNotEqual(person.id, None)
 
     def test_make_recipe_with_quantity_parameter(self):
-        people = mommy.make_recipe('test.generic.person', _quantity=3)
+        people = mommy.make_recipe('tests.generic.person', _quantity=3)
         self.assertEqual(len(people), 3)
         for person in people:
             self.assertIsInstance(person, Person)
             self.assertNotEqual(person.id, None)
 
     def test_make_extended_recipe(self):
-        extended_dog = mommy.make_recipe('test.generic.extended_dog')
+        extended_dog = mommy.make_recipe('tests.generic.extended_dog')
         self.assertEqual(extended_dog.breed, 'Super basset')
         # No side effects happened due to extension
-        base_dog = mommy.make_recipe('test.generic.dog')
+        base_dog = mommy.make_recipe('tests.generic.dog')
         self.assertEqual(base_dog.breed, 'Pug')
 
     def test_extended_recipe_type(self):
         self.assertIsInstance(pug, SmallDogRecipe)
 
     def test_save_related_instances_on_prepare_recipe(self):
-        dog = mommy.prepare_recipe('test.generic.homeless_dog')
+        dog = mommy.prepare_recipe('tests.generic.homeless_dog')
         self.assertIsNone(dog.id)
         self.assertIsNone(dog.owner.id)
 
-        dog = mommy.prepare_recipe('test.generic.homeless_dog', _save_related=True)
+        dog = mommy.prepare_recipe('tests.generic.homeless_dog', _save_related=True)
         self.assertIsNone(dog.id)
         self.assertTrue(dog.owner.id)
 
     def test_make_recipe_with_quantity_parameter_respection_model_args(self):
         people = mommy.make_recipe(
-            'test.generic.person',
+            'tests.generic.person',
             _quantity=3,
             name='Dennis Ritchie',
             age=70
@@ -269,11 +269,11 @@ class TestExecutingRecipes(TestCase):
     def test_make_recipe_raises_correct_exception_if_invalid_quantity(self):
         self.assertRaises(
             InvalidQuantityException,
-            mommy.make_recipe, 'test.generic.person', _quantity="hi"
+            mommy.make_recipe, 'tests.generic.person', _quantity="hi"
         )
         self.assertRaises(
             InvalidQuantityException,
-            mommy.make_recipe, 'test.generic.person', _quantity=-1
+            mommy.make_recipe, 'tests.generic.person', _quantity=-1
         )
 
     def test_prepare_recipe_with_foreign_key(self):
@@ -288,7 +288,7 @@ class TestExecutingRecipes(TestCase):
         self.assertIsNone(dog.owner.id)
 
     def test_prepare_recipe_with_quantity_parameter(self):
-        people = mommy.prepare_recipe('test.generic.person', _quantity=3)
+        people = mommy.prepare_recipe('tests.generic.person', _quantity=3)
         self.assertEqual(len(people), 3)
         for person in people:
             self.assertIsInstance(person, Person)
@@ -296,7 +296,7 @@ class TestExecutingRecipes(TestCase):
 
     def test_prepare_recipe_with_quantity_parameter_respection_model_args(self):
         people = mommy.prepare_recipe(
-            'test.generic.person',
+            'tests.generic.person',
             _quantity=3,
             name='Dennis Ritchie',
             age=70
@@ -309,37 +309,37 @@ class TestExecutingRecipes(TestCase):
     def test_prepare_recipe_raises_correct_exception_if_invalid_quantity(self):
         self.assertRaises(
             InvalidQuantityException,
-            mommy.prepare_recipe, 'test.generic.person', _quantity="hi"
+            mommy.prepare_recipe, 'tests.generic.person', _quantity="hi"
         )
         self.assertRaises(
             InvalidQuantityException,
-            mommy.prepare_recipe, 'test.generic.person', _quantity=-1
+            mommy.prepare_recipe, 'tests.generic.person', _quantity=-1
         )
 
     def test_prepare_recipe(self):
-        person = mommy.prepare_recipe('test.generic.person')
+        person = mommy.prepare_recipe('tests.generic.person')
         self.assertIsInstance(person, Person)
         self.assertEqual(person.id, None)
 
     def test_make_recipe_with_args(self):
-        person = mommy.make_recipe('test.generic.person', name='Dennis Ritchie', age=70)
+        person = mommy.make_recipe('tests.generic.person', name='Dennis Ritchie', age=70)
         self.assertEqual(person.name, 'Dennis Ritchie')
         self.assertEqual(person.age, 70)
 
     def test_prepare_recipe_with_args(self):
-        person = mommy.prepare_recipe('test.generic.person', name='Dennis Ritchie', age=70)
+        person = mommy.prepare_recipe('tests.generic.person', name='Dennis Ritchie', age=70)
         self.assertEqual(person.name, 'Dennis Ritchie')
         self.assertEqual(person.age, 70)
 
     def test_import_recipe_inside_deeper_modules(self):
-        recipe_name = 'test.generic.tests.sub_package.person'
+        recipe_name = 'tests.generic.tests.sub_package.person'
         person = mommy.prepare_recipe(recipe_name)
         self.assertEqual(person.name, 'John Deeper')
 
     def test_pass_save_kwargs(self):
         owner = mommy.make(Person)
 
-        dog = mommy.make_recipe('test.generic.overrided_save', _save_kwargs={'owner': owner})
+        dog = mommy.make_recipe('tests.generic.overrided_save', _save_kwargs={'owner': owner})
         self.assertEqual(owner, dog.owner)
 
 
@@ -363,11 +363,11 @@ class ForeignKeyTestCase(TestCase):
           It should not attempt to create other object when
           passing the object as argument
         """
-        person = mommy.make_recipe('test.generic.person')
+        person = mommy.make_recipe('tests.generic.person')
         self.assertEqual(Person.objects.count(), 1)
-        mommy.make_recipe('test.generic.dog', owner=person)
+        mommy.make_recipe('tests.generic.dog', owner=person)
         self.assertEqual(Person.objects.count(), 1)
-        mommy.prepare_recipe('test.generic.dog', owner=person)
+        mommy.prepare_recipe('tests.generic.dog', owner=person)
         self.assertEqual(Person.objects.count(), 1)
 
     def test_do_query_lookup_for_recipes_make_method(self):
@@ -375,7 +375,7 @@ class ForeignKeyTestCase(TestCase):
           It should not attempt to create other object when
           using query lookup syntax
         """
-        dog = mommy.make_recipe('test.generic.dog', owner__name='James')
+        dog = mommy.make_recipe('tests.generic.dog', owner__name='James')
         self.assertEqual(Person.objects.count(), 1)
         self.assertEqual(dog.owner.name, 'James')
 
@@ -384,7 +384,7 @@ class ForeignKeyTestCase(TestCase):
           It should not attempt to create other object when
           using query lookup syntax
         """
-        dog = mommy.prepare_recipe('test.generic.dog', owner__name='James')
+        dog = mommy.prepare_recipe('tests.generic.dog', owner__name='James')
         self.assertEqual(dog.owner.name, 'James')
 
     def test_do_query_lookup_empty_recipes(self):
@@ -402,30 +402,30 @@ class ForeignKeyTestCase(TestCase):
         self.assertEqual(dog.owner.name, 'Zezin')
 
     def test_related_models_recipes(self):
-        lady = mommy.make_recipe('test.generic.dog_lady')
+        lady = mommy.make_recipe('tests.generic.dog_lady')
         self.assertEqual(lady.dog_set.count(), 2)
         self.assertEqual(lady.dog_set.all()[0].breed, 'Pug')
         self.assertEqual(lady.dog_set.all()[1].breed, 'Basset')
 
     def test_nullable_related(self):
-        nullable = mommy.make_recipe('test.generic.nullable_related')
+        nullable = mommy.make_recipe('tests.generic.nullable_related')
         self.assertEqual(nullable.dummynullfieldsmodel_set.count(), 1)
 
     def test_chained_related(self):
-        movie = mommy.make_recipe('test.generic.movie_with_cast')
+        movie = mommy.make_recipe('tests.generic.movie_with_cast')
         self.assertEqual(movie.cast_members.count(), 2)
 
 
 class M2MFieldTestCase(TestCase):
     def test_create_many_to_many(self):
-        dog = mommy.make_recipe('test.generic.dog_with_friends')
+        dog = mommy.make_recipe('tests.generic.dog_with_friends')
         self.assertEqual(len(dog.friends_with.all()), 2)
         for friend in dog.friends_with.all():
             self.assertEqual(friend.breed, 'Pug')
             self.assertEqual(friend.owner.name, 'John Doe')
 
     def test_create_nested(self):
-        dog = mommy.make_recipe('test.generic.dog_with_more_friends')
+        dog = mommy.make_recipe('tests.generic.dog_with_more_friends')
         self.assertEqual(len(dog.friends_with.all()), 1)
         friend = dog.friends_with.all()[0]
         self.assertEqual(len(friend.friends_with.all()), 2)
@@ -433,23 +433,23 @@ class M2MFieldTestCase(TestCase):
 
 class TestSequences(TestCase):
     def test_increment_for_strings(self):
-        person = mommy.make_recipe('test.generic.serial_person')
+        person = mommy.make_recipe('tests.generic.serial_person')
         self.assertEqual(person.name, 'joe1')
-        person = mommy.prepare_recipe('test.generic.serial_person')
+        person = mommy.prepare_recipe('tests.generic.serial_person')
         self.assertEqual(person.name, 'joe2')
-        person = mommy.make_recipe('test.generic.serial_person')
+        person = mommy.make_recipe('tests.generic.serial_person')
         self.assertEqual(person.name, 'joe3')
 
     def test_increment_for_numbers(self):
-        dummy = mommy.make_recipe('test.generic.serial_numbers')
+        dummy = mommy.make_recipe('tests.generic.serial_numbers')
         self.assertEqual(dummy.default_int_field, 11)
         self.assertEqual(dummy.default_decimal_field, Decimal('21.1'))
         self.assertEqual(dummy.default_float_field, 2.23)
-        dummy = mommy.make_recipe('test.generic.serial_numbers')
+        dummy = mommy.make_recipe('tests.generic.serial_numbers')
         self.assertEqual(dummy.default_int_field, 12)
         self.assertEqual(dummy.default_decimal_field, Decimal('22.1'))
         self.assertEqual(dummy.default_float_field, 3.23)
-        dummy = mommy.prepare_recipe('test.generic.serial_numbers')
+        dummy = mommy.prepare_recipe('tests.generic.serial_numbers')
         self.assertEqual(dummy.default_int_field, 13)
         self.assertEqual(dummy.default_decimal_field, Decimal('23.1'))
         self.assertEqual(dummy.default_float_field, 4.23)
@@ -458,66 +458,66 @@ class TestSequences(TestCase):
         """
         This test is a repeated one but it is necessary to ensure Sequences atomicity
         """
-        dummy = mommy.make_recipe('test.generic.serial_numbers')
+        dummy = mommy.make_recipe('tests.generic.serial_numbers')
         self.assertEqual(dummy.default_int_field, 11)
         self.assertEqual(dummy.default_decimal_field, Decimal('21.1'))
         self.assertEqual(dummy.default_float_field, 2.23)
-        dummy = mommy.make_recipe('test.generic.serial_numbers')
+        dummy = mommy.make_recipe('tests.generic.serial_numbers')
         self.assertEqual(dummy.default_int_field, 12)
         self.assertEqual(dummy.default_decimal_field, Decimal('22.1'))
         self.assertEqual(dummy.default_float_field, 3.23)
-        dummy = mommy.prepare_recipe('test.generic.serial_numbers')
+        dummy = mommy.prepare_recipe('tests.generic.serial_numbers')
         self.assertEqual(dummy.default_int_field, 13)
         self.assertEqual(dummy.default_decimal_field, Decimal('23.1'))
         self.assertEqual(dummy.default_float_field, 4.23)
 
     def test_creates_unique_field_recipe_using_for_iterator(self):
         for i in range(1, 4):
-            dummy = mommy.make_recipe('test.generic.dummy_unique_field')
+            dummy = mommy.make_recipe('tests.generic.dummy_unique_field')
             self.assertEqual(dummy.value, 10 + i)
 
     def test_creates_unique_field_recipe_using_quantity_argument(self):
-        dummies = mommy.make_recipe('test.generic.dummy_unique_field', _quantity=3)
+        dummies = mommy.make_recipe('tests.generic.dummy_unique_field', _quantity=3)
         self.assertEqual(11, dummies[0].value)
         self.assertEqual(12, dummies[1].value)
         self.assertEqual(13, dummies[2].value)
 
     def test_increment_by_3(self):
-        dummy = mommy.make_recipe('test.generic.serial_numbers_by')
+        dummy = mommy.make_recipe('tests.generic.serial_numbers_by')
         self.assertEqual(dummy.default_int_field, 13)
         self.assertEqual(dummy.default_decimal_field, Decimal('22.5'))
         self.assertAlmostEqual(dummy.default_float_field, 3.030000)
-        dummy = mommy.make_recipe('test.generic.serial_numbers_by')
+        dummy = mommy.make_recipe('tests.generic.serial_numbers_by')
         self.assertEqual(dummy.default_int_field, 16)
         self.assertEqual(dummy.default_decimal_field, Decimal('24.9'))
         self.assertAlmostEqual(dummy.default_float_field, 4.83)
-        dummy = mommy.prepare_recipe('test.generic.serial_numbers_by')
+        dummy = mommy.prepare_recipe('tests.generic.serial_numbers_by')
         self.assertEqual(dummy.default_int_field, 19)
         self.assertEqual(dummy.default_decimal_field, Decimal('27.3'))
         self.assertAlmostEqual(dummy.default_float_field, 6.63)
 
     def test_increment_by_timedelta(self):
-        dummy = mommy.make_recipe('test.generic.serial_datetime')
+        dummy = mommy.make_recipe('tests.generic.serial_datetime')
         self.assertEqual(dummy.default_date_field, (TEST_TIME.date() + timedelta(days=1)))
         self.assertEqual(dummy.default_date_time_field, tz_aware(TEST_TIME + timedelta(hours=3)))
         self.assertEqual(dummy.default_time_field, (TEST_TIME + timedelta(seconds=15)).time())
-        dummy = mommy.make_recipe('test.generic.serial_datetime')
+        dummy = mommy.make_recipe('tests.generic.serial_datetime')
         self.assertEqual(dummy.default_date_field, (TEST_TIME.date() + timedelta(days=2)))
         self.assertEqual(dummy.default_date_time_field, tz_aware(TEST_TIME + timedelta(hours=6)))
         self.assertEqual(dummy.default_time_field, (TEST_TIME + timedelta(seconds=30)).time())
 
     def test_creates_unique_timedelta_recipe_using_quantity_argument(self):
-        dummies = mommy.make_recipe('test.generic.serial_datetime', _quantity=3)
+        dummies = mommy.make_recipe('tests.generic.serial_datetime', _quantity=3)
         self.assertEqual(dummies[0].default_date_field, TEST_TIME.date() + timedelta(days=1))
         self.assertEqual(dummies[1].default_date_field, TEST_TIME.date() + timedelta(days=2))
         self.assertEqual(dummies[2].default_date_field, TEST_TIME.date() + timedelta(days=3))
 
     def test_increment_after_override_definition_field(self):
-        person = mommy.make_recipe('test.generic.serial_person', name='tom')
+        person = mommy.make_recipe('tests.generic.serial_person', name='tom')
         self.assertEqual(person.name, 'tom')
-        person = mommy.make_recipe('test.generic.serial_person')
+        person = mommy.make_recipe('tests.generic.serial_person')
         self.assertEqual(person.name, 'joe1')
-        person = mommy.prepare_recipe('test.generic.serial_person')
+        person = mommy.prepare_recipe('tests.generic.serial_person')
         self.assertEqual(person.name, 'joe2')
 
 

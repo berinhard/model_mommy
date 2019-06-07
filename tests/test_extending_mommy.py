@@ -3,7 +3,7 @@ from django.test import TestCase
 from model_mommy import mommy
 from model_mommy.random_gen import gen_from_list
 from model_mommy.exceptions import CustomMommyNotFound, InvalidCustomMommy
-from test.generic.models import Person
+from tests.generic.models import Person
 
 __all__ = ['SimpleExtendMommy', 'LessSimpleExtendMommy', 'CustomizeMommyClassViaSettings']
 

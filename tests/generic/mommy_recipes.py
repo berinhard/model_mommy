@@ -3,7 +3,7 @@ from decimal import Decimal
 from model_mommy.recipe import Recipe, foreign_key, seq
 from model_mommy.recipe import related
 from model_mommy.timezone import now
-from test.generic.models import TEST_TIME, Person, Dog, DummyDefaultFieldsModel, \
+from tests.generic.models import TEST_TIME, Person, Dog, DummyDefaultFieldsModel, \
     DummyUniqueIntegerFieldModel
 
 from six import u

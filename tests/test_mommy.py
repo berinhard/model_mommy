@@ -11,8 +11,8 @@ from model_mommy import random_gen
 from model_mommy.exceptions import ModelNotFound, AmbiguousModelName, InvalidQuantityException
 from model_mommy.timezone import smart_datetime
 
-from test.generic import models
-from test.generic.forms import DummyGenericIPAddressFieldForm
+from tests.generic import models
+from tests.generic.forms import DummyGenericIPAddressFieldForm
 
 from unittest.mock import patch
 
