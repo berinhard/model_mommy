@@ -12,6 +12,7 @@ env:
   - DJANGO=django111
   - DJANGO=django20
   - DJANGO=django21
+  - DJANGO=django22
 before_install:
   - sudo apt-get update && sudo apt-get build-dep python-imaging
   - sudo service postgresql restart
