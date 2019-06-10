@@ -451,6 +451,10 @@ class FillBlanksTestCase(TestCase):
         dummy = mommy.make(models.DummyBlankFieldsModel, _fill_optional=['blank_char_field'])
         self.assertEqual(len(dummy.blank_char_field), 50)
 
+    def test_fill_wrong_field(self):
+        with self.assertRaises(Exception):
+            mommy.make(models.DummyBlankFieldsModel, _fill_optional=['blank_char_field', 'wrong'])
+
     def test_fill_many_optional(self):
         dummy = mommy.make(
             models.DummyBlankFieldsModel,

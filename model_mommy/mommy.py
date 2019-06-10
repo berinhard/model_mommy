@@ -364,7 +364,7 @@ class Mommy(object):
             field.name not in self.attr_mapping
         ]):
             # Django is quirky in that BooleanFields are always "blank",
-            # but have no default default.
+            # but have no default.
             if not field.fill_optional and (
                 not issubclass(field.__class__, Field) or
                 field.has_default() or
