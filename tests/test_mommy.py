@@ -452,8 +452,15 @@ class FillBlanksTestCase(TestCase):
         self.assertEqual(len(dummy.blank_char_field), 50)
 
     def test_fill_wrong_field(self):
-        with self.assertRaises(Exception):
-            mommy.make(models.DummyBlankFieldsModel, _fill_optional=['blank_char_field', 'wrong'])
+        with self.assertRaisesMessage(
+            AttributeError, "_fill_optional field(s) ['wrong'] are not "
+                            "related to model DummyBlankFieldsModel"
+        ):
+            mommy.make(models.DummyBlankFieldsModel,_fill_optional=['blank_char_field', 'wrong'])
+
+    def test_fill_wrong_fields_with_parent(self):
+        with self.assertRaises(AttributeError):
+            mommy.make(models.SubclassOfAbstract, _fill_optional=['name', 'wrong'])
 
     def test_fill_many_optional(self):
         dummy = mommy.make(

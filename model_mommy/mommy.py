@@ -336,6 +336,17 @@ class Mommy(object):
         def is_rel_field(x):
             return '__' in x
         self.fill_in_optional = attrs.pop('_fill_optional', False)
+        # error for non existing fields
+        if isinstance(self.fill_in_optional, (tuple, list, set)):
+            # parents and relations
+            wrong_fields = set(self.fill_in_optional) - set(
+                f.name for f in self.get_fields()
+            )
+            if wrong_fields:
+                raise AttributeError(
+                    '_fill_optional field(s) %s are not related to model %s'
+                    % (list(wrong_fields), self.model.__name__)
+                )
         self.iterator_attrs = dict((k, v) for k, v in attrs.items() if is_iterator(v))
         self.model_attrs = dict((k, v) for k, v in attrs.items() if not is_rel_field(k))
         self.rel_attrs = dict((k, v) for k, v in attrs.items() if is_rel_field(k))
