@@ -344,7 +344,7 @@ class MovieManager(models.Manager):
         '''
         return (
             super(MovieManager, self).get_queryset()
-            .annotate(name=models.F("title"))
+            .annotate(name=models.F('title'))
         )
 
 
