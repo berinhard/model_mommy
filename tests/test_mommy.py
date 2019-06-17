@@ -566,3 +566,27 @@ class MommyAutomaticallyRefreshFromDB(TestCase):
 
         self.assertEqual(person.birthday, '2017-02-01')
         self.assertNotEqual(person.birthday, datetime.date(2017, 2, 1))
+
+
+class MommyMakeCanFetchInstanceFromDefaultManager(TestCase):
+
+    def test_annotation_within_manager_get_queryset_are_run_on_make(self):
+        '''Test that a custom model Manager can be used within make().
+
+        Passing _from_manager='objects' will force mommy.make() to
+        return an instance that has been going through that given
+        Manager, thus calling its get_queryset() method and associated
+        code, like default annotations. As such the instance will have
+        the same fields as one created in the application.
+
+        '''
+        movie = mommy.make(models.MovieWithAnnotation)
+        with self.assertRaises(AttributeError):
+            movie.name
+
+        movie = mommy.make(
+            models.MovieWithAnnotation,
+            title='Old Boy',
+            _from_manager='objects',
+        )
+        self.assertEqual(movie.title, movie.name)

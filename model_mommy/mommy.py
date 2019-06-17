@@ -238,7 +238,13 @@ class Mommy(object):
             generator = import_if_str(v)
             self.type_mapping[field_class] = generator
 
-    def make(self, _save_kwargs=None, _refresh_after_create=False, **attrs):
+    def make(
+        self,
+        _save_kwargs=None,
+        _refresh_after_create=False,
+        _from_manager=None,
+        **attrs,
+    ):
         """Creates and persists an instance of the model associated
         with Mommy instance."""
         params = {
@@ -246,6 +252,7 @@ class Mommy(object):
             'commit_related': True,
             '_save_kwargs': _save_kwargs,
             '_refresh_after_create': _refresh_after_create,
+            '_from_manager': _from_manager,
         }
         params.update(attrs)
         return self._make(**params)
@@ -261,8 +268,15 @@ class Mommy(object):
     def get_related(self):
         return [r for r in self.model._meta.related_objects if not r.many_to_many]
 
-    def _make(self, commit=True, commit_related=True, _save_kwargs=None,
-              _refresh_after_create=False, **attrs):
+    def _make(
+        self,
+        commit=True,
+        commit_related=True,
+        _save_kwargs=None,
+        _refresh_after_create=False,
+        _from_manager=None,
+        **attrs,
+    ):
         _save_kwargs = _save_kwargs or {}
 
         self._clean_attrs(attrs)
@@ -289,7 +303,12 @@ class Mommy(object):
                 except StopIteration:
                     raise RecipeIteratorEmpty('{0} iterator is empty.'.format(field.name))
 
-        instance = self.instance(self.model_attrs, _commit=commit, _save_kwargs=_save_kwargs)
+        instance = self.instance(
+            self.model_attrs,
+            _commit=commit,
+            _save_kwargs=_save_kwargs,
+            _from_manager=_from_manager,
+        )
         if commit:
             for related in self.get_related():
                 self.create_by_related_name(instance, related)
@@ -306,7 +325,7 @@ class Mommy(object):
             return []
         return self.generate_value(field)
 
-    def instance(self, attrs, _commit, _save_kwargs):
+    def instance(self, attrs, _commit, _save_kwargs, _from_manager):
         one_to_many_keys = {}
         for k in tuple(attrs.keys()):
             field = getattr(self.model, k, None)
@@ -319,6 +338,15 @@ class Mommy(object):
             instance.save(**_save_kwargs)
             self._handle_one_to_many(instance, one_to_many_keys)
             self._handle_m2m(instance)
+
+            if _from_manager:
+                # Fetch the instance using the given Manager, e.g.
+                # 'objects'. This will ensure any additional code
+                # within its get_queryset() method (e.g. annotations)
+                # is run.
+                manager = getattr(self.model, _from_manager)
+                instance = manager.get(pk=instance.pk)
+
         return instance
 
     def create_by_related_name(self, instance, related):
