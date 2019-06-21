@@ -6,7 +6,6 @@ from model_mommy.timezone import now
 from tests.generic.models import TEST_TIME, Person, Dog, DummyDefaultFieldsModel, \
     DummyUniqueIntegerFieldModel
 
-from six import u
 from datetime import timedelta
 
 person = Recipe(
@@ -92,7 +91,7 @@ pug = small_dog.extend(
 other_dog_unicode = Recipe(
     Dog,
     breed='Basset',
-    owner=foreign_key(u('person'))
+    owner=foreign_key('person')
 )
 
 dummy_unique_field = Recipe(

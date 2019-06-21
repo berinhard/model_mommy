@@ -56,9 +56,9 @@ def gen_from_list(L):
 # -- DEFAULT GENERATORS --
 
 
-def gen_from_choices(C):
+def gen_from_choices(choices):
     choice_list = []
-    for value, label in C:
+    for value, label in choices:
         if isinstance(label, (list, tuple)):
             for val, lbl in label:
                 choice_list.append(val)
@@ -77,7 +77,7 @@ def gen_float():
 
 def gen_decimal(max_digits, decimal_places):
     def num_as_str(x):
-        return ''.join([str(randint(0, 9)) for i in range(x)])
+        return ''.join([str(randint(0, 9)) for _ in range(x)])
 
     if decimal_places:
         return Decimal("%s.%s" % (num_as_str(max_digits - decimal_places - 1),
@@ -101,7 +101,7 @@ def gen_time():
 
 
 def gen_string(max_length):
-    return str(''.join(choice(string.ascii_letters) for i in range(max_length)))
+    return str(''.join(choice(string.ascii_letters) for _ in range(max_length)))
 
 
 gen_string.required = ['max_length']
@@ -109,7 +109,7 @@ gen_string.required = ['max_length']
 
 def gen_slug(max_length):
     valid_chars = string.ascii_letters + string.digits + '_-'
-    return str(''.join(choice(valid_chars) for i in range(max_length)))
+    return str(''.join(choice(valid_chars) for _ in range(max_length)))
 
 
 gen_slug.required = ['max_length']
@@ -136,11 +136,11 @@ def gen_email():
 
 
 def gen_ipv6():
-    return ":".join(format(randint(1, 65535), 'x') for i in range(8))
+    return ":".join(format(randint(1, 65535), 'x') for _ in range(8))
 
 
 def gen_ipv4():
-    return ".".join(str(randint(1, 255)) for i in range(4))
+    return ".".join(str(randint(1, 255)) for _ in range(4))
 
 
 def gen_ipv46():
@@ -193,15 +193,9 @@ def gen_interval(interval_key='milliseconds'):
 
 def gen_content_type():
     from django.contrib.contenttypes.models import ContentType
+    from django.apps import apps
     try:
-        # for >= 1.7
-        from django.apps import apps
-        get_models = apps.get_models
-    except ImportError:
-        # Deprecated
-        from django.db.models import get_models
-    try:
-        return ContentType.objects.get_for_model(choice(get_models()))
+        return ContentType.objects.get_for_model(choice(apps.get_models()))
     except AssertionError:
         warnings.warn('Database access disabled, returning ContentType raw instance')
         return ContentType()

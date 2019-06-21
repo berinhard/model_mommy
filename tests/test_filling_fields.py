@@ -10,7 +10,6 @@ from django.core.files import File
 from django.core.files.images import ImageFile
 from django.db import models as django_models
 from django.test import TestCase
-from six import text_type, string_types, binary_type
 
 from model_mommy import mommy
 from model_mommy.gis import MOMMY_GIS
@@ -117,14 +116,14 @@ class StringFieldsFilling(FieldFillingTestCase):
         person_name_field = models.Person._meta.get_field('name')
         self.assertIsInstance(person_name_field, django_models.CharField)
 
-        self.assertIsInstance(self.person.name, text_type)
+        self.assertIsInstance(self.person.name, str)
         self.assertEqual(len(self.person.name), person_name_field.max_length)
 
     def test_fill_SlugField_with_a_random_str(self):
         person_nickname_field = models.Person._meta.get_field('nickname')
         self.assertIsInstance(person_nickname_field, django_models.SlugField)
 
-        self.assertIsInstance(self.person.nickname, text_type)
+        self.assertIsInstance(self.person.nickname, str)
         self.assertEqual(len(self.person.nickname),
                          person_nickname_field.max_length)
 
@@ -132,7 +131,7 @@ class StringFieldsFilling(FieldFillingTestCase):
         person_bio_field = models.Person._meta.get_field('bio')
         self.assertIsInstance(person_bio_field, django_models.TextField)
 
-        self.assertIsInstance(self.person.bio, text_type)
+        self.assertIsInstance(self.person.bio, str)
 
 
 class CIStringFieldsFilling(FieldFillingTestCase):
@@ -142,20 +141,20 @@ class CIStringFieldsFilling(FieldFillingTestCase):
             ci_char_field = models.Person._meta.get_field('ci_char')
             self.assertIsInstance(ci_char_field, CICharField)
 
-            self.assertIsInstance(self.person.ci_char, text_type)
+            self.assertIsInstance(self.person.ci_char, str)
             self.assertEqual(len(self.person.ci_char), ci_char_field.max_length)
 
     if CIEmailField:
         def test_filling_CIEmailField(self):
             ci_email_field = models.Person._meta.get_field('ci_email')
             self.assertIsInstance(ci_email_field, CIEmailField)
-            self.assertIsInstance(self.person.ci_email, string_types)
+            self.assertIsInstance(self.person.ci_email, str)
 
     if CITextField:
         def test_filling_CITextField(self):
             ci_text_field = models.Person._meta.get_field('ci_text')
             self.assertIsInstance(ci_text_field, CITextField)
-            self.assertIsInstance(self.person.ci_text, text_type)
+            self.assertIsInstance(self.person.ci_text, str)
 
 
 class BinaryFieldsFilling(FieldFillingTestCase):
@@ -164,7 +163,7 @@ class BinaryFieldsFilling(FieldFillingTestCase):
             name_hash_field = models.Person._meta.get_field('name_hash')
             self.assertIsInstance(name_hash_field, BinaryField)
             name_hash = self.person.name_hash
-            self.assertIsInstance(name_hash, binary_type)
+            self.assertIsInstance(name_hash, bytes)
             self.assertEqual(len(name_hash), name_hash_field.max_length)
 
 
@@ -305,7 +304,7 @@ class URLFieldsFilling(FieldFillingTestCase):
     def test_fill_URLField_with_valid_url(self):
         blog_field = models.Person._meta.get_field('blog')
         self.assertIsInstance(blog_field, django_models.URLField)
-        self.assertIsInstance(self.person.blog, text_type)
+        self.assertIsInstance(self.person.blog, str)
 
 
 class FillingEmailField(TestCase):
@@ -314,7 +313,7 @@ class FillingEmailField(TestCase):
         obj = mommy.make(models.DummyEmailModel)
         field = models.DummyEmailModel._meta.get_field('email_field')
         self.assertIsInstance(field, django_models.EmailField)
-        self.assertIsInstance(obj.email_field, string_types)
+        self.assertIsInstance(obj.email_field, str)
 
 
 class FillingIPAddressField(TestCase):
@@ -328,13 +327,13 @@ class FillingIPAddressField(TestCase):
         obj = mommy.make(IPModel)
         field = IPModel._meta.get_field('ipv4_field')
         self.assertIsInstance(field, GenericIPAddressField)
-        self.assertIsInstance(obj.ipv4_field, string_types)
+        self.assertIsInstance(obj.ipv4_field, str)
 
         validate_ipv4_address(obj.ipv4_field)
 
         if hasattr(obj, 'ipv6_field'):
-            self.assertIsInstance(obj.ipv6_field, string_types)
-            self.assertIsInstance(obj.ipv46_field, string_types)
+            self.assertIsInstance(obj.ipv6_field, str)
+            self.assertIsInstance(obj.ipv46_field, str)
 
             validate_ipv6_address(obj.ipv6_field)
             validate_ipv46_address(obj.ipv46_field)
