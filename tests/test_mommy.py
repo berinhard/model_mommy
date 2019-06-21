@@ -240,7 +240,6 @@ class MommyCreatesAssociatedModels(TestCase):
         owner = mommy.make(models.Person)
         dogs_set = mommy.prepare(
             models.Dog,
-            owner=owner,
             _quantity=2,
         )
         home = mommy.make(
