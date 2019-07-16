@@ -6,7 +6,6 @@ from .exceptions import RecipeNotFound
 # Enable seq to be imported from recipes
 from .utils import seq  # NoQA
 
-from six import string_types
 
 finder = mommy.ModelFinder()
 
@@ -28,7 +27,7 @@ class Recipe(object):
             if new_attrs.get(k):
                 continue
             elif mommy.is_iterator(v):
-                if isinstance(self._model, string_types):
+                if isinstance(self._model, str):
                     m = finder.get_model(self._model)
                 else:
                     m = self._model
@@ -72,7 +71,7 @@ class RecipeForeignKey(object):
     def __init__(self, recipe):
         if isinstance(recipe, Recipe):
             self.recipe = recipe
-        elif isinstance(recipe, string_types):
+        elif isinstance(recipe, str):
             frame = inspect.stack()[2]
             caller_module = inspect.getmodule(frame[0])
             recipe = getattr(caller_module, recipe)
@@ -98,7 +97,7 @@ class related(object):
         for recipe in args:
             if isinstance(recipe, Recipe):
                 self.related.append(recipe)
-            elif isinstance(recipe, string_types):
+            elif isinstance(recipe, str):
                 frame = inspect.stack()[1]
                 caller_module = inspect.getmodule(frame[0])
                 recipe = getattr(caller_module, recipe)

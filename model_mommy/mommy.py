@@ -13,16 +13,12 @@ from django.db.models.fields.related import \
     ReverseManyToOneDescriptor as ForeignRelatedObjectsDescriptor
 from django.db.models.fields.proxy import OrderWrt
 
-from . import generators
-from . import random_gen
+from . import generators, random_gen
 from .exceptions import (
     ModelNotFound, AmbiguousModelName, InvalidQuantityException, RecipeIteratorEmpty,
     CustomMommyNotFound, InvalidCustomMommy
 )
 from .utils import import_from_str, import_if_str
-from six import string_types, advance_iterator
-
-get_model = apps.get_model
 
 recipes = None
 
@@ -100,23 +96,23 @@ def prepare_recipe(mommy_recipe_name, _quantity=None, _save_related=False, **new
 
 
 class ModelFinder(object):
-    '''
+    """
     Encapsulates all the logic for finding a model to Mommy.
-    '''
+    """
     _unique_models = None
     _ambiguous_models = None
 
     def get_model(self, name):
-        '''
+        """
         Get a model.
 
         :param name String on the form 'applabel.modelname' or 'modelname'.
         :return a model class.
-        '''
+        """
         try:
             if '.' in name:
                 app_label, model_name = name.split('.')
-                model = get_model(app_label, model_name)
+                model = apps.get_model(app_label, model_name)
             else:
                 model = self.get_model_by_name(name)
         except LookupError:
@@ -128,12 +124,12 @@ class ModelFinder(object):
         return model
 
     def get_model_by_name(self, name):
-        '''
+        """
         Get a model by name.
 
         If a model with that name exists in more than one app,
         raises AmbiguousModelName.
-        '''
+        """
         name = name.lower()
 
         if self._unique_models is None:
@@ -146,9 +142,9 @@ class ModelFinder(object):
         return self._unique_models.get(name)
 
     def _populate(self):
-        '''
+        """
         Cache models for faster self._get_model.
-        '''
+        """
         unique_models = {}
         ambiguous_models = []
 
@@ -297,9 +293,7 @@ class Mommy(object):
                 self.model_attrs[field.name] = self.model_attrs[field.name]()
             elif field.name in self.iterator_attrs:
                 try:
-                    self.model_attrs[field.name] = advance_iterator(
-                        self.iterator_attrs[field.name]
-                    )
+                    self.model_attrs[field.name] = next(self.iterator_attrs[field.name])
                 except StopIteration:
                     raise RecipeIteratorEmpty('{0} iterator is empty.'.format(field.name))
 
@@ -434,7 +428,7 @@ class Mommy(object):
         return field.remote_field
 
     def generate_value(self, field, commit=True):
-        '''
+        """
         Calls the generator associated with a field passing all required args.
 
         Generator Resolution Precedence Order:
@@ -446,7 +440,7 @@ class Mommy(object):
 
         `attr_mapping` and `type_mapping` can be defined easily overwriting the
         model.
-        '''
+        """
         if field.name in self.attr_mapping:
             generator = self.attr_mapping[field.name]
         elif getattr(field, 'choices'):
@@ -476,12 +470,12 @@ class Mommy(object):
 
 
 def get_required_values(generator, field):
-    '''
+    """
     Gets required values for a generator from the field.
     If required value is a function, calls it with field as argument.
     If required value is a string, simply fetch the value from the field
     and return.
-    '''
+    """
     # FIXME: avoid abbreviations
     rt = {}
     if hasattr(generator, 'required'):
@@ -491,7 +485,7 @@ def get_required_values(generator, field):
                 key, value = item(field)
                 rt[key] = value
 
-            elif isinstance(item, string_types):
+            elif isinstance(item, str):
                 rt[item] = getattr(field, item)
 
             else:
@@ -506,8 +500,8 @@ def filter_rel_attrs(field_name, **rel_attrs):
 
     for k, v in rel_attrs.items():
         if k.startswith(field_name + '__'):
-            splited_key = k.split('__')
-            key = '__'.join(splited_key[1:])
+            splitted_key = k.split('__')
+            key = '__'.join(splitted_key[1:])
             clean_dict[key] = v
         else:
             clean_dict[k] = v
