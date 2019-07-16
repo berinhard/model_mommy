@@ -239,7 +239,7 @@ class Mommy(object):
         _save_kwargs=None,
         _refresh_after_create=False,
         _from_manager=None,
-        **attrs,
+        **attrs
     ):
         """Creates and persists an instance of the model associated
         with Mommy instance."""
@@ -271,7 +271,7 @@ class Mommy(object):
         _save_kwargs=None,
         _refresh_after_create=False,
         _from_manager=None,
-        **attrs,
+        **attrs
     ):
         _save_kwargs = _save_kwargs or {}
 
