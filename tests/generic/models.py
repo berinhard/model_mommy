@@ -75,56 +75,22 @@ class Person(models.Model):
     appointment = models.DateTimeField()
     blog = models.URLField()
     occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOCIES)
-    try:
-        uuid = models.UUIDField(primary_key=False)
-    except AttributeError:
-        # New at Django 1.9
-        pass
-    try:
-        name_hash = models.BinaryField(max_length=16)
-    except AttributeError:
-        # We can't test the binary field if it is not supported
-        # (django < 1,6)
-        pass
-    try:
-        from django.contrib.postgres.fields import ArrayField
-        acquaintances = ArrayField(models.IntegerField())
-    except ImportError:
-        # New at Django 1.9
-        pass
+    uuid = models.UUIDField(primary_key=False)
+    name_hash = models.BinaryField(max_length=16)
+    wanted_games_qtd = models.BigIntegerField()
+    duration_of_sleep = models.DurationField()
 
     try:
-        from django.contrib.postgres.fields import JSONField
-        data = JSONField()
-    except ImportError:
-        # New at Django 1.9
-        pass
-
-    try:
-        from django.contrib.postgres.fields import HStoreField
-        hstore_data = HStoreField()
-    except ImportError:
-        # New at Django 1.8
-        pass
-
-    # backward compatibility with Django 1.1
-    try:
-        wanted_games_qtd = models.BigIntegerField()
-    except AttributeError:
-        wanted_games_qtd = models.IntegerField()
-
-    try:
+        from django.contrib.postgres.fields import ArrayField, HStoreField, JSONField
         from django.contrib.postgres.fields.citext import CICharField, CIEmailField, CITextField
+        acquaintances = ArrayField(models.IntegerField())
+        data = JSONField()
+        hstore_data = HStoreField()
         ci_char = CICharField(max_length=30)
         ci_email = CIEmailField()
         ci_text = CITextField()
     except ImportError:
-        # New at Django 1.11
-        pass
-
-    try:
-        duration_of_sleep = models.DurationField()
-    except AttributeError:
+        # Skip PostgreSQL-related fields
         pass
 
     if MOMMY_GIS:
@@ -187,10 +153,7 @@ class DummyEmptyModel(models.Model):
 class DummyIntModel(models.Model):
     int_field = models.IntegerField()
     small_int_field = models.SmallIntegerField()
-    try:
-        big_int_field = models.BigIntegerField()
-    except AttributeError:
-        big_int_field = models.IntegerField()
+    big_int_field = models.BigIntegerField()
 
 
 class DummyPositiveIntModel(models.Model):
