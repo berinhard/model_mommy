@@ -34,14 +34,6 @@ from django.core.validators import (
 )
 
 
-def assert_not_raise(method, parameters, exception):
-    try:
-        method(*parameters)
-    except exception:
-        msg = "Exception %s not expected to be raised" % exception.__name__
-        raise AssertionError(msg)
-
-
 @pytest.fixture
 def person(db):
     return mommy.make('generic.Person')
