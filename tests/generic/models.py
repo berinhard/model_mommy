@@ -297,6 +297,24 @@ class Movie(models.Model):
     title = models.CharField(max_length=30)
 
 
+class MovieManager(models.Manager):
+    def get_queryset(self):
+        '''Annotate queryset with an alias field 'name'.
+
+        We want to test whether this annotation has been run after
+        calling mommy.make().
+
+        '''
+        return (
+            super(MovieManager, self).get_queryset()
+            .annotate(name=models.F('title'))
+        )
+
+
+class MovieWithAnnotation(Movie):
+    objects = MovieManager()
+
+
 class CastMember(models.Model):
     movie = models.ForeignKey(Movie, related_name='cast_members', on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
