@@ -1,7 +1,3 @@
-Next
-----
-TODO
-
 Development
 -----------
 - Use default value for unknown field types
