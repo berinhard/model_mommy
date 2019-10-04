@@ -79,6 +79,7 @@ class Person(models.Model):
     name_hash = models.BinaryField(max_length=16)
     wanted_games_qtd = models.BigIntegerField()
     duration_of_sleep = models.DurationField()
+    email = models.EmailField()
 
     try:
         from django.contrib.postgres.fields import ArrayField, HStoreField, JSONField
@@ -178,10 +179,6 @@ class UnsupportedField(models.Field):
 
 class UnsupportedModel(models.Model):
     unsupported_field = UnsupportedField()
-
-
-class DummyEmailModel(models.Model):
-    email_field = models.EmailField()
 
 
 class DummyGenericForeignKeyModel(models.Model):
