@@ -82,25 +82,6 @@ class TestStringFieldsFilling():
         assert isinstance(person.bio, str)
 
 
-@pytest.mark.skipif(connection.vendor != 'postgresql', reason='PostgreSQL specific tests')
-class TestCIStringFieldsFilling:
-    def test_fill_cicharfield_with_a_random_str(self, person):
-        ci_char_field = models.Person._meta.get_field('ci_char')
-        assert isinstance(ci_char_field, CICharField)
-        assert isinstance(person.ci_char, str)
-        assert len(person.ci_char) == ci_char_field.max_length
-
-    def test_filling_ciemailfield(self, person):
-        ci_email_field = models.Person._meta.get_field('ci_email')
-        assert isinstance(ci_email_field, CIEmailField)
-        assert isinstance(person.ci_email, str)
-
-    def test_filling_citextfield(self, person):
-        ci_text_field = models.Person._meta.get_field('ci_text')
-        assert isinstance(ci_text_field, CITextField)
-        assert isinstance(person.ci_text, str)
-
-
 class TestBinaryFieldsFilling():
 
     def test_fill_BinaryField_with_random_binary(self, person):
@@ -167,18 +148,6 @@ class TestUUIDFieldsFilling():
         uuid_field = models.Person._meta.get_field('uuid')
         assert isinstance(uuid_field, fields.UUIDField)
         assert isinstance(person.uuid, uuid.UUID)
-
-
-@pytest.mark.skipif(connection.vendor != 'postgresql', reason='PostgreSQL specific tests')
-class TestPostgreSQLFieldsFilling:
-    def test_fill_arrayfield_with_empty_array(self, person):
-        assert person.acquaintances == []
-
-    def test_fill_jsonfield_with_empty_dict(self, person):
-        assert person.data == {}
-
-    def test_fill_hstorefield_with_empty_dict(self, person):
-        assert person.hstore_data == {}
 
 
 class TestFillingIntFields():
@@ -295,27 +264,6 @@ class TestsFillingFileField():
             dummy.file_field.path  # Django raises ValueError if file does not exist
 
 
-@pytest.mark.skipif(not models.has_pil, reason="PIL is required to test ImageField")
-class TestFillingImageFileField():
-
-    def test_filling_image_file_field(self, db):
-        dummy = mommy.make(models.DummyImageFieldModel, _create_files=True)
-        field = models.DummyImageFieldModel._meta.get_field('image_field')
-        assert isinstance(field, ImageField)
-        import time
-        path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
-
-        # These require the file to exist in earlier versions of Django
-        assert abspath(path) == abspath(dummy.image_field.path)
-        assert dummy.image_field.width
-        assert dummy.image_field.height
-        dummy.image_field.delete()
-
-    def test_does_not_create_file_if_not_flagged(self, db):
-        dummy = mommy.make(models.DummyImageFieldModel)
-        with pytest.raises(ValueError):
-            dummy.image_field.path  # Django raises ValueError if file does not exist
-
 @pytest.fixture()
 def custom_cfg():
     yield None
@@ -390,6 +338,59 @@ class TestFillingAutoFields():
         field = models.DummyEmptyModel._meta.get_field('id')
         assert isinstance(field, fields.AutoField)
         assert isinstance(obj.id, int)
+
+
+@pytest.mark.skipif(not models.has_pil, reason="PIL is required to test ImageField")
+class TestFillingImageFileField():
+
+    def test_filling_image_file_field(self, db):
+        dummy = mommy.make(models.DummyImageFieldModel, _create_files=True)
+        field = models.DummyImageFieldModel._meta.get_field('image_field')
+        assert isinstance(field, ImageField)
+        import time
+        path = "%s/%s/mock-img.jpeg" % (gettempdir(), time.strftime('%Y/%m/%d'))
+
+        # These require the file to exist in earlier versions of Django
+        assert abspath(path) == abspath(dummy.image_field.path)
+        assert dummy.image_field.width
+        assert dummy.image_field.height
+        dummy.image_field.delete()
+
+    def test_does_not_create_file_if_not_flagged(self, db):
+        dummy = mommy.make(models.DummyImageFieldModel)
+        with pytest.raises(ValueError):
+            dummy.image_field.path  # Django raises ValueError if file does not exist
+
+
+@pytest.mark.skipif(connection.vendor != 'postgresql', reason='PostgreSQL specific tests')
+class TestCIStringFieldsFilling:
+    def test_fill_cicharfield_with_a_random_str(self, person):
+        ci_char_field = models.Person._meta.get_field('ci_char')
+        assert isinstance(ci_char_field, CICharField)
+        assert isinstance(person.ci_char, str)
+        assert len(person.ci_char) == ci_char_field.max_length
+
+    def test_filling_ciemailfield(self, person):
+        ci_email_field = models.Person._meta.get_field('ci_email')
+        assert isinstance(ci_email_field, CIEmailField)
+        assert isinstance(person.ci_email, str)
+
+    def test_filling_citextfield(self, person):
+        ci_text_field = models.Person._meta.get_field('ci_text')
+        assert isinstance(ci_text_field, CITextField)
+        assert isinstance(person.ci_text, str)
+
+
+@pytest.mark.skipif(connection.vendor != 'postgresql', reason='PostgreSQL specific tests')
+class TestPostgreSQLFieldsFilling:
+    def test_fill_arrayfield_with_empty_array(self, person):
+        assert person.acquaintances == []
+
+    def test_fill_jsonfield_with_empty_dict(self, person):
+        assert person.data == {}
+
+    def test_fill_hstorefield_with_empty_dict(self, person):
+        assert person.hstore_data == {}
 
 
 @pytest.mark.skipif(not MOMMY_GIS, reason="GIS support required for GIS fields")
