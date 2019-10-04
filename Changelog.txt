@@ -3,6 +3,9 @@ Development
 - Use default value for unknown field types
 - Enable seq method to be imported directly from model_mommy
 - Stick to Django's roadmap (https://www.djangoproject.com/download/)
+- Add validation to `_fill_optional` parameter
+- Add new `_from_manager` parameter to `make` method
+- Clean up obsolete imports
 
 1.6.0
 -----
