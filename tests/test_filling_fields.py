@@ -47,6 +47,15 @@ def person(db):
     return mommy.make('generic.Person')
 
 
+@pytest.fixture()
+def custom_cfg():
+    yield None
+    if hasattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN'):
+        delattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN')
+    mommy.generators.add('tests.generic.fields.CustomFieldWithGenerator', None)
+    mommy.generators.add('django.db.models.fields.CharField', None)
+
+
 class TestFillingFromChoice():
 
     def test_if_gender_is_populated_from_choices(self, person):
@@ -263,14 +272,6 @@ class TestsFillingFileField():
         with pytest.raises(ValueError):
             dummy.file_field.path  # Django raises ValueError if file does not exist
 
-
-@pytest.fixture()
-def custom_cfg():
-    yield None
-    if hasattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN'):
-        delattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN')
-    mommy.generators.add('tests.generic.fields.CustomFieldWithGenerator', None)
-    mommy.generators.add('django.db.models.fields.CharField', None)
 
 class TestFillingCustomFields():
 
