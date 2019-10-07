@@ -246,7 +246,7 @@ class TestMommyCreatesAssociatedModels():
             owner=owner,
             dogs=dogs_set,
         )
-        self.assertEqual(home.dogs.count(), 2)
+        assert home.dogs.count() == 2
         assert 2 == models.Dog.objects.count()  # dogs in dogs_set were created
 
     def test_prepare_fk(self):
