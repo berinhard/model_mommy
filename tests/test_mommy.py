@@ -243,12 +243,15 @@ class MommyCreatesAssociatedModels(TestCase):
             owner=owner,
             _quantity=2,
         )
+
+        assert 0 == models.Dog.objects.count()  # ensure there're no dogs in our db
         home = mommy.make(
             models.Home,
             owner=owner,
             dogs=dogs_set,
         )
         self.assertEqual(home.dogs.count(), 2)
+        assert 2 == models.Dog.objects.count()  # dogs in dogs_set were created
 
     def test_prepare_fk(self):
         dog = mommy.prepare(models.Dog)
