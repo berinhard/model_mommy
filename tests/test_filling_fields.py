@@ -54,7 +54,7 @@ class TestFillingFromChoice():
         from tests.generic.models import GENDER_CHOICES
         person.gender in map(lambda x: x[0], GENDER_CHOICES)
 
-    def test_if_oppucation_populated_from_choices(self, person):
+    def test_if_occupation_populated_from_choices(self, person):
         from tests.generic.models import OCCUPATION_CHOCIES
         occupations = [item[0] for list in OCCUPATION_CHOCIES for item in list[1]]
         person.occupation in occupations
