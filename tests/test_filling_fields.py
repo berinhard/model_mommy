@@ -99,7 +99,7 @@ class TestsDurationFieldsFilling():
         duration_of_sleep_field = models.Person._meta.get_field('duration_of_sleep')
         assert isinstance(duration_of_sleep_field, fields.DurationField)
         duration_of_sleep = person.duration_of_sleep
-        assert isinstance(duration_of_sleep, timedelta)
+        assert isinstance(person.duration_of_sleep, timedelta)
 
 
 class TestBooleanFieldsFilling():
