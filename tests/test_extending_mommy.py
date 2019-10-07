@@ -28,13 +28,15 @@ class SadPeopleMommy(mommy.Mommy):
     attr_mapping = {'happy': gen_opposite, 'unhappy': gen_opposite}
 
 
+@pytest.mark.django_db
 class TestSimpleExtendMommy:
-    def test_list_generator_respects_values_from_list(self, db):
+    def test_list_generator_respects_values_from_list(self):
         mom = KidMommy(Person)
         kid = mom.make()
         assert kid.age in KidMommy.age_list
 
 
+@pytest.mark.django_db
 class TestLessSimpleExtendMommy:
     def test_nonexistent_required_field(self):
         gen_opposite.required = ['house']
@@ -42,7 +44,7 @@ class TestLessSimpleExtendMommy:
         with pytest.raises(AttributeError):
             mom.make()
 
-    def test_string_to_generator_required(self, db):
+    def test_string_to_generator_required(self):
         gen_opposite.required = ['default']
         happy_field = Person._meta.get_field('happy')
         unhappy_field = Person._meta.get_field('unhappy')
@@ -52,7 +54,7 @@ class TestLessSimpleExtendMommy:
         assert person.unhappy is not unhappy_field.default
 
     @pytest.mark.parametrize('value', [18, 18.5, [], {}, True])
-    def test_fail_pass_non_string_to_generator_required(self, db, value):
+    def test_fail_pass_non_string_to_generator_required(self, value):
         mom = TeenagerMommy(Person)
 
         gen_age.required = [value]

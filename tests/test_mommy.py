@@ -386,9 +386,10 @@ class TestMommyCreatesAssociatedModels():
         assert 0 == models.RelatedNamesModel.objects.count()
 
 
+@pytest.mark.django_db
 class TestHandlingUnsupportedModels():
 
-    def test_unsupported_model_raises_an_explanatory_exception(self, db):
+    def test_unsupported_model_raises_an_explanatory_exception(self):
         try:
             mommy.make(models.UnsupportedModel)
             assert False, "Should have raised a TypeError"
@@ -396,28 +397,32 @@ class TestHandlingUnsupportedModels():
             assert 'not supported' in repr(e)
 
 
+@pytest.mark.django_db
 class TestHandlingModelsWithGenericRelationFields():
 
-    def test_create_model_with_generic_relation(self, db):
+    def test_create_model_with_generic_relation(self):
         dummy = mommy.make(models.DummyGenericRelationModel)
         assert isinstance(dummy, models.DummyGenericRelationModel)
 
 
+@pytest.mark.django_db
 class TestHandlingContentTypeField():
-    def test_create_model_with_contenttype_field(self, db):
+    def test_create_model_with_contenttype_field(self):
         dummy = mommy.make(models.DummyGenericForeignKeyModel)
         assert isinstance(dummy, models.DummyGenericForeignKeyModel)
 
 
+@pytest.mark.django_db
 class TestHandlingContentTypeFieldNoQueries():
-    def test_create_model_with_contenttype_field(self, db):
+    def test_create_model_with_contenttype_field(self):
         dummy = mommy.prepare(models.DummyGenericForeignKeyModel)
         assert isinstance(dummy, models.DummyGenericForeignKeyModel)
 
 
+@pytest.mark.django_db
 class TestSkipNullsTestCase():
 
-    def test_skip_null(self, db):
+    def test_skip_null(self):
         dummy = mommy.make(models.DummyNullFieldsModel)
         assert dummy.null_foreign_key is None
         assert dummy.null_integer_field is None
@@ -440,9 +445,10 @@ class TestFillNullsTestCase():
         assert classroom.students.count() == 0
 
 
+@pytest.mark.django_db
 class TestSkipBlanksTestCase():
 
-    def test_skip_blank(self, db):
+    def test_skip_blank(self):
         dummy = mommy.make(models.DummyBlankFieldsModel)
         assert dummy.blank_char_field == ''
         assert dummy.blank_text_field == ''
@@ -499,9 +505,10 @@ class TestFillAutoFieldsTestCase():
         assert saved_dummy.id == 543
 
 
+@pytest.mark.django_db
 class TestSkipDefaultsTestCase():
 
-    def test_skip_fields_with_default(self, db):
+    def test_skip_fields_with_default(self):
         dummy = mommy.make(models.DummyDefaultFieldsModel)
         assert dummy.default_char_field == 'default'
         assert dummy.default_text_field == 'default'
@@ -515,9 +522,10 @@ class TestSkipDefaultsTestCase():
         assert dummy.default_slug_field == 'a-slug'
 
 
+@pytest.mark.django_db
 class TestMommyHandlesModelWithNext():
 
-    def test_creates_instance_for_model_with_next(self, db):
+    def test_creates_instance_for_model_with_next(self):
         instance = mommy.make(
             models.BaseModelForNext,
             fk=mommy.make(models.ModelWithNext),
@@ -529,18 +537,20 @@ class TestMommyHandlesModelWithNext():
         assert 'foo' == instance.fk.next()
 
 
+@pytest.mark.django_db
 class TestMommyHandlesModelWithList():
 
-    def test_creates_instance_for_model_with_list(self, db):
+    def test_creates_instance_for_model_with_list(self):
         instance = mommy.make(models.BaseModelForList, fk=["foo"])
 
         assert instance.id
         assert ["foo"] == instance.fk
 
 
+@pytest.mark.django_db
 class TestMommyGeneratesIPAdresses():
 
-    def test_create_model_with_valid_ips(self, db):
+    def test_create_model_with_valid_ips(self):
         form_data = {
             'ipv4_field': random_gen.gen_ipv4(),
             'ipv6_field': random_gen.gen_ipv6(),
@@ -549,9 +559,10 @@ class TestMommyGeneratesIPAdresses():
         assert DummyGenericIPAddressFieldForm(form_data).is_valid()
 
 
+@pytest.mark.django_db
 class TestMommyAllowsSaveParameters():
 
-    def test_allows_save_kwargs_on_mommy_make(self, db):
+    def test_allows_save_kwargs_on_mommy_make(self):
         owner = mommy.make(models.Person)
         dog = mommy.make(models.ModelWithOverridedSave, _save_kwargs={'owner': owner})
         assert owner == dog.owner
@@ -586,9 +597,10 @@ class TestMommyAutomaticallyRefreshFromDB():
         assert person.birthday != datetime.date(2017, 2, 1)
 
 
+@pytest.mark.django_db
 class TestMommyMakeCanFetchInstanceFromDefaultManager():
 
-    def test_annotation_within_manager_get_queryset_are_run_on_make(self, db):
+    def test_annotation_within_manager_get_queryset_are_run_on_make(self):
         '''Test that a custom model Manager can be used within make().
 
         Passing _from_manager='objects' will force mommy.make() to

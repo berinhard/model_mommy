@@ -151,30 +151,32 @@ class TestUUIDFieldsFilling():
         assert isinstance(person.uuid, uuid.UUID)
 
 
+@pytest.mark.django_db
 class TestFillingIntFields():
 
-    def test_fill_IntegerField_with_a_random_number(self, db):
+    def test_fill_IntegerField_with_a_random_number(self):
         dummy_int_model = mommy.make(models.DummyIntModel)
         int_field = models.DummyIntModel._meta.get_field('int_field')
         assert isinstance(int_field, fields.IntegerField)
         assert isinstance(dummy_int_model.int_field, int)
 
-    def test_fill_BigIntegerField_with_a_random_number(self, db):
+    def test_fill_BigIntegerField_with_a_random_number(self):
         dummy_int_model = mommy.make(models.DummyIntModel)
         big_int_field = models.DummyIntModel._meta.get_field('big_int_field')
         assert isinstance(big_int_field, fields.BigIntegerField)
         assert isinstance(dummy_int_model.big_int_field, int)
 
-    def test_fill_SmallIntegerField_with_a_random_number(self, db):
+    def test_fill_SmallIntegerField_with_a_random_number(self):
         dummy_int_model = mommy.make(models.DummyIntModel)
         small_int_field = models.DummyIntModel._meta.get_field('small_int_field')
         assert isinstance(small_int_field, fields.SmallIntegerField)
         assert isinstance(dummy_int_model.small_int_field, int)
 
 
+@pytest.mark.django_db
 class TestFillingPositiveIntFields():
 
-    def test_fill_PositiveSmallIntegerField_with_a_random_number(self, db):
+    def test_fill_PositiveSmallIntegerField_with_a_random_number(self):
         dummy_positive_int_model = mommy.make(models.DummyPositiveIntModel)
         field = models.DummyPositiveIntModel._meta.get_field('positive_small_int_field')
         positive_small_int_field = field
@@ -182,7 +184,7 @@ class TestFillingPositiveIntFields():
         assert isinstance(dummy_positive_int_model.positive_small_int_field, int)
         assert dummy_positive_int_model.positive_small_int_field > 0
 
-    def test_fill_PositiveIntegerField_with_a_random_number(self, db):
+    def test_fill_PositiveIntegerField_with_a_random_number(self):
         dummy_positive_int_model = mommy.make(models.DummyPositiveIntModel)
         positive_int_field = models.DummyPositiveIntModel._meta.get_field('positive_int_field')
         assert isinstance(positive_int_field, fields.PositiveIntegerField)
@@ -190,15 +192,16 @@ class TestFillingPositiveIntFields():
         assert dummy_positive_int_model.positive_int_field > 0
 
 
+@pytest.mark.django_db
 class TestFillingOthersNumericFields():
 
-    def test_filling_FloatField_with_a_random_float(self, db):
+    def test_filling_FloatField_with_a_random_float(self):
         self.dummy_numbers_model = mommy.make(models.DummyNumbersModel)
         float_field = models.DummyNumbersModel._meta.get_field('float_field')
         assert isinstance(float_field, fields.FloatField)
         assert isinstance(self.dummy_numbers_model.float_field, float)
 
-    def test_filling_DecimalField_with_random_decimal(self, db):
+    def test_filling_DecimalField_with_random_decimal(self):
         self.dummy_decimal_model = mommy.make(models.DummyDecimalModel)
         decimal_field = models.DummyDecimalModel._meta.get_field('decimal_field')
         assert isinstance(decimal_field, fields.DecimalField)
@@ -221,9 +224,10 @@ class TestFillingEmailField():
         assert isinstance(person.email, str)
 
 
+@pytest.mark.django_db
 class TestFillingIPAddressField():
 
-    def test_filling_IPAddressField(self, db):
+    def test_filling_IPAddressField(self):
         obj = mommy.make(models.DummyGenericIPAddressFieldModel)
         field = models.DummyGenericIPAddressFieldModel._meta.get_field('ipv4_field')
         assert isinstance(field, fields.GenericIPAddressField)
@@ -239,17 +243,19 @@ class TestFillingIPAddressField():
             validate_ipv46_address(obj.ipv46_field)
 
 
+@pytest.mark.django_db
 class TestFillingGenericForeignKeyField():
 
-    def test_filling_content_type_field(self, db):
+    def test_filling_content_type_field(self):
         dummy = mommy.make(models.DummyGenericForeignKeyModel)
         assert isinstance(dummy.content_type, ContentType)
         assert dummy.content_type.model_class() is not None
 
 
+@pytest.mark.django_db
 class TestsFillingFileField():
 
-    def test_filling_file_field(self, db):
+    def test_filling_file_field(self):
         dummy = mommy.make(models.DummyFileFieldModel, _create_files=True)
         field = models.DummyFileFieldModel._meta.get_field('file_field')
         assert isinstance(field, FileField)
@@ -259,27 +265,28 @@ class TestsFillingFileField():
         assert abspath(path) == abspath(dummy.file_field.path)
         dummy.file_field.delete()
 
-    def test_does_not_create_file_if_not_flagged(self, db):
+    def test_does_not_create_file_if_not_flagged(self):
         dummy = mommy.make(models.DummyFileFieldModel)
         with pytest.raises(ValueError):
             dummy.file_field.path  # Django raises ValueError if file does not exist
 
 
+@pytest.mark.django_db
 class TestFillingCustomFields():
 
-    def test_raises_unsupported_field_for_custom_field(self, db, custom_cfg):
+    def test_raises_unsupported_field_for_custom_field(self, custom_cfg):
         """Should raise an exception if a generator is not provided for a custom field"""
         with pytest.raises(TypeError):
             mommy.make(models.CustomFieldWithoutGeneratorModel)
 
-    def test_uses_generator_defined_on_settings_for_custom_field(self, db, custom_cfg):
+    def test_uses_generator_defined_on_settings_for_custom_field(self, custom_cfg):
         """Should use the function defined in settings as a generator"""
         generator_dict = {'tests.generic.fields.CustomFieldWithGenerator': generators.gen_value_string}
         setattr(settings, 'MOMMY_CUSTOM_FIELDS_GEN', generator_dict)
         obj = mommy.make(models.CustomFieldWithGeneratorModel)
         assert "value" == obj.custom_value
 
-    def test_uses_generator_defined_as_string_on_settings_for_custom_field(self, db, custom_cfg):
+    def test_uses_generator_defined_as_string_on_settings_for_custom_field(self, custom_cfg):
         """Should import and use the function present in the import path defined in settings"""
         generator_dict = {
             'tests.generic.fields.CustomFieldWithGenerator':
@@ -289,7 +296,7 @@ class TestFillingCustomFields():
         obj = mommy.make(models.CustomFieldWithGeneratorModel)
         assert "value" == obj.custom_value
 
-    def test_uses_generator_defined_on_settings_for_custom_foreignkey(self, db, custom_cfg):
+    def test_uses_generator_defined_on_settings_for_custom_foreignkey(self, custom_cfg):
         """Should use the function defined in the import path for a foreign key field"""
         generator_dict = {
             'tests.generic.fields.CustomForeignKey': 'model_mommy.random_gen.gen_related'
@@ -298,7 +305,7 @@ class TestFillingCustomFields():
         obj = mommy.make(models.CustomForeignKeyWithGeneratorModel, custom_fk__email="a@b.com")
         assert 'a@b.com' == obj.custom_fk.email
 
-    def test_uses_generator_defined_as_string_for_custom_field(self, db, custom_cfg):
+    def test_uses_generator_defined_as_string_for_custom_field(self, custom_cfg):
         """Should import and use the generator function used in the add method"""
         mommy.generators.add(
             'tests.generic.fields.CustomFieldWithGenerator',
@@ -307,13 +314,13 @@ class TestFillingCustomFields():
         obj = mommy.make(models.CustomFieldWithGeneratorModel)
         assert "value" == obj.custom_value
 
-    def test_uses_generator_function_for_custom_foreignkey(self, db, custom_cfg):
+    def test_uses_generator_function_for_custom_foreignkey(self, custom_cfg):
         """Should use the generator function passed as a value for the add method"""
         mommy.generators.add('tests.generic.fields.CustomForeignKey', gen_related)
         obj = mommy.make(models.CustomForeignKeyWithGeneratorModel, custom_fk__email="a@b.com")
         assert 'a@b.com' == obj.custom_fk.email
 
-    def test_can_override_django_default_field_functions_generator(self, db, custom_cfg):
+    def test_can_override_django_default_field_functions_generator(self, custom_cfg):
         def gen_char():
             return 'Some value'
 
@@ -324,19 +331,21 @@ class TestFillingCustomFields():
         assert 'Some value' == person.name
 
 
+@pytest.mark.django_db
 class TestFillingAutoFields():
 
-    def test_filling_AutoField(self, db):
+    def test_filling_AutoField(self):
         obj = mommy.make(models.DummyEmptyModel)
         field = models.DummyEmptyModel._meta.get_field('id')
         assert isinstance(field, fields.AutoField)
         assert isinstance(obj.id, int)
 
 
+@pytest.mark.django_db
 @pytest.mark.skipif(not models.has_pil, reason="PIL is required to test ImageField")
 class TestFillingImageFileField():
 
-    def test_filling_image_file_field(self, db):
+    def test_filling_image_file_field(self):
         dummy = mommy.make(models.DummyImageFieldModel, _create_files=True)
         field = models.DummyImageFieldModel._meta.get_field('image_field')
         assert isinstance(field, ImageField)
@@ -349,7 +358,7 @@ class TestFillingImageFileField():
         assert dummy.image_field.height
         dummy.image_field.delete()
 
-    def test_does_not_create_file_if_not_flagged(self, db):
+    def test_does_not_create_file_if_not_flagged(self):
         dummy = mommy.make(models.DummyImageFieldModel)
         with pytest.raises(ValueError):
             dummy.image_field.path  # Django raises ValueError if file does not exist
