@@ -31,9 +31,13 @@ if MOMMY_GIS:
 else:
     from django.db import models
 
-GENDER_CH = [('M', 'male'), ('F', 'female')]
+GENDER_CHOICES = [
+    ('M', 'male'),
+    ('F', 'female'),
+    ('N', 'non-binary'),
+]
 
-OCCUPATION_CHOCIES = (
+OCCUPATION_CHOICES = (
     ('Service Industry', (
         ('waitress', 'Waitress'),
         ('bartender', 'Bartender'))),
@@ -62,7 +66,7 @@ class PaymentBill(models.Model):
 
 
 class Person(models.Model):
-    gender = models.CharField(max_length=1, choices=GENDER_CH)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     happy = models.BooleanField(default=True)
     unhappy = models.BooleanField(default=False)
     bipolar = models.BooleanField(default=False)
@@ -74,11 +78,12 @@ class Person(models.Model):
     birth_time = models.TimeField()
     appointment = models.DateTimeField()
     blog = models.URLField()
-    occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOCIES)
+    occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOICES)
     uuid = models.UUIDField(primary_key=False)
     name_hash = models.BinaryField(max_length=16)
     wanted_games_qtd = models.BigIntegerField()
     duration_of_sleep = models.DurationField()
+    email = models.EmailField()
 
     try:
         from django.contrib.postgres.fields import ArrayField, HStoreField, JSONField
@@ -178,10 +183,6 @@ class UnsupportedField(models.Field):
 
 class UnsupportedModel(models.Model):
     unsupported_field = UnsupportedField()
-
-
-class DummyEmailModel(models.Model):
-    email_field = models.EmailField()
 
 
 class DummyGenericForeignKeyModel(models.Model):
