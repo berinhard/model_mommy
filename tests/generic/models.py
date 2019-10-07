@@ -37,7 +37,7 @@ GENDER_CHOICES = [
     ('N', 'non-binary'),
 ]
 
-OCCUPATION_CHOCIES = (
+OCCUPATION_CHOICES = (
     ('Service Industry', (
         ('waitress', 'Waitress'),
         ('bartender', 'Bartender'))),
@@ -78,7 +78,7 @@ class Person(models.Model):
     birth_time = models.TimeField()
     appointment = models.DateTimeField()
     blog = models.URLField()
-    occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOCIES)
+    occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOICES)
     uuid = models.UUIDField(primary_key=False)
     name_hash = models.BinaryField(max_length=16)
     wanted_games_qtd = models.BigIntegerField()
