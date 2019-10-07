@@ -1,23 +1,26 @@
-from django.test import TestCase
+import pytest
 
-from model_mommy.utils import import_if_str
+from model_mommy.utils import import_if_str, import_from_str
 
 from tests.generic.models import User
 
 
-class TestUtils(TestCase):
-
+class TestUtils:
     def test_import_from_str(self):
-        self.assertRaises(AttributeError,
-                          import_if_str, 'tests.generic.UndefinedObject')
-        self.assertRaises(ImportError,
-                          import_if_str, 'tests.generic.undefined_path.User')
-        self.assertEqual(User, import_if_str('tests.generic.models.User'))
+        with pytest.raises(AttributeError):
+            import_from_str('tests.generic.UndefinedObject')
+
+        with pytest.raises(ImportError):
+            import_from_str('tests.generic.undefined_path.User')
+
+        assert import_from_str('tests.generic.models.User') == User
 
     def test_import_if_str(self):
-        self.assertRaises(AttributeError,
-                          import_if_str, 'tests.generic.UndefinedObject')
-        self.assertRaises(ImportError,
-                          import_if_str, 'tests.generic.undefined_path.User')
-        self.assertEqual(User, import_if_str('tests.generic.models.User'))
-        self.assertEqual(User, import_if_str(User))
+        with pytest.raises(AttributeError):
+            import_if_str('tests.generic.UndefinedObject')
+
+        with pytest.raises(ImportError):
+            import_if_str('tests.generic.undefined_path.User')
+
+        assert import_if_str('tests.generic.models.User') == User
+        assert import_if_str(User) == User
