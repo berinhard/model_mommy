@@ -51,8 +51,8 @@ def custom_cfg():
 class TestFillingFromChoice():
 
     def test_if_gender_is_populated_from_choices(self, person):
-        from tests.generic.models import GENDER_CH
-        person.gender in map(lambda x: x[0], GENDER_CH)
+        from tests.generic.models import GENDER_CHOICES
+        person.gender in map(lambda x: x[0], GENDER_CHOICES)
 
     def test_if_oppucation_populated_from_choices(self, person):
         from tests.generic.models import OCCUPATION_CHOCIES

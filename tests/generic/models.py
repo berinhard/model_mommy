@@ -31,7 +31,11 @@ if MOMMY_GIS:
 else:
     from django.db import models
 
-GENDER_CH = [('M', 'male'), ('F', 'female')]
+GENDER_CHOICES = [
+    ('M', 'male'),
+    ('F', 'female'),
+    ('N', 'non-binary'),
+]
 
 OCCUPATION_CHOCIES = (
     ('Service Industry', (
@@ -62,7 +66,7 @@ class PaymentBill(models.Model):
 
 
 class Person(models.Model):
-    gender = models.CharField(max_length=1, choices=GENDER_CH)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     happy = models.BooleanField(default=True)
     unhappy = models.BooleanField(default=False)
     bipolar = models.BooleanField(default=False)
