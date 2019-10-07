@@ -289,7 +289,7 @@ class TestMommyCreatesAssociatedModels():
 
     def test_nullable_many_to_many_is_not_created_even_if_flagged(self):
         classroom = mommy.make(models.Classroom, make_m2m=True)
-        assert classroom.students.count() == 0
+        assert not classroom.students.count()
 
     def test_m2m_changed_signal_is_fired(self):
         # TODO: Use object attrs instead of mocks for Django 1.4 compat
