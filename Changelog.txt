@@ -6,6 +6,7 @@ Development
 - Add validation to `_fill_optional` parameter
 - Add new `_from_manager` parameter to `make` method
 - Clean up obsolete imports
+- Save object instances when handling one to many relations
 
 1.6.0
 -----

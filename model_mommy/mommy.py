@@ -414,7 +414,12 @@ class Mommy(object):
     def _handle_one_to_many(self, instance, attrs):
         for k, v in attrs.items():
             manager = getattr(instance, k)
-            manager.set(v, clear=True)
+
+            try:
+                manager.set(v, bulk=False, clear=True)
+            except TypeError:
+                # for many-to-many relationships the bulk keyword argument doesn't exist
+                manager.set(v, clear=True)
 
     def _handle_m2m(self, instance):
         for key, values in self.m2m_dict.items():

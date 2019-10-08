@@ -123,6 +123,12 @@ class GuardDog(Dog):
     pass
 
 
+class Home(models.Model):
+    address = models.CharField(max_length=200)
+    owner = models.ForeignKey('Person', on_delete=models.CASCADE)
+    dogs = models.ManyToManyField('Dog')
+
+
 class LonelyPerson(models.Model):
     only_friend = models.OneToOneField(Person, on_delete=models.CASCADE)
 
