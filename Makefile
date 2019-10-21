@@ -3,7 +3,7 @@ help:
 	@cat Makefile | egrep '^(\w+?):' | sed 's/:\(.*\)//g' | sed 's/^/- /g'
 
 test:
-	@python runtests.py
+	@python -m pytest
 
 release:
 	@python setup.py sdist bdist_wheel upload

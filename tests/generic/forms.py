@@ -1,7 +1,8 @@
 from django.forms import ModelForm
 
 
-from test.generic.models import DummyGenericIPAddressFieldModel
+from tests.generic.models import DummyGenericIPAddressFieldModel
+
 
 class DummyGenericIPAddressFieldForm(ModelForm):
     class Meta:

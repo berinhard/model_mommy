@@ -1,6 +1,8 @@
 -r requirements.txt
-mock>=1.0.1
+pillow
+pre-commit
+pytest
+pytest-django
 sphinx
-django-test-without-migrations==0.6
-wheel
 tox
+wheel

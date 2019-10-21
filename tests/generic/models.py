@@ -1,41 +1,43 @@
-# coding: utf-8
-
-from __future__ import absolute_import
-
 #######################################
 # TESTING PURPOSE ONLY MODELS!!       #
 # DO NOT ADD THE APP TO INSTALLED_APPS#
 #######################################
+import datetime as base_datetime
 from decimal import Decimal
 from tempfile import gettempdir
 
 from model_mommy.gis import MOMMY_GIS
 
-if MOMMY_GIS:
-    from django.contrib.gis.db import models
-else:
-    from django.db import models
 from django.core.files.storage import FileSystemStorage
 
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation, GenericForeignKey
 
-from .fields import CustomFieldWithGenerator, CustomFieldWithoutGenerator, FakeListField, CustomForeignKey
-
+from .fields import (
+    CustomFieldWithGenerator, CustomFieldWithoutGenerator, FakeListField, CustomForeignKey
+)
 from model_mommy.timezone import smart_datetime as datetime
-import datetime as base_datetime
 
 # check whether or not PIL is installed
 try:
-    from PIL import ImageFile as PilImageFile
+    from PIL import ImageFile as PilImageFile  # NoQA
 except ImportError:
     has_pil = False
 else:
     has_pil = True
 
-GENDER_CH = [('M', 'male'), ('F', 'female')]
+if MOMMY_GIS:
+    from django.contrib.gis.db import models
+else:
+    from django.db import models
 
-OCCUPATION_CHOCIES = (
+GENDER_CHOICES = [
+    ('M', 'male'),
+    ('F', 'female'),
+    ('N', 'non-binary'),
+]
+
+OCCUPATION_CHOICES = (
     ('Service Industry', (
         ('waitress', 'Waitress'),
         ('bartender', 'Bartender'))),
@@ -64,7 +66,7 @@ class PaymentBill(models.Model):
 
 
 class Person(models.Model):
-    gender = models.CharField(max_length=1, choices=GENDER_CH)
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     happy = models.BooleanField(default=True)
     unhappy = models.BooleanField(default=False)
     bipolar = models.BooleanField(default=False)
@@ -76,57 +78,24 @@ class Person(models.Model):
     birth_time = models.TimeField()
     appointment = models.DateTimeField()
     blog = models.URLField()
-    occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOCIES)
-    try:
-        uuid = models.UUIDField(primary_key=False)
-    except AttributeError:
-        # New at Django 1.9
-        pass
-    try:
-        name_hash = models.BinaryField(max_length=16)
-    except AttributeError:
-        # We can't test the binary field if it is not supported
-        # (django < 1,6)
-        pass
-    try:
-        from django.contrib.postgres.fields import ArrayField
-        acquaintances = ArrayField(models.IntegerField())
-    except ImportError:
-        # New at Django 1.9
-        pass
+    occupation = models.CharField(max_length=10, choices=OCCUPATION_CHOICES)
+    uuid = models.UUIDField(primary_key=False)
+    name_hash = models.BinaryField(max_length=16)
+    wanted_games_qtd = models.BigIntegerField()
+    duration_of_sleep = models.DurationField()
+    email = models.EmailField()
 
     try:
-        from django.contrib.postgres.fields import JSONField
-        data = JSONField()
-    except ImportError:
-        # New at Django 1.9
-        pass
-
-    try:
-        from django.contrib.postgres.fields import HStoreField
-        hstore_data = HStoreField()
-    except ImportError:
-        # New at Django 1.8
-        pass
-
-    # backward compatibility with Django 1.1
-    try:
-        wanted_games_qtd = models.BigIntegerField()
-    except AttributeError:
-        wanted_games_qtd = models.IntegerField()
-
-    try:
+        from django.contrib.postgres.fields import ArrayField, HStoreField, JSONField
         from django.contrib.postgres.fields.citext import CICharField, CIEmailField, CITextField
+        acquaintances = ArrayField(models.IntegerField())
+        data = JSONField()
+        hstore_data = HStoreField()
         ci_char = CICharField(max_length=30)
         ci_email = CIEmailField()
         ci_text = CITextField()
     except ImportError:
-        # New at Django 1.11
-        pass
-
-    try:
-        duration_of_sleep = models.DurationField()
-    except AttributeError:
+        # Skip PostgreSQL-related fields
         pass
 
     if MOMMY_GIS:
@@ -152,6 +121,12 @@ class Dog(models.Model):
 
 class GuardDog(Dog):
     pass
+
+
+class Home(models.Model):
+    address = models.CharField(max_length=200)
+    owner = models.ForeignKey('Person', on_delete=models.CASCADE)
+    dogs = models.ManyToManyField('Dog')
 
 
 class LonelyPerson(models.Model):
@@ -189,10 +164,7 @@ class DummyEmptyModel(models.Model):
 class DummyIntModel(models.Model):
     int_field = models.IntegerField()
     small_int_field = models.SmallIntegerField()
-    try:
-        big_int_field = models.BigIntegerField()
-    except AttributeError:
-        big_int_field = models.IntegerField()
+    big_int_field = models.BigIntegerField()
 
 
 class DummyPositiveIntModel(models.Model):
@@ -219,10 +191,6 @@ class UnsupportedModel(models.Model):
     unsupported_field = UnsupportedField()
 
 
-class DummyEmailModel(models.Model):
-    email_field = models.EmailField()
-
-
 class DummyGenericForeignKeyModel(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -234,7 +202,11 @@ class DummyGenericRelationModel(models.Model):
 
 
 class DummyNullFieldsModel(models.Model):
-    null_foreign_key = models.ForeignKey('DummyBlankFieldsModel', null=True, on_delete=models.CASCADE)
+    null_foreign_key = models.ForeignKey(
+        'DummyBlankFieldsModel',
+        null=True,
+        on_delete=models.CASCADE
+    )
     null_integer_field = models.IntegerField(null=True)
 
 
@@ -332,6 +304,24 @@ class Movie(models.Model):
     title = models.CharField(max_length=30)
 
 
+class MovieManager(models.Manager):
+    def get_queryset(self):
+        '''Annotate queryset with an alias field 'name'.
+
+        We want to test whether this annotation has been run after
+        calling mommy.make().
+
+        '''
+        return (
+            super(MovieManager, self).get_queryset()
+            .annotate(name=models.F('title'))
+        )
+
+
+class MovieWithAnnotation(Movie):
+    objects = MovieManager()
+
+
 class CastMember(models.Model):
     movie = models.ForeignKey(Movie, related_name='cast_members', on_delete=models.CASCADE)
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -341,3 +331,14 @@ class DummyGenericIPAddressFieldModel(models.Model):
     ipv4_field = models.GenericIPAddressField(protocol='IPv4')
     ipv6_field = models.GenericIPAddressField(protocol='IPv6')
     ipv46_field = models.GenericIPAddressField(protocol='both')
+
+
+class AbstractModel(models.Model):
+    class Meta(object):
+        abstract = True
+
+    name = models.CharField(max_length=30)
+
+
+class SubclassOfAbstract(AbstractModel):
+    height = models.IntegerField()

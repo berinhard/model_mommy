@@ -1,39 +1,15 @@
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import (
-    CharField, EmailField, SlugField, TextField, URLField,
-    DateField, DateTimeField, TimeField,
-    IntegerField, SmallIntegerField, PositiveIntegerField,
-    PositiveSmallIntegerField, BooleanField, DecimalField,
-    FloatField, FileField, ImageField, IPAddressField,
-    ForeignKey, ManyToManyField, OneToOneField, NullBooleanField)
+    BigIntegerField, BinaryField, BooleanField, CharField, DateField, DateTimeField, DecimalField,
+    DurationField, EmailField, FileField, FloatField, ForeignKey, GenericIPAddressField,
+    ImageField, IntegerField, IPAddressField, ManyToManyField, NullBooleanField, OneToOneField,
+    PositiveIntegerField, PositiveSmallIntegerField, SlugField, SmallIntegerField, TextField,
+    TimeField, URLField, UUIDField
+)
 
+from . import random_gen
 from .gis import default_gis_mapping
 from .utils import import_if_str
-
-try:
-    from django.db.models import BigIntegerField
-except ImportError:
-    BigIntegerField = IntegerField
-
-try:
-    from django.db.models import GenericIPAddressField
-except ImportError:
-    GenericIPAddressField = IPAddressField
-
-try:
-    from django.db.models import BinaryField
-except ImportError:
-    BinaryField = None
-
-try:
-    from django.db.models import DurationField
-except ImportError:
-    DurationField = None
-
-try:
-    from django.db.models import UUIDField
-except ImportError:
-    UUIDField = None
 
 try:
     from django.contrib.postgres.fields import ArrayField
@@ -57,7 +33,6 @@ except ImportError:
     CIEmailField = None
     CITextField = None
 
-from . import random_gen
 
 default_mapping = {
     ForeignKey: random_gen.gen_related,
@@ -70,15 +45,17 @@ default_mapping = {
     BigIntegerField: random_gen.gen_integer,
     SmallIntegerField: random_gen.gen_integer,
 
-    PositiveIntegerField: lambda: random_gen.gen_integer(0),
-    PositiveSmallIntegerField: lambda: random_gen.gen_integer(0),
+    PositiveIntegerField: lambda: random_gen.gen_integer(min_int=0),
+    PositiveSmallIntegerField: lambda: random_gen.gen_integer(min_int=0),
 
     FloatField: random_gen.gen_float,
     DecimalField: random_gen.gen_decimal,
 
+    BinaryField: random_gen.gen_byte_string,
     CharField: random_gen.gen_string,
     TextField: random_gen.gen_text,
     SlugField: random_gen.gen_slug,
+    UUIDField: random_gen.gen_uuid,
 
     DateField: random_gen.gen_date,
     DateTimeField: random_gen.gen_datetime,
@@ -90,16 +67,11 @@ default_mapping = {
     GenericIPAddressField: random_gen.gen_ip,
     FileField: random_gen.gen_file_field,
     ImageField: random_gen.gen_image_field,
+    DurationField: random_gen.gen_interval,
 
     ContentType: random_gen.gen_content_type,
 }
 
-if BinaryField:
-    default_mapping[BinaryField] = random_gen.gen_byte_string
-if DurationField:
-    default_mapping[DurationField] = random_gen.gen_interval
-if UUIDField:
-    default_mapping[UUIDField] = random_gen.gen_uuid
 if ArrayField:
     default_mapping[ArrayField] = random_gen.gen_array
 if JSONField:
