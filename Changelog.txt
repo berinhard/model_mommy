@@ -3,7 +3,7 @@ Development
 
 2.0.0
 -----
-- Discontinue the lib and migrate to model_bakery
+- Discontinue the lib and migrate to https://github.com/model-bakers/model_bakery
 - Use default value for unknown field types
 - Enable seq method to be imported directly from model_mommy
 - Stick to Django's roadmap (https://www.djangoproject.com/download/)
